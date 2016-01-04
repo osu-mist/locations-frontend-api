@@ -1,11 +1,11 @@
-package edu.oregonstate.mist.webapiskeleton
+package edu.oregonstate.mist.locations.frontend
 
 import edu.oregonstate.mist.api.Configuration
 import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.api.InfoResource
 import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.api.BasicAuthenticator
-import edu.oregonstate.mist.webapiskeleton.resources.SampleResource
+import edu.oregonstate.mist.locations.frontend.resources.SampleResource
 import io.dropwizard.Application
 import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
@@ -15,7 +15,7 @@ import io.dropwizard.auth.basic.BasicAuthFactory
 /**
  * Main application class.
  */
-class SkeletonApplication extends Application<Configuration> {
+class LocationsFrontEndApplication extends Application<Configuration> {
     /**
      * Initializes application bootstrap.
      *
@@ -39,7 +39,7 @@ class SkeletonApplication extends Application<Configuration> {
                 AuthFactory.binder(
                         new BasicAuthFactory<AuthenticatedUser>(
                                 new BasicAuthenticator(configuration.getCredentialsList()),
-                                'SkeletonApplication',
+                                'LocationsFrontEndApplication',
                                 AuthenticatedUser.class)))
     }
 
@@ -50,6 +50,6 @@ class SkeletonApplication extends Application<Configuration> {
      * @throws Exception
      */
     public static void main(String[] arguments) throws Exception {
-        new SkeletonApplication().run(arguments)
+        new LocationsFrontEndApplication().run(arguments)
     }
 }
