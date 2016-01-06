@@ -23,11 +23,9 @@ class LocationResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
 
     private final Map<String, String> locationConfiguration
-    final Client client
 
-    LocationResource(Map<String, String> locationConfiguration, Client client) {
+    LocationResource(Map<String, String> locationConfiguration) {
         this.locationConfiguration = locationConfiguration
-        this.client = client
     }
 
     @GET
@@ -62,9 +60,7 @@ class LocationResource {
     @Path('{id}')
     Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
         def esFullUrl = getESFullUrl()
-        String esResponse = client.target( esFullUrl + "/${id}/_source")
-                .request(MediaType.TEXT_PLAIN_TYPE)
-                .get(String.class)
+        String esResponse = new URL(esFullUrl + "/${id}/_source").getText()
 
         if (!esResponse) {
             throw new WebApplicationException(Response.Status.NOT_FOUND)

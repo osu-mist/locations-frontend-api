@@ -8,7 +8,6 @@ import edu.oregonstate.mist.api.BasicAuthenticator
 import edu.oregonstate.mist.locations.frontend.resources.LocationResource
 import edu.oregonstate.mist.locations.frontend.resources.SampleResource
 import io.dropwizard.Application
-import io.dropwizard.client.JerseyClientBuilder
 import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
 import io.dropwizard.auth.AuthFactory
@@ -39,9 +38,7 @@ class LocationsFrontEndApplication extends Application<LocationConfiguration> {
         Resource.loadProperties('resource.properties')
         environment.jersey().register(new SampleResource())
         environment.jersey().register(new InfoResource())
-        final Client client = new JerseyClientBuilder(environment).using(configuration.getJerseyClientConfiguration())
-                .build(getName())
-        environment.jersey().register(new LocationResource(configuration.locationsConfiguration, client))
+        environment.jersey().register(new LocationResource(configuration.locationsConfiguration))
 
         environment.jersey().register(
                 AuthFactory.binder(
