@@ -16,13 +16,30 @@ import javax.ws.rs.WebApplicationException
 import javax.ws.rs.client.Client
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
+import java.util.regex.Pattern
 
 @Path("/locations")
 @Produces(MediaType.APPLICATION_JSON)
 class LocationResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
+    public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis"]
+    public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
 
     private final Map<String, String> locationConfiguration
+
+    private static final Pattern illegalCharacterPattern = Pattern.compile(
+            '''(?x)       # this extended regex defines
+               (?!        # any character that is not
+                  [
+                   a-zA-Z # a letter,
+                   0-9    # a number,
+                   -      # a hyphen,
+                   _      # an underscore,
+                   \\.    # a period, or
+                   @      # an at sign
+                  ])
+               .          # to be an illegal character.
+            ''')
 
     LocationResource(Map<String, String> locationConfiguration) {
         this.locationConfiguration = locationConfiguration
@@ -33,12 +50,19 @@ class LocationResource {
     @Timed
     Response list(@QueryParam('q') String q, @QueryParam('campus') String campus, @QueryParam('type') String type,
                   @Auth AuthenticatedUser authenticatedUser) {
-        //@todo: sanitize input
-        //@todo: validate campus & type
         //@todo: pagination
-        def trimmedQ = q?.trim()
-        def trimmedCampus = campus?.trim()
-        def trimmedType = type?.trim()
+        def trimmedQ = sanitize(q?.trim())
+        def trimmedCampus = sanitize(campus?.trim())
+        def trimmedType = sanitize(type?.trim())
+
+        if (trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND)
+        }
+
+        if (trimmedType && !ALLOWED_TYPES.contains(trimmedType)) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND)
+        }
+
         def query = [ "match_all": [:] ]
         def esFullUrl = getESFullUrl()
 
@@ -143,5 +167,19 @@ class LocationResource {
 
         esQuery.query.filtered.query = query
         esQuery
+    }
+
+    /**
+     * Sanitizes the search query string by replacing illegal characters with spaces.
+     *
+     * @param searchQuery
+     * @return sanitized search query
+     */
+    private static String sanitize(String searchQuery) {
+        if (!searchQuery) {
+            return ""
+        }
+
+        illegalCharacterPattern.matcher(searchQuery).replaceAll(' ')
     }
 }
