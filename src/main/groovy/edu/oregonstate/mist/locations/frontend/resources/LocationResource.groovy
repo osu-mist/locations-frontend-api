@@ -13,9 +13,11 @@ import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
 import javax.ws.rs.WebApplicationException
-import javax.ws.rs.client.Client
+import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.MultivaluedMap
 import javax.ws.rs.core.Response
+import javax.ws.rs.core.UriInfo
 import java.util.regex.Pattern
 
 @Path("/locations")
@@ -24,6 +26,21 @@ class LocationResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis"]
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
+
+    /**
+     * Default page number used in pagination
+     * @todo: should this be coming from skeleton or configuration file?
+     */
+    public static final Integer DEFAULT_PAGE_NUMBER = 1
+
+    /**
+     * Default page size used in pagination
+     * @todo: should this be coming from skeleton or configuration file?
+     */
+    public static final Integer DEFAULT_PAGE_SIZE = 10
+
+    @Context
+    UriInfo uriInfo
 
     private final Map<String, String> locationConfiguration
 
@@ -50,7 +67,9 @@ class LocationResource {
     @Timed
     Response list(@QueryParam('q') String q, @QueryParam('campus') String campus, @QueryParam('type') String type,
                   @Auth AuthenticatedUser authenticatedUser) {
-        //@todo: pagination
+
+        def pageNumber = getPageNumber()
+        def pageSize = getPageSize()
         def trimmedQ = sanitize(q?.trim())
         def trimmedCampus = sanitize(campus?.trim())
         def trimmedType = sanitize(type?.trim())
@@ -66,7 +85,7 @@ class LocationResource {
         def query = [ "match_all": [:] ]
         def esFullUrl = getESFullUrl()
 
-        def esQuery = getESSearchQuery(trimmedCampus, trimmedType, trimmedQ, query)
+        def esQuery = getESSearchQuery(trimmedCampus, trimmedType, trimmedQ, pageNumber, pageSize, query)
         ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
         String esQueryJson = mapper.writeValueAsString(esQuery)
 
@@ -134,10 +153,13 @@ class LocationResource {
      * @param trimmedCampus
      * @param trimmedType
      * @param trimmedQ
+     * @param pageNumber
+     * @param pageSize
      * @param query
      * @return
      */
-    private def getESSearchQuery(String trimmedCampus, String trimmedType, String trimmedQ, def query) {
+    private def getESSearchQuery(String trimmedCampus, String trimmedType, String trimmedQ, int pageNumber,
+                                 int pageSize, def query) {
         def esQuery = [
                 "query": [
                     "filtered": [
@@ -149,8 +171,8 @@ class LocationResource {
                         "query" : [:]
                     ]
                 ],
-                "from" : 0,
-                "size" : 10
+                "from" : (pageNumber - 1) * pageSize,
+                "size" : pageSize
         ]
 
         if (trimmedCampus) {
@@ -181,5 +203,59 @@ class LocationResource {
         }
 
         illegalCharacterPattern.matcher(searchQuery).replaceAll(' ')
+    }
+
+    /**
+     * Returns the value for an array parameter in the GET string.
+     *
+     * The JSONAPI format reserves the page parameter for pagination. This API uses page[size] and page[number].
+     * This function allows us to get just value for a specific parameter in an array.
+     *
+     * @param key
+     * @param index
+     * @param queryParameters
+     * @return
+     */
+    public static String getArrayParameter(String key, String index,  MultivaluedMap<String, String> queryParameters) {
+        // @todo: this function should probably be moved to the skeleton
+        for (Map.Entry<String, List<String>> entry : queryParameters.entrySet()) {
+            // not an array parameter
+            if (!entry.key.contains("[") && !entry.key.contains("]")) {
+                continue
+            }
+
+            int a = entry.key.indexOf('[')
+            int b = entry.key.indexOf(']')
+
+            if (entry.key.substring(0, a).equals(key)) {
+                if (entry.key.substring(a + 1, b).equals(index)) {
+                    return entry.value?.get(0)
+                }
+            }
+        }
+
+        null
+    }
+
+    private Integer getPageNumber() {
+        def pageNumber = getArrayParameter("page", "number", uriInfo.getQueryParameters())
+        if (!pageNumber || !pageNumber.isInteger()) {
+            return DEFAULT_PAGE_NUMBER
+        }
+
+        pageNumber.toInteger()
+    }
+
+    /**
+     * Returns the
+     * @return
+     */
+    private Integer getPageSize() {
+        def pageSize = getArrayParameter("page", "size", uriInfo.getQueryParameters())
+        if (!pageSize || !pageSize.isInteger()) {
+            return DEFAULT_PAGE_SIZE
+        }
+
+        pageSize.toInteger()
     }
 }
