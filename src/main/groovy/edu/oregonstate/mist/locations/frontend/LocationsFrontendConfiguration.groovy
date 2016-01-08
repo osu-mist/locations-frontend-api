@@ -8,7 +8,7 @@ import io.dropwizard.client.JerseyClientConfiguration
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
-class LocationConfiguration extends Configuration {
+class LocationsFrontendConfiguration extends Configuration {
     @JsonProperty('authentication')
     @NotNull
     @Valid

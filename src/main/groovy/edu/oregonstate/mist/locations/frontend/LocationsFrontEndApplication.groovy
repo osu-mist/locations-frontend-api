@@ -19,7 +19,7 @@ import javax.ws.rs.client.Client
 /**
  * Main application class.
  */
-class LocationsFrontEndApplication extends Application<LocationConfiguration> {
+class LocationsFrontEndApplication extends Application<LocationsFrontendConfiguration> {
     /**
      * Initializes application bootstrap.
      *
@@ -35,7 +35,7 @@ class LocationsFrontEndApplication extends Application<LocationConfiguration> {
      * @param environment
      */
     @Override
-    public void run(LocationConfiguration configuration, Environment environment) {
+    public void run(LocationsFrontendConfiguration configuration, Environment environment) {
         Resource.loadProperties('resource.properties')
         environment.jersey().register(new SampleResource())
         environment.jersey().register(new InfoResource())
