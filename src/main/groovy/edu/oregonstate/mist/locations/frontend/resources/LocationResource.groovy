@@ -118,9 +118,9 @@ class LocationResource {
      * @return
      */
     private GString getESFullUrl() {
-        def esUrl = locationConfiguration.get("esUrl")
-        def esIndex = locationConfiguration.get("esIndex")
-        def esType = locationConfiguration.get("estype")
+        String esUrl = locationConfiguration.get("esUrl")
+        String esIndex = locationConfiguration.get("esIndex")
+        String esType = locationConfiguration.get("estype")
         "${esUrl}/${esIndex}/${esType}"
     }
 
