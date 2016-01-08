@@ -1,9 +1,9 @@
 package edu.oregonstate.mist.locations.frontend.resources
 
 import com.codahale.metrics.annotation.Timed
-import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.api.Resource
+import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import io.dropwizard.auth.Auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -24,6 +24,7 @@ import java.util.regex.Pattern
 @Produces(MediaType.APPLICATION_JSON)
 class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
+
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis"]
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
 
@@ -39,10 +40,10 @@ class LocationResource extends Resource {
      */
     public static final Integer DEFAULT_PAGE_SIZE = 10
 
+    private final LocationDAO locationDAO
+
     @Context
     UriInfo uriInfo
-
-    private final Map<String, String> locationConfiguration
 
     private static final Pattern illegalCharacterPattern = Pattern.compile(
             '''(?x)       # this extended regex defines
@@ -58,8 +59,8 @@ class LocationResource extends Resource {
                .          # to be an illegal character.
             ''')
 
-    LocationResource(Map<String, String> locationConfiguration) {
-        this.locationConfiguration = locationConfiguration
+    LocationResource(LocationDAO locationDAO) {
+        this.locationDAO = locationDAO
     }
 
     @GET
@@ -80,18 +81,8 @@ class LocationResource extends Resource {
             return notFound().build()
         }
 
-        // generate ES query to search for locations
-        def query = [ "match_all": [:] ]
-        def esFullUrl = getESFullUrl()
-        def esQuery = getESSearchQuery(trimmedCampus, trimmedType, trimmedQ, pageNumber, pageSize, query)
-        ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-        String esQueryJson = mapper.writeValueAsString(esQuery)
-
-        // get data from ES
-        def url = new URL(esFullUrl + "/_search")
-        URLConnection connection = postRequest(url, esQueryJson)
-
-        ok(connection.content.text).build()
+        String result = locationDAO.search(trimmedQ, trimmedCampus, trimmedType, pageNumber, pageSize)
+        ok(result).build()
     }
 
     @GET
@@ -99,93 +90,13 @@ class LocationResource extends Resource {
     @Timed
     @Path('{id}')
     Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
-        def esFullUrl = getESFullUrl()
-        String esResponse = new URL(esFullUrl + "/${id}/_source").getText()
+        String esResponse  = locationDAO.getById(id)
 
         if (!esResponse) {
             return notFound().build()
         }
 
         ok(esResponse).build()
-    }
-
-    /**
-     * Returns url of elastic search collection and type to search.
-     *
-     * @return
-     */
-    private GString getESFullUrl() {
-        String esUrl = locationConfiguration.get("esUrl")
-        String esIndex = locationConfiguration.get("esIndex")
-        String esType = locationConfiguration.get("estype")
-        "${esUrl}/${esIndex}/${esType}"
-    }
-
-    /**
-     * Performs POST request.
-     *
-     * This groovy approach is used instead of jerseyClient because jersey client kept
-     * throwing no response errors.
-     *
-     * @param url
-     * @param esQueryJson
-     * @return
-     */
-    private URLConnection postRequest(URL url, String esQueryJson) {
-        def connection = url.openConnection()
-        connection.setRequestMethod("POST")
-        connection.doOutput = true
-
-        def writer = new OutputStreamWriter(connection.outputStream)
-        writer.write(esQueryJson)
-        writer.flush()
-        writer.close()
-        connection.connect()
-        connection
-    }
-
-    /**
-     * Generate ElasticSearch query to list locations by campus, type and full text search.
-     *
-     * @param trimmedCampus
-     * @param trimmedType
-     * @param trimmedQ
-     * @param pageNumber
-     * @param pageSize
-     * @param query
-     * @return
-     */
-    private def getESSearchQuery(String trimmedCampus, String trimmedType, String trimmedQ, int pageNumber,
-                                 int pageSize, def query) {
-        def esQuery = [
-                "query": [
-                    "filtered": [
-                        "filter": [
-                            "bool": [
-                                "must": []
-                            ]
-                        ],
-                        "query" : [:]
-                    ]
-                ],
-                "from" : (pageNumber - 1) * pageSize,
-                "size" : pageSize
-        ]
-
-        if (trimmedCampus) {
-            esQuery.query.filtered.filter.bool.must += ["term": ["attributes.campus": trimmedCampus]]
-        }
-
-        if (trimmedType) {
-            esQuery.query.filtered.filter.bool.must += ["term": ["attributes.type": trimmedType]]
-        }
-
-        if (trimmedQ) {
-            query = ["query_string": ["query": trimmedQ]]
-        }
-
-        esQuery.query.filtered.query = query
-        esQuery
     }
 
     /**
@@ -196,10 +107,10 @@ class LocationResource extends Resource {
      */
     private static String sanitize(String searchQuery) {
         if (!searchQuery) {
-            return ""
+            return null
         }
 
-        illegalCharacterPattern.matcher(searchQuery).replaceAll(' ')
+        illegalCharacterPattern?.matcher(searchQuery)?.replaceAll(' ')
     }
 
     /**
