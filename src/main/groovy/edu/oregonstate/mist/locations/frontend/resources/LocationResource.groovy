@@ -3,6 +3,7 @@ package edu.oregonstate.mist.locations.frontend.resources
 import com.codahale.metrics.annotation.Timed
 import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.AuthenticatedUser
+import edu.oregonstate.mist.api.Resource
 import io.dropwizard.auth.Auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,7 +13,6 @@ import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
-import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.MultivaluedMap
@@ -22,7 +22,7 @@ import java.util.regex.Pattern
 
 @Path("/locations")
 @Produces(MediaType.APPLICATION_JSON)
-class LocationResource {
+class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis"]
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
@@ -67,34 +67,31 @@ class LocationResource {
     @Timed
     Response list(@QueryParam('q') String q, @QueryParam('campus') String campus, @QueryParam('type') String type,
                   @Auth AuthenticatedUser authenticatedUser) {
-
         def pageNumber = getPageNumber()
         def pageSize = getPageSize()
         def trimmedQ = sanitize(q?.trim())
         def trimmedCampus = sanitize(campus?.trim())
         def trimmedType = sanitize(type?.trim())
 
-        if (trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND)
+        // validate filtering parameters
+        def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
+        def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
+        if (invalidCampus || invalidType) {
+            return notFound().build()
         }
 
-        if (trimmedType && !ALLOWED_TYPES.contains(trimmedType)) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND)
-        }
-
+        // generate ES query to search for locations
         def query = [ "match_all": [:] ]
         def esFullUrl = getESFullUrl()
-
         def esQuery = getESSearchQuery(trimmedCampus, trimmedType, trimmedQ, pageNumber, pageSize, query)
         ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
         String esQueryJson = mapper.writeValueAsString(esQuery)
 
+        // get data from ES
         def url = new URL(esFullUrl + "/_search")
         URLConnection connection = postRequest(url, esQueryJson)
 
-        def esReponse = connection.content.text
-
-        Response.ok(esReponse).build()
+        ok(connection.content.text).build()
     }
 
     @GET
@@ -106,10 +103,10 @@ class LocationResource {
         String esResponse = new URL(esFullUrl + "/${id}/_source").getText()
 
         if (!esResponse) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND)
+            return notFound().build()
         }
 
-        Response.ok(esResponse).build()
+        ok(esResponse).build()
     }
 
     /**
