@@ -31,7 +31,7 @@ class LocationResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
-    @Path('{id}')
+    @Path('{id: [0-9a-z]+}')
     Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
         def esUrl = locationConfiguration.get("esUrl")
         def esIndex = locationConfiguration.get("esIndex")
