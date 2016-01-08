@@ -234,6 +234,11 @@ class LocationResource extends Resource {
         null
     }
 
+    /**
+     *  Returns the page number used by pagination. The value of: page[number] in the url.
+     *
+     * @return
+     */
     private Integer getPageNumber() {
         def pageNumber = getArrayParameter("page", "number", uriInfo.getQueryParameters())
         if (!pageNumber || !pageNumber.isInteger()) {
@@ -244,7 +249,8 @@ class LocationResource extends Resource {
     }
 
     /**
-     * Returns the
+     * Returns the page size used by pagination. The value of: page[size] in the url.
+     *
      * @return
      */
     private Integer getPageSize() {
