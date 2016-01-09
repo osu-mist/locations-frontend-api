@@ -5,17 +5,21 @@ import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.api.InfoResource
 import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.api.BasicAuthenticator
+import edu.oregonstate.mist.locations.frontend.resources.LocationResource
 import edu.oregonstate.mist.locations.frontend.resources.SampleResource
 import io.dropwizard.Application
+import io.dropwizard.client.JerseyClientBuilder
 import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
 import io.dropwizard.auth.AuthFactory
 import io.dropwizard.auth.basic.BasicAuthFactory
 
+import javax.ws.rs.client.Client
+
 /**
  * Main application class.
  */
-class LocationsFrontEndApplication extends Application<Configuration> {
+class LocationsFrontEndApplication extends Application<LocationsFrontendConfiguration> {
     /**
      * Initializes application bootstrap.
      *
@@ -31,10 +35,14 @@ class LocationsFrontEndApplication extends Application<Configuration> {
      * @param environment
      */
     @Override
-    public void run(Configuration configuration, Environment environment) {
+    public void run(LocationsFrontendConfiguration configuration, Environment environment) {
         Resource.loadProperties('resource.properties')
         environment.jersey().register(new SampleResource())
         environment.jersey().register(new InfoResource())
+        final Client client = new JerseyClientBuilder(environment).using(configuration.getJerseyClientConfiguration())
+                .build(getName())
+        environment.jersey().register(new LocationResource(configuration.locationsConfiguration, client))
+
         environment.jersey().register(
                 AuthFactory.binder(
                         new BasicAuthFactory<AuthenticatedUser>(
