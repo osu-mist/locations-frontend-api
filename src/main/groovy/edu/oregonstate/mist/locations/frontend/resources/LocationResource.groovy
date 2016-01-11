@@ -177,13 +177,16 @@ class LocationResource extends Resource {
     @Timed
     @Path('{id: [0-9a-z]+}')
     Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
+        ResultObject resultObject = new ResultObject()
         String esResponse  = locationDAO.getById(id)
 
         if (!esResponse) {
             return notFound().build()
         }
 
-        ok(esResponse).build()
+        ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
+        resultObject.data = mapper.readValue(esResponse, Object.class)
+        ok(resultObject).build()
     }
 
     /**
