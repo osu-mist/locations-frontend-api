@@ -43,38 +43,7 @@ authentication:
   - username: username
     password: password
 
-#
-## Example Oracle configuration
-#
-#database:
-#  driverClass: oracle.jdbc.OracleDriver
-#  url: jdbc:oracle:thin:@(DESCRIPTION=(LOAD_BALANCE=ON) (ADDRESS=(PROTOCOL=TCP)(Host=db1.example.com)(Port=1521)) (ADDRESS=(PROTOCOL=TCP)(Host=db2.example.com)(Port=1521)) (CONNECT_DATA=(SERVICE_NAME=example.db)))
-#  user: Username
-#  password: Password
-#  abandonWhenPercentageFull: 0
-#  alternateUsernamesAllowed: false
-#  commitOnReturn: false
-#  autoCommitByDefault: true
-#  readOnlyByDefault: false
-#  properties:
-#    hibernate.dialect: org.hibernate.dialect.Oracle10gDialect
-#  defaultCatalog: # none
-#  defaultTransactionIsolation: default
-#  useFairQueue: true
-#  initialSize: 10
-#  minSize: 10
-#  maxSize: 20
-#  initializationQuery: # none
-#  logAbandonedConnections: true
-#  logValidationErrors: true
-#  maxConnectionAge: # none
-#  maxWaitForConnection: 1 # second
-#  minIdleTime: 1 # minute
-#  validationQuery: "SELECT 1 FROM dual"
-#  validationQueryTimeout: # none
-#  checkConnectionWhileIdle: true
-#  checkConnectionOnConnect: false
-#  checkConnectionOnReturn: false
-#  autoCommentsEnabled: true
-#  evictionInterval: 5 # seconds
-#  validationInterval: 30 # seconds
+locations:
+  esUrl: http://elastic-search-url.example.com
+  esIndex: elastic-search-index
+  estype: elastic-search-type
