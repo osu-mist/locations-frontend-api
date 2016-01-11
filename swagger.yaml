@@ -173,6 +173,26 @@ definitions:
         type: string
       type:
         type: string
+      open_hours:
+        type: array
+        items:
+          $ref: "#/definitions/DayHours"
+
+  DayHours:
+    properties:
+      day:
+        type: int32
+      hours:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      
+  TimeSlot:
+    properties:
+      start:
+        type: string
+      end:
+        type: string
         
   Links:
     properties:
@@ -202,4 +222,3 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/Error"
-      
