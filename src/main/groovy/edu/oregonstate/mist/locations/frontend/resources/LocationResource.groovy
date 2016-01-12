@@ -73,8 +73,8 @@ class LocationResource extends Resource {
     Response list(@QueryParam('q') String q, @QueryParam('campus') String campus, @QueryParam('type') String type,
                   @Auth AuthenticatedUser authenticatedUser) {
         def trimmedQ = sanitize(q?.trim())
-        def trimmedCampus = sanitize(campus?.trim())
-        def trimmedType = sanitize(type?.trim())
+        def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
+        def trimmedType = sanitize(type?.trim()?.toLowerCase())
 
         // validate filtering parameters
         def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
@@ -175,7 +175,7 @@ class LocationResource extends Resource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
-    @Path('{id: [0-9a-z]+}')
+    @Path('{id: [0-9a-zA-Z]+}')
     Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
         ResultObject resultObject = new ResultObject()
         String esResponse  = locationDAO.getById(id)
