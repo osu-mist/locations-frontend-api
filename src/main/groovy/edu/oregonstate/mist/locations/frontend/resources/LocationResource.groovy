@@ -127,25 +127,32 @@ class LocationResource extends Resource {
 
         Integer pageNumber = getPageNumber()
         Integer pageSize = getPageSize()
-        def map = ["q": q, "type": type, "campus": campus, "pageSize": pageSize, "pageNumber": pageNumber]
+        def urlParams = [
+                "q": q,
+                "type": type,
+                "campus": campus,
+                "pageSize": pageSize,
+                "pageNumber": pageNumber
+        ]
+
         int lastPage = Math.ceil(totalHits / pageSize)
 
-        resultObject.links["self"] = getPaginationUrl(map)
-        map.pageNumber = 1
-        resultObject.links["first"] = getPaginationUrl(map)
-        map.pageNumber = lastPage
-        resultObject.links["last"] = getPaginationUrl(map)
+        resultObject.links["self"] = getPaginationUrl(urlParams)
+        urlParams.pageNumber = 1
+        resultObject.links["first"] = getPaginationUrl(urlParams)
+        urlParams.pageNumber = lastPage
+        resultObject.links["last"] = getPaginationUrl(urlParams)
 
         if (pageNumber > DEFAULT_PAGE_NUMBER) {
-            map.pageNumber = pageNumber - 1
-            resultObject.links["prev"] = getPaginationUrl(map)
+            urlParams.pageNumber = pageNumber - 1
+            resultObject.links["prev"] = getPaginationUrl(urlParams)
         } else {
             resultObject.links["prev"] = null
         }
 
         if (totalHits > (pageNumber * pageSize)) {
-            map.pageNumber = pageNumber + 1
-            resultObject.links["next"] = getPaginationUrl(map)
+            urlParams.pageNumber = pageNumber + 1
+            resultObject.links["next"] = getPaginationUrl(urlParams)
         } else {
             resultObject.links["next"] = null
         }
