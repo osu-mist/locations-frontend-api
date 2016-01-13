@@ -29,7 +29,7 @@ import java.util.regex.Pattern
 class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
 
-    public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis"]
+    public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
 
     /**
