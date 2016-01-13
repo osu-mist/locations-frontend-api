@@ -25,23 +25,23 @@ paths:
           required: false
           type: string
         - in: query
-          name: dining
-          description: "Specify 1 for locations that are dining areas"
-          required: false
-          type: string
-        - in: query
-          name: is_open_dining
-          description: "Specify 1 for dining locations that are currently open"
-          required: false
-          type: string
-        - in: query
-          name: county
-          description: "Name of the location in the county"
-          required: false
-          type: string
-        - in: query
           name: campus
-          description: "Name of the campus. Valid options are: corvallis, bend, newport or extension"
+          description: "Name of the campus. Valid options are: corvallis and extension"
+          required: false
+          type: string
+        - in: query
+          name: type
+          description: "Type of location. Valid options are: building and dining"
+          required: false
+          type: string
+        - in: query
+          name: page[size]
+          description: "Number of results to return. Used in pagination. Default value is 10."
+          required: false
+          type: string
+        - in: query
+          name: page[number]
+          description: "Page number of results. Used to paginate through results."
           required: false
           type: string
 
@@ -50,10 +50,12 @@ paths:
         # Response code
         "200":
           description: "Successful response"
-          # A schema describing your response object.
-          # Use JSON Schema format
           schema:
             $ref: "#/definitions/ResultObjects"
+        "404":
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         "500":
           description: "Internal Server Error"
           schema:
@@ -181,7 +183,7 @@ definitions:
   DayHours:
     properties:
       day:
-        type: int32
+        type: integer
       hours:
         type: array
         items:
@@ -208,13 +210,18 @@ definitions:
         type: string
 
   Error:
-    required:
-      - statusCode
-      - statusMessage
+    type: object
     properties:
-      statusCode:
-        type: number
-      statusMessage:
+      status:
+        type: integer
+        format: int32
+      developerMessage:
+        type: string
+      userMesage:
+        type: string
+      code:
+        type: integer
+      details:
         type: string
 
   Errors:
