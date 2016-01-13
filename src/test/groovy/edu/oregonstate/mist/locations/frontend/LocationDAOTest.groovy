@@ -30,6 +30,7 @@ class LocationDAOTest {
     public void testGetById() {
         assert locationDAO.getById(SINGLE_RESOURCE_ID) != null
         assert locationDAO.getById("invalid-id") == null
+        assert locationDAO.getById(null) == null
     }
 
     @Test
