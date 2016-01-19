@@ -1,9 +1,13 @@
 package edu.oregonstate.mist.locations.frontend.resources
 
 import com.codahale.metrics.annotation.Timed
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
+import edu.oregonstate.mist.locations.frontend.jsonapi.ResourceObject
+import edu.oregonstate.mist.locations.frontend.jsonapi.ResultObject
 import io.dropwizard.auth.Auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,7 +29,7 @@ import java.util.regex.Pattern
 class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
 
-    public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis"]
+    public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
 
     /**
@@ -68,11 +72,9 @@ class LocationResource extends Resource {
     @Timed
     Response list(@QueryParam('q') String q, @QueryParam('campus') String campus, @QueryParam('type') String type,
                   @Auth AuthenticatedUser authenticatedUser) {
-        def pageNumber = getPageNumber()
-        def pageSize = getPageSize()
         def trimmedQ = sanitize(q?.trim())
-        def trimmedCampus = sanitize(campus?.trim())
-        def trimmedType = sanitize(type?.trim())
+        def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
+        def trimmedType = sanitize(type?.trim()?.toLowerCase())
 
         // validate filtering parameters
         def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
@@ -82,21 +84,116 @@ class LocationResource extends Resource {
         }
 
         String result = locationDAO.search(trimmedQ, trimmedCampus, trimmedType, pageNumber, pageSize)
-        ok(result).build()
+
+        ResultObject resultObject = new ResultObject()
+        resultObject.data = []
+
+        // parse ES into JSON Node
+        ObjectMapper mapper = new ObjectMapper() // can reuse, share globally
+        JsonNode actualObj = mapper.readTree(result)
+
+        def topLevelHits = actualObj.get("hits")
+        topLevelHits.get("hits").asList().each {
+            def source = it.get("_source")
+            ResourceObject resourceObject = new ResourceObject(
+                    id: source.get("id").asText(),
+                    type: source.get("type").asText(),
+                    attributes: source.get("attributes")
+            )
+            resultObject.data += resourceObject
+        }
+
+        setPaginationLinks(topLevelHits, q, type, campus, resultObject)
+
+        ok(resultObject).build()
+    }
+
+    /**
+     * Add pagination links to the data search results.
+     *
+     * @param topLevelHits          First "hits" node in the json document
+     * @param q
+     * @param type
+     * @param campus
+     * @param resultObject
+     */
+    private void setPaginationLinks(JsonNode topLevelHits, String q, String type, String campus,
+                                    ResultObject resultObject) {
+        def totalHits = topLevelHits.get("total").asInt()
+        // If no results were found, no need to add links
+        if (!totalHits) {
+            return
+        }
+
+        Integer pageNumber = getPageNumber()
+        Integer pageSize = getPageSize()
+        def urlParams = [
+                "q": q,
+                "type": type,
+                "campus": campus,
+                "pageSize": pageSize,
+                "pageNumber": pageNumber
+        ]
+
+        int lastPage = Math.ceil(totalHits / pageSize)
+
+        resultObject.links["self"] = getPaginationUrl(urlParams)
+        urlParams.pageNumber = 1
+        resultObject.links["first"] = getPaginationUrl(urlParams)
+        urlParams.pageNumber = lastPage
+        resultObject.links["last"] = getPaginationUrl(urlParams)
+
+        if (pageNumber > DEFAULT_PAGE_NUMBER) {
+            urlParams.pageNumber = pageNumber - 1
+            resultObject.links["prev"] = getPaginationUrl(urlParams)
+        } else {
+            resultObject.links["prev"] = null
+        }
+
+        if (totalHits > (pageNumber * pageSize)) {
+            urlParams.pageNumber = pageNumber + 1
+            resultObject.links["next"] = getPaginationUrl(urlParams)
+        } else {
+            resultObject.links["next"] = null
+        }
+    }
+
+    /**
+     * Returns string url to use in pagination links.
+     *
+     * @param params
+     * @return
+     */
+    private String getPaginationUrl(def params) {
+        def uriAndPath = uriInfo.getBaseUri().toString() + uriInfo.getPath()
+        def nonNullParams = params.clone()
+        // convert pageVariable to page[variable]
+        nonNullParams["page[number]"] = nonNullParams['pageNumber']
+        nonNullParams["page[size]"] = nonNullParams['pageSize']
+        nonNullParams.remove('pageSize')
+        nonNullParams.remove('pageNumber')
+
+        // remove empty GET parameters
+        nonNullParams = nonNullParams.findAll { it.value } .collect { k, v -> "$k=$v" }
+
+        uriAndPath + "?" + nonNullParams.join('&')
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
-    @Path('{id: [0-9a-z]+}')
+    @Path('{id: [0-9a-zA-Z]+}')
     Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
+        ResultObject resultObject = new ResultObject()
         String esResponse  = locationDAO.getById(id)
 
         if (!esResponse) {
             return notFound().build()
         }
 
-        ok(esResponse).build()
+        ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
+        resultObject.data = mapper.readValue(esResponse, Object.class)
+        ok(resultObject).build()
     }
 
     /**

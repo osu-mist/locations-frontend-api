@@ -6,6 +6,7 @@ import edu.oregonstate.mist.api.InfoResource
 import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.api.BasicAuthenticator
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
+import edu.oregonstate.mist.locations.frontend.health.ElasticSearchHealthCheck
 import edu.oregonstate.mist.locations.frontend.resources.LocationResource
 import edu.oregonstate.mist.locations.frontend.resources.SampleResource
 import io.dropwizard.Application
@@ -42,6 +43,9 @@ class LocationsFrontEndApplication extends Application<LocationsFrontendConfigur
         environment.jersey().register(new SampleResource())
         environment.jersey().register(new InfoResource())
         environment.jersey().register(new LocationResource(locationDAO))
+        final ElasticSearchHealthCheck healthCheck =
+                new ElasticSearchHealthCheck(configuration.locationsConfiguration)
+        environment.healthChecks().register("elasticSearchCluster", healthCheck)
 
         environment.jersey().register(
                 AuthFactory.binder(

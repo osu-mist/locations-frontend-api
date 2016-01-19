@@ -1,78 +1,220 @@
 swagger: '2.0'
+
 info:
-  title: Web API Skeleton
-  description: Skeleton for Dropwizard Web APIs
-  version: '0.0'
-  license:
-    name: GNU Affero General Public License Version 3
-    url: http://www.gnu.org/licenses/agpl-3.0.en.html
-externalDocs:
-  description: GitHub Repository
-  url: https://github.com/osu-mist/web-api-skeleton
-host: localhost
-schemes:
-  - http
-basePath: /api/v0
-consumes:
-  - text/plain
-produces:
-  - text/plain
+  version: "0.0.1"
+  title: Locations API
+
+# Describe your paths here
 paths:
-  /:
+  # This is a path endpoint. Change it.
+  /locations:
+    # This is a HTTP operation
     get:
-      summary: Get information
-      description: Build and runtime information about the application.
-      responses:
-        200:
-          description: Object containing information
-          schema:
-            $ref: '#/definitions/Info'
-  /sample:
-    get:
-      summary: Get message
-      description: This is a sample resource that returns a short message.
-      responses:
-        200:
-          description: A short message
-          schema:
-            type: string
-        404:
-          description: Not found
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      summary: Post message
-      description: This is a sample resource that returns the message it receives.
+      tags:
+       - locations
+      # Describe this verb here. Note: you can use markdown
+      description: "Gets all `Location` objects. Can be filtered by parameters."
+      operationId: getLocations
+      # This is array of GET operation parameters:
+      produces:
+        - application/json
       parameters:
-        - name: message
-          in: body
-          schema:
-            type: string
-          required: true
+        - in: query
+          name: q
+          description: "Query to search through buildings. Looks through the building name, abbreviation, summary and description"
+          required: false
+          type: string
+        - in: query
+          name: campus
+          description: "Name of the campus. Valid options are: corvallis and extension"
+          required: false
+          type: string
+        - in: query
+          name: type
+          description: "Type of location. Valid options are: building and dining"
+          required: false
+          type: string
+        - in: query
+          name: page[size]
+          description: "Number of results to return. Used in pagination. Default value is 10."
+          required: false
+          type: string
+        - in: query
+          name: page[number]
+          description: "Page number of results. Used to paginate through results."
+          required: false
+          type: string
+
+      # Expected responses for this operation:
       responses:
-        200:
-          description: The message received
+        # Response code
+        "200":
+          description: "Successful response"
           schema:
-            type: string
-        404:
-          description: Not found
+            $ref: "#/definitions/ResultObjects"
+        "404":
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/Error'
+            $ref: "#/definitions/Error"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/Errors"
+      security:
+        - locations_api_key: []
+
+  /locations/{buildingID}:
+    get:
+      tags:
+        - locations
+      description: "Finds location by buildingID"
+      operationId: getLocationByBuildingID
+      produces:
+        - application/json
+      parameters:
+        - name: buildingID
+          in: path
+          description: "buildingID of location to be searched by"
+          required: true
+          type: string
+      responses:
+        "200":
+          description: "Successful response"
+          schema:
+            $ref: "#/definitions/ResultObject"
+        "404":
+          description: "Resource not found"
+          schema:
+            $ref: "#/definitions/Errors"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/Errors"
+      security:
+        - locations_api_key: []
+    
+
+securityDefinitions:
+
+  locations_api_key:
+    type: apiKey
+    name: locations_api_key
+    in: query
+
 definitions:
-  Info:
+  ResultObject:
+    properties:
+      links:
+        $ref: "#/definitions/Links"
+      data:
+        $ref: "#/definitions/ResourceObject"
+
+  ResultObjects:
+    properties:
+      links:
+        $ref: "#/definitions/Links"
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/ResourceObject"
+        
+  ResourceObject:
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      attributes:
+        $ref: "#/definitions/Attributes"
+        
+  Attributes:
     properties:
       name:
         type: string
-      time:
+      abbreviation:
+        type: string
+      latitude:
+        type: string
+      longitude:
+        type: string        
+      summary:
+        type: string
+      description:
+        type: string
+      address:
+        type: string
+      city:
+        type: string
+      state:
+        type: string
+      zip:
+        type: string
+      telephone:
+        type: string
+      fax:
+        type: string
+      thumbnails:
+        type: array
+        items:
+          type: string
+      images:
+        type: array
+        items:
+          type: string
+      departments:
+        type: array
+        items:
+          type: string
+      website:
+        type: string
+      sqft:
+        type: string
+      calendar:
+        type: string
+      campus:
+        type: string
+      type:
+        type: string
+      open_hours:
+        type: array
+        items:
+          $ref: "#/definitions/DayHours"
+
+  DayHours:
+    properties:
+      day:
         type: integer
-      commit:
+      hours:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      
+  TimeSlot:
+    properties:
+      start:
         type: string
-      documentation:
+      end:
         type: string
+        
+  Links:
+    properties:
+      self:
+        type: string
+      first:
+        type: string
+      last:
+        type: string
+      prev:
+        type: string
+      next:
+        type: string
+
   Error:
+    type: object
     properties:
       status:
         type: integer
+        format: int32
       developerMessage:
         type: string
       userMesage:
@@ -81,3 +223,9 @@ definitions:
         type: integer
       details:
         type: string
+
+  Errors:
+    title: ArrayOfErrors
+    type: array
+    items:
+      $ref: "#/definitions/Error"

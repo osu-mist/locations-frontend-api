@@ -46,7 +46,7 @@ class LocationDAO {
      */
     String getById(String id) {
         try {
-            return "${ESFullUrl}/${id}/_source".toURL().text
+            return "${ESFullUrl}/${id?.toLowerCase()}/_source".toURL().text
         } catch (FileNotFoundException e) {
             return null
         }

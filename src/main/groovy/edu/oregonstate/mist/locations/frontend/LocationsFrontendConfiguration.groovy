@@ -1,7 +1,7 @@
 package edu.oregonstate.mist.locations.frontend
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.dropwizard.Configuration
+import edu.oregonstate.mist.api.Configuration
 
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
