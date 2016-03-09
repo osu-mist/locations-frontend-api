@@ -165,7 +165,7 @@ class LocationResource extends Resource {
      * @return
      */
     private String getPaginationUrl(def params) {
-        def uriAndPath = uriInfo.getBaseUri().toString() + uriInfo.getPath()
+        def uriAndPath = locationDAO.getGatewayUrl() + uriInfo.getPath()
         def nonNullParams = params.clone()
         // convert pageVariable to page[variable]
         nonNullParams["page[number]"] = nonNullParams['pageNumber']
