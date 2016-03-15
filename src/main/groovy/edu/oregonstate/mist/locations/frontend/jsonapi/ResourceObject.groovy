@@ -4,4 +4,5 @@ class ResourceObject {
     String id
     String type
     def attributes
+    def links
 }

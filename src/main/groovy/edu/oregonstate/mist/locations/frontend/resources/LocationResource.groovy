@@ -94,13 +94,8 @@ class LocationResource extends Resource {
 
         def topLevelHits = actualObj.get("hits")
         topLevelHits.get("hits").asList().each {
-            def source = it.get("_source")
-            ResourceObject resourceObject = new ResourceObject(
-                    id: source.get("id").asText(),
-                    type: source.get("type").asText(),
-                    attributes: source.get("attributes")
-            )
-            resultObject.data += resourceObject
+            String singleLocation = it.get("_source").toString()
+            resultObject.data += (ResourceObject) mapper.readValue(singleLocation, Object.class)
         }
 
         setPaginationLinks(topLevelHits, q, type, campus, resultObject)
