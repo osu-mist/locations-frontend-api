@@ -94,13 +94,8 @@ class LocationResource extends Resource {
 
         def topLevelHits = actualObj.get("hits")
         topLevelHits.get("hits").asList().each {
-            def source = it.get("_source")
-            ResourceObject resourceObject = new ResourceObject(
-                    id: source.get("id").asText(),
-                    type: source.get("type").asText(),
-                    attributes: source.get("attributes")
-            )
-            resultObject.data += resourceObject
+            String singleLocation = it.get("_source").toString()
+            resultObject.data += (ResourceObject) mapper.readValue(singleLocation, Object.class)
         }
 
         setPaginationLinks(topLevelHits, q, type, campus, resultObject)
@@ -165,7 +160,7 @@ class LocationResource extends Resource {
      * @return
      */
     private String getPaginationUrl(def params) {
-        def uriAndPath = uriInfo.getBaseUri().toString() + uriInfo.getPath()
+        def uriAndPath = locationDAO.getGatewayUrl() + uriInfo.getPath()
         def nonNullParams = params.clone()
         // convert pageVariable to page[variable]
         nonNullParams["page[number]"] = nonNullParams['pageNumber']
