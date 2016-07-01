@@ -18,7 +18,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
 }
 
@@ -53,6 +53,10 @@ jar {
     version = 'git log -n1 --format=format:%h'.execute().getText()
     extension = 'jar'
     archiveName = "${baseName}-${appendix}-${version}.${extension}"
+}
+
+tasks.withType(CodeNarc) {
+    maxPriority3Violations = 6
 }
 
 // https://github.com/johnrengelman/shadow
