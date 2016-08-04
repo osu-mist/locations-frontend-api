@@ -72,35 +72,41 @@ class LocationResource extends Resource {
     @Timed
     Response list(@QueryParam('q') String q, @QueryParam('campus') String campus, @QueryParam('type') String type,
                   @Auth AuthenticatedUser authenticatedUser) {
-        def trimmedQ = sanitize(q?.trim())
-        def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
-        def trimmedType = sanitize(type?.trim()?.toLowerCase())
+        try {
+            def trimmedQ = sanitize(q?.trim())
+            def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
+            def trimmedType = sanitize(type?.trim()?.toLowerCase())
 
-        // validate filtering parameters
-        def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
-        def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
-        if (invalidCampus || invalidType) {
-            return notFound().build()
+            // validate filtering parameters
+            def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
+            def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
+            if (invalidCampus || invalidType) {
+                return notFound().build()
+            }
+
+            String result = locationDAO.search(trimmedQ, trimmedCampus, trimmedType, pageNumber, pageSize)
+
+            ResultObject resultObject = new ResultObject()
+            resultObject.data = []
+
+            // parse ES into JSON Node
+            ObjectMapper mapper = new ObjectMapper() // can reuse, share globally
+            JsonNode actualObj = mapper.readTree(result)
+
+            def topLevelHits = actualObj.get("hits")
+            topLevelHits.get("hits").asList().each {
+                String singleLocation = it.get("_source").toString()
+                resultObject.data += (ResourceObject) mapper.readValue(singleLocation, Object.class)
+            }
+
+            setPaginationLinks(topLevelHits, q, type, campus, resultObject)
+
+            ok(resultObject).build()
+        } catch (Exception e) {
+            LOGGER.error("Exception while getting locations.",e)
+            internalServerError("Woot you found a bug for us to fix!").build()
         }
 
-        String result = locationDAO.search(trimmedQ, trimmedCampus, trimmedType, pageNumber, pageSize)
-
-        ResultObject resultObject = new ResultObject()
-        resultObject.data = []
-
-        // parse ES into JSON Node
-        ObjectMapper mapper = new ObjectMapper() // can reuse, share globally
-        JsonNode actualObj = mapper.readTree(result)
-
-        def topLevelHits = actualObj.get("hits")
-        topLevelHits.get("hits").asList().each {
-            String singleLocation = it.get("_source").toString()
-            resultObject.data += (ResourceObject) mapper.readValue(singleLocation, Object.class)
-        }
-
-        setPaginationLinks(topLevelHits, q, type, campus, resultObject)
-
-        ok(resultObject).build()
     }
 
     /**
@@ -179,16 +185,22 @@ class LocationResource extends Resource {
     @Timed
     @Path('{id: [0-9a-zA-Z]+}')
     Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
-        ResultObject resultObject = new ResultObject()
-        String esResponse  = locationDAO.getById(id)
+        try {
+            ResultObject resultObject = new ResultObject()
+            String esResponse  = locationDAO.getById(id)
 
-        if (!esResponse) {
-            return notFound().build()
+            if (!esResponse) {
+                return notFound().build()
+            }
+
+            ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
+            resultObject.data = mapper.readValue(esResponse, Object.class)
+            ok(resultObject).build()
+        } catch (Exception e) {
+            LOGGER.error("Exception while getting location by ID", e)
+            internalServerError("Woot you found a bug for us to fix!").build()
         }
 
-        ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-        resultObject.data = mapper.readValue(esResponse, Object.class)
-        ok(resultObject).build()
     }
 
     /**
