@@ -15,4 +15,10 @@ class LocationResourceTest {
     public static final ResourceTestRule locationResource = ResourceTestRule.builder()
             .addResource(new LocationResource(locationDAO))
             .build()
+
+    @Test
+    public void testSanitize() {
+        assert LocationResource.sanitize("Valley[!#]Library") == "Valley    Library"
+        assert !LocationResource.sanitize(null)
+    }
 }
