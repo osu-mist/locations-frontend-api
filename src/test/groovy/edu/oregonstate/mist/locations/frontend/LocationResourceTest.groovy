@@ -2,7 +2,7 @@ package edu.oregonstate.mist.locations.frontend
 
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.resources.LocationResource
-import groovy.mock.interceptor.Mockfor
+import groovy.mock.interceptor.MockFor
 import org.junit.Test
 
 class LocationResourceTest {
