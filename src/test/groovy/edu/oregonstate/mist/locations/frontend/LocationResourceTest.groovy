@@ -9,6 +9,7 @@ import org.junit.Test
 class LocationResourceTest {
     static def user = new AuthenticatedUser('nobody')
 
+    // Test: LocationResource.list()
     @Test
     public void testList() {
         def mock = new MockFor(LocationDAO)
@@ -20,13 +21,13 @@ class LocationResourceTest {
         def resource = new LocationResource(dao)
         resource.uriInfo = new MockUriInfo()
 
-        // test case: no result
+        // Test: no result
         def noResultRsp = resource.list('dixon', null, null, user)
         assert noResultRsp.status == 200
         assert noResultRsp.entity.links == [:]
         assert noResultRsp.entity.data == []
 
-        // test case: invalid campus
+        // Test: invalid campus
         def invalidCampRes = resource.list('dixon', 'invalid', null, user)
         assert invalidCampRes.status == 404
         assert invalidCampRes.entity.developerMessage.contains("Not Found")
@@ -36,8 +37,28 @@ class LocationResourceTest {
         mock.verify(dao)
     }
 
+    // Test: LocationResource.getById(): valid ID
     @Test
-    public void testGetById() {
+    public void testValidId() {
+        def mock = new MockFor(LocationDAO)
+        mock.demand.getById() {
+            String id -> '{"id":"","type":"locations","attributes":{}}'
+        }
+        def dao = mock.proxyInstance()
+        def resource = new LocationResource(dao)
+        resource.uriInfo = new MockUriInfo()
+
+        def validIdRes = resource.getById('valid-id', user)
+        assert validIdRes.status == 200
+        validIdRes.entity.links == [:]
+        validIdRes.entity.data == '{"id":"","type":"locations","attributes":{}}'
+
+        mock.verify(dao)
+    }
+
+    // Test: LocationResource.getById(): invalid ID
+    @Test
+    public void testInvalidId() {
         def mock = new MockFor(LocationDAO)
         mock.demand.getById() {
             String id -> null
@@ -46,11 +67,11 @@ class LocationResourceTest {
         def resource = new LocationResource(dao)
         resource.uriInfo = new MockUriInfo()
 
-        def response = resource.getById(null, user)
-        assert response.status == 404
-        assert response.entity.developerMessage.contains("Not Found")
-        assert response.entity.userMessage.contains("Not Found")
-        assert response.entity.code == 1404
+        def invalidIdRes = resource.getById(null, user)
+        assert invalidIdRes.status == 404
+        assert invalidIdRes.entity.developerMessage.contains("Not Found")
+        assert invalidIdRes.entity.userMessage.contains("Not Found")
+        assert invalidIdRes.entity.code == 1404
 
         mock.verify(dao)
     }
