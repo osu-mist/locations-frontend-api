@@ -20,10 +20,18 @@ class LocationResourceTest {
         def resource = new LocationResource(dao)
         resource.uriInfo = new MockUriInfo()
 
-        def response = resource.list('dixon', null, null, user)
-        assert response.status == 200
-        assert response.entity.links == [:]
-        assert response.entity.data == []
+        // test case: no result
+        def noResultRsp = resource.list('dixon', null, null, user)
+        assert noResultRsp.status == 200
+        assert noResultRsp.entity.links == [:]
+        assert noResultRsp.entity.data == []
+
+        // test case: invalid campus
+        def invalidCampRes = resource.list('dixon', 'invalid', null, user)
+        assert invalidCampRes.status == 404
+        assert invalidCampRes.entity.developerMessage.contains("Not Found")
+        assert invalidCampRes.entity.userMessage.contains("Not Found")
+        assert invalidCampRes.entity.code == 1404
 
         mock.verify(dao)
     }
