@@ -10,13 +10,12 @@ class LocationResourceTest {
     static def user = new AuthenticatedUser('nobody')
 
     @Test
-    public void testNoResults() {
+    public void testList() {
         def mock = new MockFor(LocationDAO)
         mock.demand.search() {
             String q, String campus, String type, Integer pageNumber, Integer pageSize ->
                 '{"hits": {"total": 0, "hits": []}}'
         }
-
         def dao = mock.proxyInstance()
         def resource = new LocationResource(dao)
         resource.uriInfo = new MockUriInfo()
@@ -25,6 +24,25 @@ class LocationResourceTest {
         assert response.status == 200
         assert response.entity.links == [:]
         assert response.entity.data == []
+
+        mock.verify(dao)
+    }
+
+    @Test
+    public void testGetById() {
+        def mock = new MockFor(LocationDAO)
+        mock.demand.getById() {
+            String id -> null
+        }
+        def dao = mock.proxyInstance()
+        def resource = new LocationResource(dao)
+        resource.uriInfo = new MockUriInfo()
+
+        def response = resource.getById(null, user)
+        assert response.status == 404
+        assert response.entity.developerMessage.contains("Not Found")
+        assert response.entity.userMessage.contains("Not Found")
+        assert response.entity.code == 1404
 
         mock.verify(dao)
     }
