@@ -76,9 +76,16 @@ class LocationResourceTest {
         mock.verify(dao)
     }
 
+    // Test: LocationResource.sanitize()
     @Test
     public void testSanitize() {
-        assert LocationResource.sanitize("Valley[!#]Library") == "Valley    Library"
+        String legalStr = 'abc_ABC-123.@'
+        String illegalStr = ' ~!#$%^&*()=+[]{}|\\\'\";:<>?/'
+        String mixStr = ' a~b!c_#A$B%C^-&1*2(3).=@+'
+
+        assert LocationResource.sanitize(legalStr) == legalStr
+        assert LocationResource.sanitize(illegalStr).replaceAll(" ", "") == ""
+        assert LocationResource.sanitize(mixStr).replaceAll(" ", "") == legalStr
         assert !LocationResource.sanitize(null)
     }
 }
