@@ -4,7 +4,6 @@ This directory contains files that run integration tests against the locations f
 
 * [json](https://docs.python.org/2/library/json.html)
 * [requests](http://docs.python-requests.org/en/master/)
-	python integrationtests.py
 * [unittest](https://docs.python.org/2/library/unittest.html)
 
 Use this command to run the tests:
