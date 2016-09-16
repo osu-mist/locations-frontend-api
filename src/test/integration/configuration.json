@@ -5,8 +5,8 @@
 	"api": "/locations",
 
 	"token_endpoint": "/token",
-	"locations_endpoint": "/",
+	"api_endpoint": "/",
 
-	"client_id": "secret",
-	"client_secret": "sauce"
+	"client_id": "uiGZFctkGvl1fIlpHOiHOKvYxP8USmx2",
+	"client_secret": "41ijTl9NPIPZ9fyC"
 }
