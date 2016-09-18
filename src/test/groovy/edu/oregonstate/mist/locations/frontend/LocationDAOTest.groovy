@@ -13,7 +13,7 @@ class LocationDAOTest {
 
     private ObjectMapper mapper = new ObjectMapper()
 
-    private final String SINGLE_RESOURCE_ID = "831ed9ce6311601afba57934adea7a8e"
+    private final String SINGLE_RESOURCE_ID = "a5041ecde8b53e54c7479e770825d7c1"
 
     @ClassRule
     public static final DropwizardAppRule<LocationsFrontendConfiguration> APPLICATION =
