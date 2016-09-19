@@ -1,19 +1,20 @@
 import json
+import requests
 
-config_data_file = open('configuration.json')
-config_data = json.load(config_data_file)
-
-base_url = config_data["hostname"] + config_data["version"] + config_data["api"]
-access_token_url = base_url + config_data["token_endpoint"]
+def get_config_data():
+	config_data_file = open('configuration.json')
+	return json.load(config_data_file)
 
 def get_url():
-	return base_url + config_data["api_endpoint"]
+	config_data = get_config_data()
+	return config_data["hostname"] + config_data["version"] + config_data["api"]
 
-def get_access_token_url():
-	return base_url + config_data["token_endpoint"]
-
-def get_client_id():
-	return config_data["client_id"]
-
-def get_client_secret():
-	return config_data["client_secret"]
+def get_access_token():
+	config_data = get_config_data()
+	access_token_url = get_url() + config_data["token_endpoint"]
+	client_id = config_data["client_id"]
+	client_secret = config_data["client_secret"]
+	post_data = {'client_id': client_id, 'client_secret': client_secret, 'grant_type': 'client_credentials'}
+	request = requests.post(access_token_url, data=post_data)
+	response = request.json()
+	return 'Bearer ' + response["access_token"]

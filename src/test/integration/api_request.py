@@ -1,45 +1,42 @@
 import json
 import requests
+import urllib2
 from configuration_load import *
 
-def getAccessToken(url, client_id, client_secret):
-    post_data = {'client_id': client_id, 'client_secret': client_secret, 'grant_type': 'client_credentials'}
-    request = requests.post(url, data=post_data)
-    response = request.json()
-    return 'Bearer ' + response["access_token"]
 
-def goodRequest(url, access_token):
+def good_request():
     query_params = {'q': 'Oxford'}
-    headers = {'Authorization': access_token}
-    request = requests.get(url, params=query_params, headers=headers)
+    headers = {'Authorization': get_access_token()}
+    request = requests.get(get_url(), params=query_params, headers=headers)
     return request.status_code
 
-def unauthRequest(url):
+def unauth_request():
     query_params = {'q': 'Oxford'}
-    request = requests.get(url, params=query_params)
+    request = requests.get(get_url(), params=query_params)
     return request.status_code
     
-def notFoundRequest(url, access_token):
+def not_found_request():
     query_params = {'campus': 'Pluto'}
-    headers = {'Authorization': access_token}
-    request = requests.get(url, params=query_params, headers=headers)
+    headers = {'Authorization': get_access_token()}
+    request = requests.get(get_url(), params=query_params, headers=headers)
     return request.status_code
 
-def getStatusCode(test_code):
-    url = get_url()
-    access_token_url = get_access_token_url()
-    client_id = get_client_id()
-    client_secret = get_client_secret()
+def blank_result():
+    query_params = {'q': 'nosuchbuilding'}
+    headers = {'Authorization': get_access_token()}
+    request = requests.get(get_url(), params=query_params, headers=headers)
+    response = request.json()
+    
+    if response["data"] == []:
+        return True
+    else:
+        return False
 
-    if test_code == 200:
-        access_token = getAccessToken(access_token_url, client_id, client_secret)
-        response_code = goodRequest(url, access_token)
-
-    if test_code == 401:
-        response_code = unauthRequest(url)
-
-    if test_code == 404:
-        access_token = getAccessToken(access_token_url, client_id, client_secret)
-        response_code = notFoundRequest(url, access_token)
-
-    return response_code
+def response_time():
+    query_params = {'q': 'Oxford'}
+    headers = {'Authorization': get_access_token()}
+    request = requests.get(get_url(), params=query_params, headers=headers)
+    response_time = request.elapsed.total_seconds()
+    
+    print "API response time: ", response_time
+    return response_time

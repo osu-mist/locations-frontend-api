@@ -19,7 +19,7 @@ configuration.yaml
 build.properties
 
 # Integration Tests Configuration
-configuration.json
+**/configuration.json
 
 # Python Compiled Bytecode
 *.pyc
