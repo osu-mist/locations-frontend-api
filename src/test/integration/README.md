@@ -5,6 +5,8 @@ This directory contains files that run integration tests against the locations f
 * [json](https://docs.python.org/2/library/json.html)
 * [requests](http://docs.python-requests.org/en/master/)
 * [unittest](https://docs.python.org/2/library/unittest.html)
+* [ssl](https://pypi.python.org/pypi/ssl/)
+* [urllib2](https://docs.python.org/2/library/urllib2.html)
 
 Use this command to run the tests:
 

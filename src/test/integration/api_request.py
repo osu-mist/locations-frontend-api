@@ -1,6 +1,7 @@
 import json
 import requests
 import urllib2
+import ssl
 from configuration_load import *
 
 
@@ -38,5 +39,15 @@ def response_time():
     request = requests.get(get_url(), params=query_params, headers=headers)
     response_time = request.elapsed.total_seconds()
     
-    print "API response time: ", response_time
+    print "API response time: ", response_time, " seconds"
     return response_time
+
+def check_ssl(protocol):
+    try:
+        context = ssl.SSLContext(protocol)
+        request = urllib2.Request(get_url() + "?q=Oxford", headers={"Authorization" : get_access_token()})
+        urllib2.urlopen(request, context=context)
+    except (urllib2.URLError):
+        return False
+    else:
+        return True
