@@ -4,7 +4,7 @@ import json
 from api_request import *
 from configuration_load import *
 
-class integration_tests(unittest.TestCase):
+class gateway_tests(unittest.TestCase):
 
 	# Tests that a good request returns a 200
 	def test_success(self):
