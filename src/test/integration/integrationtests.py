@@ -1,5 +1,6 @@
 import unittest
 import sys
+import json
 from api_request import *
 from configuration_load import *
 
@@ -8,6 +9,16 @@ class integration_tests(unittest.TestCase):
 	# Tests that a good request returns a 200
 	def test_success(self):
 		self.assertEqual(good_request(url, access_token), 200)
+
+	# Tests that a query with more than 10 results contains correct links
+	def test_links(self):
+		links = results_with_links(url, access_token)
+
+		self.assertIsNotNone(links["self"])
+		self.assertIsNotNone(links["first"])
+		self.assertIsNotNone(links["last"])
+		self.assertIsNone(links["prev"])
+		self.assertIsNotNone(links["next"])
 
 	# Tests that a request with auth header returns a 401
 	def test_unauth(self):

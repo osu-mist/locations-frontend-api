@@ -11,6 +11,13 @@ def good_request(url, access_token):
     request = requests.get(url, params=query_params, headers=headers)
     return request.status_code
 
+def results_with_links(url, access_token):
+    query_params = {'campus': 'Corvallis'}
+    headers = {'Authorization': access_token}
+    request = requests.get(url, params=query_params, headers=headers)
+    response = request.json()
+    return response["links"]
+
 def unauth_request(url):
     query_params = {'q': 'Oxford'}
     request = requests.get(url, params=query_params)
