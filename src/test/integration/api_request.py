@@ -27,7 +27,13 @@ def not_found_request(url, access_token):
     query_params = {'campus': 'Pluto'}
     headers = {'Authorization': access_token}
     request = requests.get(url, params=query_params, headers=headers)
-    return request.status_code
+    return request
+
+def not_found_status_code(url, access_token):
+    return not_found_request(url, access_token).status_code
+
+def not_found_json(url, access_token):
+    return not_found_request(url, access_token).json()
 
 def blank_result(url, access_token):
     query_params = {'q': 'nosuchbuilding'}

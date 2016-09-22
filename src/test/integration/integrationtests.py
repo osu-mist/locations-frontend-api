@@ -13,7 +13,6 @@ class integration_tests(unittest.TestCase):
 	# Tests that a query with more than 10 results contains correct links
 	def test_links(self):
 		links = results_with_links(url, access_token)
-
 		self.assertIsNotNone(links["self"])
 		self.assertIsNotNone(links["first"])
 		self.assertIsNotNone(links["last"])
@@ -26,8 +25,16 @@ class integration_tests(unittest.TestCase):
 
 	# Tests that a nonexistent campus returns a 404
 	def test_not_found(self):
-		self.assertEqual(not_found_request(url, access_token), 404)
+		self.assertEqual(not_found_status_code(url, access_token), 404)
 
+	# Tests that a 404 response contains correct JSON fields
+	def test_not_found_results(self):
+		response = not_found_json(url, access_token)
+		self.assertIsNotNone(response["status"])
+		self.assertIsNotNone(response["developerMessage"])
+		self.assertIsNotNone(response["userMessage"])
+		self.assertIsNotNone(response["code"])
+		self.assertIsNotNone(response["details"])
 	# Tests that that a certain query returns no data
 	def test_blank_result(self):
 		self.assertTrue(blank_result(url, access_token))
