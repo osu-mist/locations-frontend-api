@@ -5,27 +5,27 @@ import ssl
 from configuration_load import *
 
 
-def good_request():
+def good_request(url, access_token):
     query_params = {'q': 'Oxford'}
-    headers = {'Authorization': get_access_token()}
-    request = requests.get(get_url(), params=query_params, headers=headers)
+    headers = {'Authorization': access_token}
+    request = requests.get(url, params=query_params, headers=headers)
     return request.status_code
 
-def unauth_request():
+def unauth_request(url):
     query_params = {'q': 'Oxford'}
-    request = requests.get(get_url(), params=query_params)
+    request = requests.get(url, params=query_params)
     return request.status_code
     
-def not_found_request():
+def not_found_request(url, access_token):
     query_params = {'campus': 'Pluto'}
-    headers = {'Authorization': get_access_token()}
-    request = requests.get(get_url(), params=query_params, headers=headers)
+    headers = {'Authorization': access_token}
+    request = requests.get(url, params=query_params, headers=headers)
     return request.status_code
 
-def blank_result():
+def blank_result(url, access_token):
     query_params = {'q': 'nosuchbuilding'}
-    headers = {'Authorization': get_access_token()}
-    request = requests.get(get_url(), params=query_params, headers=headers)
+    headers = {'Authorization': access_token}
+    request = requests.get(url, params=query_params, headers=headers)
     response = request.json()
     
     if response["data"] == []:
@@ -33,19 +33,19 @@ def blank_result():
     else:
         return False
 
-def response_time():
+def response_time(url, access_token):
     query_params = {'q': 'Oxford'}
-    headers = {'Authorization': get_access_token()}
-    request = requests.get(get_url(), params=query_params, headers=headers)
+    headers = {'Authorization': access_token}
+    request = requests.get(url, params=query_params, headers=headers)
     response_time = request.elapsed.total_seconds()
     
     print "API response time: ", response_time, " seconds"
     return response_time
 
-def check_ssl(protocol):
+def check_ssl(protocol, url, access_token):
     try:
         context = ssl.SSLContext(protocol)
-        request = urllib2.Request(get_url() + "?q=Oxford", headers={"Authorization" : get_access_token()})
+        request = urllib2.Request(url + "?q=Oxford", headers={"Authorization" : access_token})
         urllib2.urlopen(request, context=context)
     except (urllib2.URLError):
         return False

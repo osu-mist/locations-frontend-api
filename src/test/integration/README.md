@@ -10,4 +10,10 @@ This directory contains files that run integration tests against the locations f
 
 Use this command to run the tests:
 
-	python integrationtests.py
+	python integrationtests.py -i /path/to/configuration.json
+
+Any unittest command line arguments should be used before the -i argument. For example, this command will run the tests in verbose mode:
+	
+	python integrationtests.py -v -i /path/to/configuration.json
+
+Python Version: 2.7.10
