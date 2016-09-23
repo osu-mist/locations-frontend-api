@@ -16,4 +16,8 @@ Any unittest command line arguments should be used before the -i argument. For e
 	
 	python integrationtests.py -v -i /path/to/configuration.json
 
+Successfully passing all the tests with the command above would output this result:
+
+![success_test][images/successful-test]
+
 Python Version: 2.7.10
