@@ -18,6 +18,6 @@ Any unittest command line arguments should be used before the -i argument. For e
 
 Successfully passing all the tests with the command above would output this result:
 
-![success_test][images/successful-test.png]
+![success_test](images/successful-test.png)
 
 Python Version: 2.7.10
