@@ -1,0 +1,11 @@
+{
+	"hostname": "https://api.oregonstate.edu/",
+	"version": "v1",
+
+	"api": "/locations/",
+
+	"token_endpoint": "token",
+
+	"client_id": "secret",
+	"client_secret": "sauce"
+}
