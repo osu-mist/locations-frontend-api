@@ -6,9 +6,37 @@ from configuration_load import *
 
 class gateway_tests(unittest.TestCase):
 
-	# Tests that a good request returns a 200
-	def test_success(self):
-		self.assertEqual(good_request(url, access_token), 200)
+	# Tests a single resource ID in different case styles
+	def test_id(self):
+		response = id_request(url, access_token, single_resourse_id)
+		self.assertIsNotNone(response["data"])
+		self.assertEqual(response["data"]["id"], single_resourse_id)
+
+		response = id_request(url, access_token, single_resourse_id.upper())
+		self.assertIsNotNone(response["data"])
+
+		response = id_request(url, access_token, single_resourse_id.lower())
+		self.assertIsNotNone(response["data"])
+
+	# Tests that different verbs return expected responses
+	def test_verbs(self):
+		query_params = {'q': 'Oxford'}
+
+		self.assertEqual(query_request(url, access_token, "get", query_params).status_code, 200)
+		self.assertEqual(query_request(url, access_token, "post", query_params).status_code, 405)
+		self.assertEqual(query_request(url, access_token, "put", query_params).status_code, 405)
+		self.assertEqual(query_request(url, access_token, "delete", query_params).status_code, 405)
+
+	# Tests that certain parameters return expected number of results
+	def test_results(self):
+		all_dixon = query_request(url, access_token, "get", {'q': 'Dixon'}).json()
+		self.assertEqual(len(all_dixon['data']), 3)
+
+		dining_dixon = query_request(url, access_token, "get", {'q': 'Dixon', 'type': 'dining'}).json()
+		self.assertEqual(len(dining_dixon['data']), 1)
+
+		building_dixon = query_request(url, access_token, "get", {'q': 'Dixon', 'type': 'building'}).json()
+		self.assertEqual(len(building_dixon['data']), 2)
 
 	# Tests that a query with more than 10 results contains correct links
 	def test_links(self):
@@ -25,11 +53,16 @@ class gateway_tests(unittest.TestCase):
 
 	# Tests that a nonexistent campus returns a 404
 	def test_not_found(self):
-		self.assertEqual(not_found_status_code(url, access_token), 404)
+		self.assertEqual(not_found_request(url, access_token, 
+			{'q': 'Hello world', 'campus': 'Pluto'}).status_code, 404)
+		self.assertEqual(not_found_request(url, access_token, 
+			{'q': 'Hello world', 'type': 'invalid-type'}).status_code, 404)
+		self.assertEqual(not_found_request(url, access_token, 
+			{'q': 'Hello world', 'campus': 'Pluto', 'type': 'invalid-type'}).status_code, 404)
 
 	# Tests that a 404 response contains correct JSON fields
 	def test_not_found_results(self):
-		response = not_found_json(url, access_token)
+		response = not_found_request(url, access_token, {'campus': 'Pluto'}).json()
 		self.assertIsNotNone(response["status"])
 		self.assertIsNotNone(response["developerMessage"])
 		self.assertIsNotNone(response["userMessage"])
@@ -71,5 +104,6 @@ if __name__ == '__main__':
 
 	url = get_url(config_path)
 	access_token = get_access_token(config_path)
+	single_resourse_id = get_single_resource_id(config_path)
 
 	unittest.main()

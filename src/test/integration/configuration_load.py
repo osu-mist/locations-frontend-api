@@ -18,3 +18,7 @@ def get_access_token(config_path):
 	request = requests.post(access_token_url, data=post_data)
 	response = request.json()
 	return 'Bearer ' + response["access_token"]
+
+def get_single_resource_id(config_path):
+	config_data = get_config_data(config_path)
+	return config_data["single_resource_id"]
