@@ -4,11 +4,19 @@ import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.resources.LocationResource
 import groovy.mock.interceptor.MockFor
+import io.dropwizard.testing.junit.DropwizardAppRule
 import org.junit.Test
+import org.junit.ClassRule
 
 class LocationResourceTest {
     static def user = new AuthenticatedUser('nobody')
 
+    @ClassRule
+    public static final DropwizardAppRule<LocationsFrontendConfiguration> APPLICATION =
+            new DropwizardAppRule<LocationsFrontendConfiguration>(
+                    LocationsFrontEndApplication.class,
+                    new File("configuration.yaml").absolutePath)
+    
     // Test: LocationResource.list()
     @Test
     public void testList() {
