@@ -4,12 +4,16 @@ import urllib2
 import ssl
 from configuration_load import *
 
-
-def good_request(url, access_token):
-    query_params = {'q': 'Oxford'}
+def id_request(url, access_token, id):
+    url += id
     headers = {'Authorization': access_token}
-    request = requests.get(url, params=query_params, headers=headers)
-    return request.status_code
+    request = requests.get(url, headers=headers)
+    return request.json()    
+
+def query_request(url, access_token, verb, query_params):
+    headers = {'Authorization': access_token}
+    request = requests.request(verb, url, params=query_params, headers=headers)
+    return request
 
 def results_with_links(url, access_token):
     query_params = {'campus': 'Corvallis'}
@@ -23,17 +27,10 @@ def unauth_request(url):
     request = requests.get(url, params=query_params)
     return request.status_code
     
-def not_found_request(url, access_token):
-    query_params = {'campus': 'Pluto'}
+def not_found_request(url, access_token, query_params):
     headers = {'Authorization': access_token}
     request = requests.get(url, params=query_params, headers=headers)
     return request
-
-def not_found_status_code(url, access_token):
-    return not_found_request(url, access_token).status_code
-
-def not_found_json(url, access_token):
-    return not_found_request(url, access_token).json()
 
 def blank_result(url, access_token):
     query_params = {'q': 'nosuchbuilding'}
