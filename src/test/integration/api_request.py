@@ -1,7 +1,8 @@
 import json
 import requests
-import urllib2
+import urllib3
 import ssl
+import warnings
 from configuration_load import *
 
 def id_request(url, access_token, id):
@@ -52,12 +53,14 @@ def response_time(url, access_token):
     print "API response time: ", response_time, " seconds"
     return response_time
 
-def check_ssl(protocol, url, access_token):
-    try:
-        context = ssl.SSLContext(protocol)
-        request = urllib2.Request(url + "?q=Oxford", headers={"Authorization" : access_token})
-        urllib2.urlopen(request, context=context)
-    except (urllib2.URLError):
-        return False
-    else:
-        return True
+def check_ssl(protocol, url):
+    manager = urllib3.poolmanager.PoolManager(
+        ssl_version=protocol)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', urllib3.exceptions.InsecureRequestWarning)
+        try:
+            manager.request('GET', url)
+        except urllib3.exceptions.SSLError:
+            return False
+        else:
+            return True
