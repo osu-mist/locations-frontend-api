@@ -11,7 +11,10 @@ This directory contains files that run integration tests against the locations f
 Use these commands to build and run the container. All you need installed is Docker.
 
     docker build -t locations-frontend-integration-tests .
-    docker run -v "$PWD"/configuration.json locations-frontend-integration-tests
+    # Run the integration tests in *nix
+    docker run -v "$PWD"/configuration.json:/usr/src/app/configuration.json locations-frontend-integration-tests
+    # Run the integration tests in Windows
+    docker run -v c:\path\to\configuration.json:/c:\usr\src\app\configuration.json locations-frontend-integration-tests
 
 Successfully passing all the tests with the command above would output this result:
 
