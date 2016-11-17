@@ -38,6 +38,20 @@ class gateway_tests(unittest.TestCase):
         building_dixon = query_request(url, access_token, "get", {'q': 'Dixon', 'type': 'building'}).json()
         self.assertEqual(len(building_dixon['data']), 2)
 
+        # test search only from name + abbr
+        building_library = query_request(url, access_token, "get", {'q': 'library'}).json()
+        self.assertEqual(len(building_library['data']), 1)
+
+        building_library = query_request(url, access_token, "get", {'q': 'vlib'}).json()
+        self.assertEqual(len(building_library['data']), 1)
+
+        # test filter
+        dinning_library = query_request(url, access_token, "get", {'q': 'library', 'type': 'dining'}).json()
+        self.assertEqual(len(dinning_library['data']), 0)
+
+        building_engineering = query_request(url, access_token, "get", {'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
+        self.assertEqual(len(building_engineering['data']), 2)
+
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
         links = results_with_links(url, access_token)
