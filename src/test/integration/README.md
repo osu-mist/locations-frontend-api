@@ -8,13 +8,13 @@ This directory contains files that run integration tests against the locations f
 * [ssl](https://pypi.python.org/pypi/ssl/)
 * [urllib2](https://docs.python.org/2/library/urllib2.html)
 
-Use this command to run the tests:
+Use these commands to build and run the container. All you need installed is Docker.
 
-	python integrationtests.py -i /path/to/configuration.json
-
-Any unittest command line arguments should be used before the -i argument. For example, this command will run the tests in verbose mode:
-	
-	python integrationtests.py -v -i /path/to/configuration.json
+    docker build -t locations-frontend-integration-tests .
+    # Run the integration tests in *nix
+    docker run -v "$PWD"/configuration.json:/usr/src/app/configuration.json locations-frontend-integration-tests
+    # Run the integration tests in Windows
+    docker run -v c:\path\to\configuration.json:/c:\usr\src\app\configuration.json locations-frontend-integration-tests
 
 Successfully passing all the tests with the command above would output this result:
 

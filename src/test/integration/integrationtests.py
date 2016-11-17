@@ -78,15 +78,27 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a call using TLSv1 is successful
     def test_tls_v1(self):
-        self.assertTrue(check_ssl(ssl.PROTOCOL_TLSv1, url, access_token))
+        self.assertTrue(check_ssl(ssl.PROTOCOL_TLSv1, url))
 
     # Tests that a call using SSLv2 is unsuccessful
     def test_ssl_v2(self):
-        self.assertFalse(check_ssl(ssl.PROTOCOL_SSLv2, url, access_token))
+        try:
+            # openssl can be compiled without SSLv2 support, in which case
+            # the PROTOCOL_SSLv2 constant is not available
+            ssl.PROTOCOL_SSLv2
+        except AttributeError:
+            self.skipTest('SSLv2 support not available')
+        self.assertFalse(check_ssl(ssl.PROTOCOL_SSLv2, url))
 
     # Tests that a call using SSLv3 is unsuccessful
     def test_ssl_v3(self):
-        self.assertFalse(check_ssl(ssl.PROTOCOL_SSLv3, url, access_token))
+        try:
+            # openssl can be compiled without SSLv3 support, in which case
+            # the PROTOCOL_SSLv3 constant is not available
+            ssl.PROTOCOL_SSLv3
+        except AttributeError:
+            self.skipTest('SSLv3 support not available')
+        self.assertFalse(check_ssl(ssl.PROTOCOL_SSLv3, url))
 
 if __name__ == '__main__':
     options_tpl = ('-i', 'config_path')
