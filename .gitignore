@@ -6,11 +6,13 @@ build/
 logs/
 configuration.yaml
 
+
 # IntelliJ IDEA
 *.iml
 *.ipr
 *.iws
 .idea/
+classes/
 
 # Mac OS X
 .DS_Store
@@ -23,3 +25,8 @@ build.properties
 
 # Python Compiled Bytecode
 *.pyc
+
+# key-pair
+*.cer
+*.keystore
+*.truststore

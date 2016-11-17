@@ -105,32 +105,30 @@ class LocationDAO {
      */
     private def getESSearchQuery(String q, String campus, String type, int pageNumber, int pageSize) {
         def esQuery = [
-                "query": [
-                    "filtered": [
-                        "filter": [
-                            "bool": [
-                                "must": []
-                            ]
-                        ],
-                        "query": [:]
-                    ]
-                ],
-                "from" : (pageNumber - 1) * pageSize,
-                "size" : pageSize
+            "query": [
+                "bool": [
+                    "must": [],
+                    "filter": []
+                ]
+            ],
+            "from": (pageNumber - 1) * pageSize,
+            "size": pageSize
         ]
 
+
         if (campus) {
-            esQuery.query.filtered.filter.bool.must += ["term": ["attributes.campus": campus]]
+            esQuery.query.bool.must += [ "match": [ "attributes.campus": campus ]]
         }
 
         if (type) {
-            esQuery.query.filtered.filter.bool.must += ["term": ["attributes.type": type]]
+            esQuery.query.bool.must += [ "match": [ "attributes.type": type ]]
         }
 
         if (q) {
-            esQuery.query.filtered.query = ["query_string": ["query": q]]
-        } else {
-            esQuery.query.filtered.query = [ "match_all": [:] ]
+            esQuery.query.bool.filter = [ "multi_match" : [
+                    "query":    q,
+                    "fields": [ "attributes.name", "attributes.abbreviation" ]
+            ]]
         }
 
         esQuery
