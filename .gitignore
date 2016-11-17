@@ -30,3 +30,6 @@ build.properties
 *.cer
 *.keystore
 *.truststore
+
+# virtual_len
+**/virtual_env/*
