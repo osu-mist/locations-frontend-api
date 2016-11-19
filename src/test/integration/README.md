@@ -13,7 +13,7 @@ Use this command to run the tests:
 	python integrationtests.py -i /path/to/configuration.json
 
 Any unittest command line arguments should be used before the -i argument. For example, this command will run the tests in verbose mode:
-	
+
 	python integrationtests.py -v -i /path/to/configuration.json
 
 Successfully passing all the tests with the command above would output this result:

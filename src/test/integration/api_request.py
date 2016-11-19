@@ -8,7 +8,7 @@ def id_request(url, access_token, id):
     url += id
     headers = {'Authorization': access_token}
     request = requests.get(url, headers=headers)
-    return request.json()    
+    return request.json()
 
 def query_request(url, access_token, verb, query_params):
     headers = {'Authorization': access_token}
@@ -26,7 +26,7 @@ def unauth_request(url):
     query_params = {'q': 'Oxford'}
     request = requests.get(url, params=query_params)
     return request.status_code
-    
+
 def not_found_request(url, access_token, query_params):
     headers = {'Authorization': access_token}
     request = requests.get(url, params=query_params, headers=headers)
@@ -37,7 +37,7 @@ def blank_result(url, access_token):
     headers = {'Authorization': access_token}
     request = requests.get(url, params=query_params, headers=headers)
     response = request.json()
-    
+
     if response["data"] == []:
         return True
     else:
@@ -48,7 +48,7 @@ def response_time(url, access_token):
     headers = {'Authorization': access_token}
     request = requests.get(url, params=query_params, headers=headers)
     response_time = request.elapsed.total_seconds()
-    
+
     print "API response time: ", response_time, " seconds"
     return response_time
 

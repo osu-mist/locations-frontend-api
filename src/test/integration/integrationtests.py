@@ -38,6 +38,20 @@ class gateway_tests(unittest.TestCase):
         building_dixon = query_request(url, access_token, "get", {'q': 'Dixon', 'type': 'building'}).json()
         self.assertEqual(len(building_dixon['data']), 2)
 
+        # test search only from name + abbr
+        building_library = query_request(url, access_token, "get", {'q': 'library'}).json()
+        self.assertEqual(len(building_library['data']), 1)
+
+        building_library = query_request(url, access_token, "get", {'q': 'vlib'}).json()
+        self.assertEqual(len(building_library['data']), 1)
+
+        # test filter
+        dinning_library = query_request(url, access_token, "get", {'q': 'library', 'type': 'dining'}).json()
+        self.assertEqual(len(dinning_library['data']), 0)
+
+        building_engineering = query_request(url, access_token, "get", {'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
+        self.assertEqual(len(building_engineering['data']), 2)
+
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
         links = results_with_links(url, access_token)
@@ -53,11 +67,11 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a nonexistent campus returns a 404
     def test_not_found(self):
-        self.assertEqual(not_found_request(url, access_token, 
+        self.assertEqual(not_found_request(url, access_token,
             {'q': 'Hello world', 'campus': 'Pluto'}).status_code, 404)
-        self.assertEqual(not_found_request(url, access_token, 
+        self.assertEqual(not_found_request(url, access_token,
             {'q': 'Hello world', 'type': 'invalid-type'}).status_code, 404)
-        self.assertEqual(not_found_request(url, access_token, 
+        self.assertEqual(not_found_request(url, access_token,
             {'q': 'Hello world', 'campus': 'Pluto', 'type': 'invalid-type'}).status_code, 404)
 
     # Tests that a 404 response contains correct JSON fields
@@ -82,6 +96,12 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a call using SSLv2 is unsuccessful
     def test_ssl_v2(self):
+        try:
+            # openssl can be compiled without SSLv2 support, in which case
+            # the PROTOCOL_SSLv2 constant is not available
+            ssl.PROTOCOL_SSLv2
+        except AttributeError:
+            self.skipTest('SSLv2 support not available')
         self.assertFalse(check_ssl(ssl.PROTOCOL_SSLv2, url, access_token))
 
     # Tests that a call using SSLv3 is unsuccessful
@@ -91,7 +111,7 @@ class gateway_tests(unittest.TestCase):
 if __name__ == '__main__':
     options_tpl = ('-i', 'config_path')
     del_list = []
-    
+
     for i,config_path in enumerate(sys.argv):
         if config_path in options_tpl:
             del_list.append(i)
