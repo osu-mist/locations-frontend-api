@@ -21,9 +21,25 @@ paths:
       parameters:
         - in: query
           name: q
-          description: "Query to search through buildings. Looks through the building name, abbreviation, summary and description"
+          description: "Query to search through buildings. Looks through the building name, abbreviation. Disabled when lat/lon parameter are presented."
           required: false
           type: string
+        - in: query
+          name: lat
+          description: "Latitude of the location. Should be used with lon parameter"
+          required: false
+          type: number
+          format: double
+        - in: query
+          name: lon
+          description: "Longitude of the location. Should be used with lat parameter"
+          required: false
+          type: number
+          format: double
+        - in: query
+          name: isopen
+          required: false
+          type: boolean
         - in: query
           name: campus
           description: "Name of the campus. Valid options are: corvallis and extension"
