@@ -25,11 +25,12 @@ class LocationDAO {
      *
      * @return json             JSON search results from ES
      */
-    String search(String q, String campus, String type, Integer pageNumber, Integer pageSize) {
+    String search(String q, String campus, String type, Double lat,
+                  Double lon, Boolean isOpen, Integer pageNumber, Integer pageSize) {
         ObjectMapper mapper = new ObjectMapper()
 
         // generate ES query to search for locations
-        def esQuery = getESSearchQuery(q, campus, type, pageNumber, pageSize)
+        def esQuery = getESSearchQuery(q, campus, type, lat, lon, isOpen, pageNumber, pageSize)
         String esQueryJson = mapper.writeValueAsString(esQuery)
 
         // get data from ES
@@ -103,7 +104,8 @@ class LocationDAO {
      * @param query
      * @return
      */
-    private def getESSearchQuery(String q, String campus, String type, int pageNumber, int pageSize) {
+    private def getESSearchQuery(String q, String campus, String type, Double lat,
+                                 Double lon, Boolean isOpen,int pageNumber, int pageSize) {
         def esQuery = [
             "query": [
                 "bool": [
@@ -128,6 +130,14 @@ class LocationDAO {
             esQuery.query.bool.filter = [ "multi_match" : [
                     "query":    q,
                     "fields": [ "attributes.name", "attributes.abbreviation" ]
+            ]]
+        } else {
+            esQuery.query.bool.filter = ["geo_distance": [
+                "distance": "0.2km",
+                "attributes.geoLocation": [
+                    "lat": lat,
+                    "lon": lon
+                ]
             ]]
         }
 

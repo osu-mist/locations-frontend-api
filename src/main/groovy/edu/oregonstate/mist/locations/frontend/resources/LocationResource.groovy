@@ -70,21 +70,25 @@ class LocationResource extends Resource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
-    Response list(@QueryParam('q') String q, @QueryParam('campus') String campus, @QueryParam('type') String type,
-                  @Auth AuthenticatedUser authenticatedUser) {
+    Response list(@QueryParam('q') String q, @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
+                  @QueryParam('isopen') Boolean isOpen, @QueryParam('campus') String campus,
+                  @QueryParam('type') String type, @Auth AuthenticatedUser authenticatedUser) {
         try {
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
             def trimmedType = sanitize(type?.trim()?.toLowerCase())
+            isOpen = isOpen == null? false: isOpen
 
             // validate filtering parameters
             def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
             def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
-            if (invalidCampus || invalidType) {
+            def invalidLocation = (lat == null && lon != null) || (lat != null && lon == null)
+            if (invalidCampus || invalidType || invalidLocation) {
                 return notFound().build()
             }
 
-            String result = locationDAO.search(trimmedQ, trimmedCampus, trimmedType, pageNumber, pageSize)
+            String result = locationDAO.search(
+                    trimmedQ, trimmedCampus, trimmedType, lat, lon, isOpen, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []
