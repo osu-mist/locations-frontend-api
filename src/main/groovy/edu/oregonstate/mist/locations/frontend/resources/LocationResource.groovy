@@ -9,6 +9,7 @@ import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.jsonapi.ResourceObject
 import edu.oregonstate.mist.locations.frontend.jsonapi.ResultObject
+import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
 import io.dropwizard.auth.Auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -96,13 +97,12 @@ class LocationResource extends Resource {
 
             // parse ES into JSON Node
             ObjectMapper mapper = new ObjectMapper() // can reuse, share globally
+            LocationMapper locationMapper = new LocationMapper()
             JsonNode actualObj = mapper.readTree(result)
 
             def topLevelHits = actualObj.get("hits")
             topLevelHits.get("hits").asList().each {
-                String singleLocation = it.get("_source").toString()
-                println(it.get("sort").toString())
-                resultObject.data += (ResourceObject) mapper.readValue(singleLocation, Object.class)
+                resultObject.data += locationMapper.map(it)
             }
 
             setPaginationLinks(topLevelHits, q, type, campus, resultObject)
@@ -115,9 +115,6 @@ class LocationResource extends Resource {
 
     }
 
-    private String getSingleLocation(JsonNode source, JsonNode sort) {
-
-    }
 
     /**
      * Add pagination links to the data search results.
