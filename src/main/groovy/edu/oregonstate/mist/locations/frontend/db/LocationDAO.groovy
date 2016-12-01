@@ -2,7 +2,6 @@ package edu.oregonstate.mist.locations.frontend.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.joda.time.DateTime
-import groovy.json.JsonSlurper
 
 
 /**
@@ -116,6 +115,7 @@ class LocationDAO {
                     "filter": []
                 ]
             ],
+            "sort": [],
             "from": (pageNumber - 1) * pageSize,
             "size": pageSize
         ]
@@ -161,8 +161,7 @@ class LocationDAO {
                 ]
         ]]
 
-        esQuery += [
-                "sort": [
+        esQuery.sort = [
                         "_geo_distance": [
                                 "attributes.geoLocation": [
                                         "lat":  lat,
@@ -171,7 +170,7 @@ class LocationDAO {
                                 "order":         "asc",
                                 "unit":          "km",
                                 "distance_type": "plane"]
-                ]]
+                ]
     }
 
     /**

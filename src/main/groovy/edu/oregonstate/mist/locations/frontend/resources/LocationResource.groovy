@@ -3,6 +3,7 @@ package edu.oregonstate.mist.locations.frontend.resources
 import com.codahale.metrics.annotation.Timed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor
 import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
@@ -100,6 +101,7 @@ class LocationResource extends Resource {
             def topLevelHits = actualObj.get("hits")
             topLevelHits.get("hits").asList().each {
                 String singleLocation = it.get("_source").toString()
+                println(it.get("sort").toString())
                 resultObject.data += (ResourceObject) mapper.readValue(singleLocation, Object.class)
             }
 
@@ -110,6 +112,10 @@ class LocationResource extends Resource {
             LOGGER.error("Exception while getting locations.",e)
             internalServerError("Woot you found a bug for us to fix!").build()
         }
+
+    }
+
+    private String getSingleLocation(JsonNode source, JsonNode sort) {
 
     }
 
