@@ -1,6 +1,9 @@
 # Gradle
 .gradle/
 
+# Extra dependencies (database drivers)
+bin/
+
 # Dropwizard
 build/
 logs/
@@ -12,7 +15,11 @@ configuration.yaml
 *.ipr
 *.iws
 .idea/
+<<<<<<< HEAD
 classes/
+=======
+out/
+>>>>>>> skeleton/master
 
 # Mac OS X
 .DS_Store
@@ -20,6 +27,7 @@ classes/
 # Build Properties
 build.properties
 
+<<<<<<< HEAD
 # Integration Tests Configuration
 **/configuration.json
 
@@ -33,3 +41,10 @@ build.properties
 
 # virtual_len
 **/virtual_env/*
+=======
+# Keytool Files
+*.pem
+*.cer
+*.keystore
+*.truststore
+>>>>>>> skeleton/master

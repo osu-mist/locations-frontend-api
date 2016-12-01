@@ -84,7 +84,7 @@ class LocationMapper {
         Map<Integer, List<DayOpenHours>> openHours = new HashMap<Integer, List<DayOpenHours>>()
         if ( node != null ) {
             (1..7).each {
-                openHours.put(it, _getHoursList(node.get(Integer.toString(it))))
+                openHours.put(it, getHoursList(node.get(Integer.toString(it))))
             }
         }
 
@@ -96,19 +96,19 @@ class LocationMapper {
      * @param node
      * @return
      */
-    private static List<DayOpenHours> _getHoursList(JsonNode node) {
-        List<DayOpenHours> _hoursList = new ArrayList<DayOpenHours>()
+    private static List<DayOpenHours> getHoursList(JsonNode node) {
+        List<DayOpenHours> hoursList = new ArrayList<DayOpenHours>()
 
         if ( node != null ) {
             node.asList().each {
-                _hoursList.add(new DayOpenHours(
+                hoursList.add(new DayOpenHours(
                         start: (new DateTime(it.get("start").asText())).toDate(),
                         end: (new DateTime(it.get("end").asText())).toDate()
                 ))
             }
         }
 
-        _hoursList
+        hoursList
     }
 
 }

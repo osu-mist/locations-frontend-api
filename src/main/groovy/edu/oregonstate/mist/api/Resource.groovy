@@ -1,7 +1,10 @@
 package edu.oregonstate.mist.api
 
+import javax.ws.rs.core.Context
 import javax.ws.rs.core.Response
 import javax.ws.rs.core.Response.ResponseBuilder
+import org.apache.http.client.utils.URIBuilder
+import javax.ws.rs.core.UriInfo
 
 /**
  * Abstract class for reusing common response messages.
@@ -9,8 +12,30 @@ import javax.ws.rs.core.Response.ResponseBuilder
 abstract class Resource {
     protected static Properties properties = new Properties()
 
-    public static loadProperties(String fileName) {
-        properties.load(new FileReader(fileName))
+    /**
+     * Default page number used in pagination
+     */
+    public static final Integer DEFAULT_PAGE_NUMBER = 1
+
+    /**
+     * Default page size used in pagination
+     */
+    public static final Integer DEFAULT_PAGE_SIZE = 10
+
+    @Context
+    UriInfo uriInfo
+
+    /**
+     * URI used to provide jsonapi pagination links.
+     */
+    private URI endpointUri
+
+    public static loadProperties() {
+        def stream = this.getResourceAsStream('resource.properties')
+        if (stream == null) {
+            throw new Exception("couldn't open resource.properties")
+        }
+        properties.load(stream)
     }
 
     /**
@@ -69,7 +94,8 @@ abstract class Resource {
     }
 
     /**
-     * Returns a builder for an HTTP 500 ("internal server error") response with an error message as body.
+     * Returns a builder for an HTTP 500 ("internal server error") response with an error message
+     * as body.
      *
      * @return internal server error response builder
      */
@@ -82,5 +108,69 @@ abstract class Resource {
                 code: Integer.parseInt(properties.get('internalServerError.code')),
                 details: properties.get('internalServerError.details')
         ))
+    }
+
+    void setEndpointUri(URI endpointUri) {
+        this.endpointUri = endpointUri
+    }
+
+    /**
+     * Constructs a url to use in pagination links.
+     *
+     * The path is copied from the request path.
+     * The query parameters are taken from the params argument.
+     *
+     * Falsey params are omitted from the url.
+     * The parameters pageNumber and pageSize are
+     * converted to page[number] and page[size].
+     *
+     * @param params a map of query parameters for the url
+     * @return the url
+     */
+    protected String getPaginationUrl(Map params) {
+        URIBuilder uriBuilder = new URIBuilder(endpointUri).setPath(uriInfo.requestUri.path)
+
+        // use a copy of params since other parameters could be present
+        def nonNullParams = params.clone()
+        nonNullParams.remove('pageSize')
+        nonNullParams.remove('pageNumber')
+
+        // convert pageVariable to page[variable]
+        nonNullParams["page[number]"] = params['pageNumber']
+        nonNullParams["page[size]"] = params['pageSize']
+
+        nonNullParams.findAll { it.value } .collect { k, v ->
+            uriBuilder.setParameter(k, v.toString())
+        }
+
+        uriBuilder.build().toString()
+    }
+
+    /**
+     *  Returns the page number used by pagination. The value of: page[number] in the url.
+     *
+     * @return
+     */
+    protected Integer getPageNumber() {
+        def pageNumber = uriInfo.getQueryParameters().getFirst('page[number]')
+        if (!pageNumber || !pageNumber.isInteger()) {
+            return DEFAULT_PAGE_NUMBER
+        }
+
+        pageNumber.toInteger()
+    }
+
+    /**
+     * Returns the page size used by pagination. The value of: page[size] in the url.
+     *
+     * @return
+     */
+    protected Integer getPageSize() {
+        def pageSize = uriInfo.getQueryParameters().getFirst('page[size]')
+        if (!pageSize || !pageSize.isInteger()) {
+            return DEFAULT_PAGE_SIZE
+        }
+
+        pageSize.toInteger()
     }
 }

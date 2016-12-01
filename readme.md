@@ -18,6 +18,7 @@ curl -s -XPOST localhost:9200/locations/locations/_bulk --data-binary "@path-to-
 
 ## Configure
 
+
 Copy [configuration-example.yaml](configuration-example.yaml) to `configuration.yaml`. Modify as necessary, being careful to avoid committing sensitive data.
 
 Please refer to [Location Frontend API](https://wiki.library.oregonstate.edu/confluence/display/CO/Location+Frontend+API) for `locations` session configuration
@@ -37,6 +38,7 @@ Run the project:
 ## Resources
 
 The Web API definition is contained in the [Swagger specification](swagger.yaml).
+
 
 ### GET /locations/{id}
 

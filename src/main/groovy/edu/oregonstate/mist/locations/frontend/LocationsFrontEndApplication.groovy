@@ -15,8 +15,6 @@ import io.dropwizard.setup.Environment
 import io.dropwizard.auth.AuthFactory
 import io.dropwizard.auth.basic.BasicAuthFactory
 
-import javax.ws.rs.client.Client
-
 /**
  * Main application class.
  */
@@ -38,14 +36,14 @@ class LocationsFrontEndApplication extends Application<LocationsFrontendConfigur
     @Override
     public void run(LocationsFrontendConfiguration configuration, Environment environment) {
         Resource.loadProperties('resource.properties')
-        final LocationDAO locationDAO = new LocationDAO(configuration.locationsConfiguration)
+        final LocationDAO LOCATION_DAO = new LocationDAO(configuration.locationsConfiguration)
 
         environment.jersey().register(new SampleResource())
         environment.jersey().register(new InfoResource())
-        environment.jersey().register(new LocationResource(locationDAO))
-        final ElasticSearchHealthCheck healthCheck =
+        environment.jersey().register(new LocationResource(LOCATION_DAO))
+        final ElasticSearchHealthCheck HEALTH_CHECK =
                 new ElasticSearchHealthCheck(configuration.locationsConfiguration)
-        environment.healthChecks().register("elasticSearchCluster", healthCheck)
+        environment.healthChecks().register("elasticSearchCluster", HEALTH_CHECK)
 
         environment.jersey().register(
                 AuthFactory.binder(

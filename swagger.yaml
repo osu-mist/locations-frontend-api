@@ -108,7 +108,6 @@ paths:
             $ref: "#/definitions/Errors"
       security:
         - locations_api_key: []
-    
 
 securityDefinitions:
 
@@ -233,10 +232,13 @@ definitions:
         format: int32
       developerMessage:
         type: string
+        description: An error string aimed at developers.
       userMesage:
         type: string
+        description: An error string aimed at end users.
       code:
         type: integer
+        description: Error code.
       details:
         type: string
 

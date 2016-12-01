@@ -5,43 +5,18 @@ ruleset {
     description 'MIST Groovy RuleSet'
 
     /* class name starts with a uppercase letter */
-    ClassName {
-        description = 'Verify that class name starts with an uppercase letter followed by zero or ' +
-                      'more word characters or dollar signs, warning if skeleton code is unchanged.'
-        regex = '''(?x)
-                   ^(
-                     (?!(SkeletonApplication|Sample|SampleResource)$) # fail on skeleton class names
-                     ([A-Z]\\w*$?)*                                   # codenarc default
-                   )$'''
-        priority = 3
-    }
+    ClassName
 
     /* variable name starts with a lowercase letter */
-    VariableName {
-        description = 'Verify that class name starts with an lowercase letter followed by zero or ' +
-                'more word characters or dollar signs, warning if skeleton code is unchanged.'
-        regex = '''(?x)
-                   ^(
-                     ([a-z]\\w*$?)*
-                   )$'''
-        priority = 3
-    }
+    VariableName
 
     /* method name starts with a lowercase letter */
     MethodName
 
     PackageName {
-        description = 'Verify that package name begins with \'edu.oregonstate.mist.\' and consists ' +
-                      'only of lowercase letters and numbers separated by periods, warning if ' +
-                      'skeleton code is unchanged.'
-        regex = '''(?x)
-                   ^(
-                     edu\\.oregonstate\\.mist # begin with edu.oregonstate.mist
-                     (?!\\.webapiskeleton)    # fail on skeleton package name
-                     (\\.[a-z0-9]+)*          # periods separate lowercase alphanumeric package names
-                   )$'''
+        description = "Verify that package name begins with 'edu.oregonstate.mist.'"
+        regex = /^edu\.oregonstate\.mist\..*$/
         packageNameRequired = true
-        priority = 3
     }
 
     /* package name consists only of lowercase letters and numbers, separated
@@ -60,6 +35,11 @@ ruleset {
     /* Checks that else blocks use braces, even for a single statement. */
     ElseBlockBraces
 
+    /* Checks the location of the opening brace ({) for if statements, including elseOnSameLineAsClosingBrace and elseOnSameLineAsOpeningBrace */
+    BracesForIfElse {
+        validateElse = true
+    }
+
     /* Checks that for statements use braces, even for a single statement. */
     ForStatementBraces
 
@@ -74,4 +54,28 @@ ruleset {
 
     /* Check that there is at least one space after each closing brace */
     SpaceAfterClosingBrace
+
+    /* Check that the opening brace for the method starts on the same line */
+    BracesForMethod
+
+    /* Check that there is at least one space (blank) or whitespace around each binary operator */
+    SpaceAroundOperator
+
+    /* Check that the opening brace for classes starts on the same line */
+    BracesForClass
+
+    /* Check that the opening brace for loops starts on the same line */
+    BracesForForLoop
+
+    /* Check that the opening brace for try statements starts on the same line */
+    BracesForTryCatchFinally
+
+    /* Checks the maximum length for each line of source code. Defaults is 120 characters maximum. */
+    LineLength {
+        description = 'Checks for number of characters, so lines that include tabs may not ' +
+                      'exceed 100 characters.'
+        length = 100
+
+        priority = 3
+    }
 }

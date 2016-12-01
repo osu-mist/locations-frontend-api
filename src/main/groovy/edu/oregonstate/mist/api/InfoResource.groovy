@@ -14,6 +14,10 @@ import javax.ws.rs.core.Response
 class InfoResource extends Resource {
     private Info info = new Info()
 
+    public InfoResource(Info info) {
+        this.info = info
+    }
+
     /**
      * Responds to GET requests by returning object containing information.
      *

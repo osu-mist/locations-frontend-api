@@ -3,7 +3,6 @@ package edu.oregonstate.mist.locations.frontend.db
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.joda.time.DateTime
 
-
 /**
  * Handles HTTP requests against ElasticSearch. Operation supported are:
  * search and findById.

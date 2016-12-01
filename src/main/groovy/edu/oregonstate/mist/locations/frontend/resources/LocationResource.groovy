@@ -3,11 +3,9 @@ package edu.oregonstate.mist.locations.frontend.resources
 import com.codahale.metrics.annotation.Timed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor
 import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
-import edu.oregonstate.mist.locations.frontend.jsonapi.ResourceObject
 import edu.oregonstate.mist.locations.frontend.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
 import io.dropwizard.auth.Auth
@@ -72,14 +70,15 @@ class LocationResource extends Resource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
-    Response list(@QueryParam('q') String q, @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
-                  @QueryParam('isopen') Boolean isOpen, @QueryParam('campus') String campus,
-                  @QueryParam('type') String type, @Auth AuthenticatedUser authenticatedUser) {
+    Response list(@QueryParam('q') String q, @QueryParam('lat') Double lat,
+                  @QueryParam('lon') Double lon, @QueryParam('isopen') Boolean isOpen,
+                  @QueryParam('campus') String campus, @QueryParam('type') String type,
+                  @Auth AuthenticatedUser authenticatedUser) {
         try {
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
             def trimmedType = sanitize(type?.trim()?.toLowerCase())
-            isOpen = isOpen == null? false: isOpen
+            isOpen = isOpen == null ? false : isOpen
 
             // validate filtering parameters
             def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
@@ -109,17 +108,16 @@ class LocationResource extends Resource {
 
             ok(resultObject).build()
         } catch (Exception e) {
-            LOGGER.error("Exception while getting locations.",e)
+            LOGGER.error("Exception while getting locations.", e)
             internalServerError("Woot you found a bug for us to fix!").build()
         }
 
     }
 
-
     /**
      * Add pagination links to the data search results.
      *
-     * @param topLevelHits          First "hits" node in the json document
+     * @param topLevelHits First "hits" node in the json document
      * @param q
      * @param type
      * @param campus
@@ -136,10 +134,10 @@ class LocationResource extends Resource {
         Integer pageNumber = getPageNumber()
         Integer pageSize = getPageSize()
         def urlParams = [
-                "q": q,
-                "type": type,
-                "campus": campus,
-                "pageSize": pageSize,
+                "q"         : q,
+                "type"      : type,
+                "campus"    : campus,
+                "pageSize"  : pageSize,
                 "pageNumber": pageNumber
         ]
 
@@ -166,26 +164,26 @@ class LocationResource extends Resource {
         }
     }
 
-    /**
-     * Returns string url to use in pagination links.
-     *
-     * @param params
-     * @return
-     */
-    private String getPaginationUrl(def params) {
-        def uriAndPath = locationDAO.getGatewayUrl() + uriInfo.getPath()
-        def nonNullParams = params.clone()
-        // convert pageVariable to page[variable]
-        nonNullParams["page[number]"] = nonNullParams['pageNumber']
-        nonNullParams["page[size]"] = nonNullParams['pageSize']
-        nonNullParams.remove('pageSize')
-        nonNullParams.remove('pageNumber')
-
-        // remove empty GET parameters
-        nonNullParams = nonNullParams.findAll { it.value } .collect { k, v -> "$k=$v" }
-
-        uriAndPath + "?" + nonNullParams.join('&')
-    }
+//    /**
+//     * Returns string url to use in pagination links.
+//     *
+//     * @param params
+//     * @return
+//     */
+//    private String getPaginationUrl(def params) {
+//        def uriAndPath = locationDAO.getGatewayUrl() + uriInfo.getPath()
+//        def nonNullParams = params.clone()
+//        // convert pageVariable to page[variable]
+//        nonNullParams["page[number]"] = nonNullParams['pageNumber']
+//        nonNullParams["page[size]"] = nonNullParams['pageSize']
+//        nonNullParams.remove('pageSize')
+//        nonNullParams.remove('pageNumber')
+//
+//        // remove empty GET parameters
+//        nonNullParams = nonNullParams.findAll { it.value } .collect { k, v -> "$k=$v" }
+//
+//        uriAndPath + "?" + nonNullParams.join('&')
+//    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -194,7 +192,7 @@ class LocationResource extends Resource {
     Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
         try {
             ResultObject resultObject = new ResultObject()
-            String esResponse  = locationDAO.getById(id)
+            String esResponse = locationDAO.getById(id)
 
             if (!esResponse) {
                 return notFound().build()
@@ -227,7 +225,8 @@ class LocationResource extends Resource {
     /**
      * Returns the value for an array parameter in the GET string.
      *
-     * The JSONAPI format reserves the page parameter for pagination. This API uses page[size] and page[number].
+     * The JSONAPI format reserves the page parameter for pagination.
+     * This API uses page[size] and page[number].
      * This function allows us to get just value for a specific parameter in an array.
      *
      * @param key
@@ -235,7 +234,8 @@ class LocationResource extends Resource {
      * @param queryParameters
      * @return
      */
-    public static String getArrayParameter(String key, String index,  MultivaluedMap<String, String> queryParameters) {
+    public static String getArrayParameter(String key, String index,
+                                           MultivaluedMap<String, String> queryParameters) {
         // @todo: this function should probably be moved to the skeleton
         for (Map.Entry<String, List<String>> entry : queryParameters.entrySet()) {
             // not an array parameter
@@ -256,31 +256,32 @@ class LocationResource extends Resource {
         null
     }
 
-    /**
-     *  Returns the page number used by pagination. The value of: page[number] in the url.
-     *
-     * @return
-     */
-    private Integer getPageNumber() {
-        def pageNumber = getArrayParameter("page", "number", uriInfo.getQueryParameters())
-        if (!pageNumber || !pageNumber.isInteger()) {
-            return DEFAULT_PAGE_NUMBER
-        }
-
-        pageNumber.toInteger()
-    }
-
-    /**
-     * Returns the page size used by pagination. The value of: page[size] in the url.
-     *
-     * @return
-     */
-    private Integer getPageSize() {
-        def pageSize = getArrayParameter("page", "size", uriInfo.getQueryParameters())
-        if (!pageSize || !pageSize.isInteger()) {
-            return DEFAULT_PAGE_SIZE
-        }
-
-        pageSize.toInteger()
-    }
+//    /**
+//     *  Returns the page number used by pagination. The value of: page[number] in the url.
+//     *
+//     * @return
+//     */
+//    private Integer getPageNumber() {
+//        def pageNumber = getArrayParameter("page", "number", uriInfo.getQueryParameters())
+//        if (!pageNumber || !pageNumber.isInteger()) {
+//            return DEFAULT_PAGE_NUMBER
+//        }
+//
+//        pageNumber.toInteger()
+//    }
+//
+//    /**
+//     * Returns the page size used by pagination. The value of: page[size] in the url.
+//     *
+//     * @return
+//     */
+//    private Integer getPageSize() {
+//        def pageSize = getArrayParameter("page", "size", uriInfo.getQueryParameters())
+//        if (!pageSize || !pageSize.isInteger()) {
+//            return DEFAULT_PAGE_SIZE
+//        }
+//
+//        pageSize.toInteger()
+//    }
+//}
 }
