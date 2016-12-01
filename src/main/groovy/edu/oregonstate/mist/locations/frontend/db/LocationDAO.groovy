@@ -2,6 +2,8 @@ package edu.oregonstate.mist.locations.frontend.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.joda.time.DateTime
+import groovy.json.JsonSlurper
+
 
 /**
  * Handles HTTP requests against ElasticSearch. Operation supported are:
@@ -110,15 +112,13 @@ class LocationDAO {
         def esQuery = [
             "query": [
                 "bool": [
-                    "must": [:],
-                    "filter": [:]
-                ],
-                "sort" : [:]
+                    "must": [],
+                    "filter": []
+                ]
             ],
             "from": (pageNumber - 1) * pageSize,
             "size": pageSize
         ]
-
 
         if (campus) {
             esQuery.query.bool.must += [ "match": [ "attributes.campus": campus ]]
@@ -129,58 +129,46 @@ class LocationDAO {
         }
 
         if (q) {
-            esQuery.query.bool.filter += [[ "multi_match" : [
+            esQuery.query.bool.filter += [ "multi_match" : [
                     "query":    q,
                     "fields": [ "attributes.name", "attributes.abbreviation" ]
-            ]]]
+            ]]
         }
 
         if (lat && lon) {
-            esQuery.query.bool.filter += [["geo_distance": [
-                "distance": "0.2km",
+            esQuery.query.bool.filter += ["geo_distance": [
+                "distance": "0.5km",
                 "attributes.geoLocation": [
                     "lat": lat,
                     "lon": lon
                 ]
-            ]]]
-
-            esQuery.query.sort = [[
-                "_geo_distance": [
-                    "attributes.geoLocation": [
-                        "lat":  lat,
-                        "lon": lon
-                    ],
-                    "order":         "asc",
-                    "unit":          "km",
-                    "distance_type": "plane"
-                ]
             ]]
+
+            esQuery += [
+                    "sort": [
+                        "_geo_distance": [
+                            "attributes.geoLocation": [
+                                "lat":  lat,
+                                "lon": lon
+                            ],
+                            "order":         "asc",
+                            "unit":          "km",
+                            "distance_type": "plane"]
+                    ]]
         }
 
         if (isOpen) {
             String weekday = Integer.toString(DateTime.now().getDayOfWeek())
-
             esQuery.query.bool.filter += [
-                    [
-                        "nested": [
+                    ["nested": [
                             "path": "attributes.openHours." + weekday,
                             "filter": [
-                                    [ "range": [
-                                        "attributes.openHours." + weekday + ".start": [
-                                            "lt": "now"
-                                        ]
-                                    ]],
-                                    ["range": [
-                                        "attributes.openHours." + weekday + ".end": [
-                                            "gt": "now"
-                                        ]
-                                     ]]
-                                    ]
-                        ]
-                    ]
-            ]
-
+                                    [ "range":["attributes.openHours.${weekday}.start":
+                                                       [ "lt": "now"]]],
+                                    ["range": ["attributes.openHours.${weekday}.end":
+                                                       ["gt": "now"]]]]]]]
         }
+
         esQuery
     }
 }
