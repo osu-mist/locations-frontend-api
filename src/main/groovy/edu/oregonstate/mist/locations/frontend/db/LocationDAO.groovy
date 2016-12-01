@@ -1,6 +1,7 @@
 package edu.oregonstate.mist.locations.frontend.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.joda.time.DateTime
 
 /**
  * Handles HTTP requests against ElasticSearch. Operation supported are:
@@ -109,9 +110,10 @@ class LocationDAO {
         def esQuery = [
             "query": [
                 "bool": [
-                    "must": [],
-                    "filter": []
-                ]
+                    "must": [:],
+                    "filter": [:]
+                ],
+                "sort" : [:]
             ],
             "from": (pageNumber - 1) * pageSize,
             "size": pageSize
@@ -127,20 +129,58 @@ class LocationDAO {
         }
 
         if (q) {
-            esQuery.query.bool.filter = [ "multi_match" : [
+            esQuery.query.bool.filter += [[ "multi_match" : [
                     "query":    q,
                     "fields": [ "attributes.name", "attributes.abbreviation" ]
-            ]]
-        } else {
-            esQuery.query.bool.filter = ["geo_distance": [
+            ]]]
+        }
+
+        if (lat && lon) {
+            esQuery.query.bool.filter += [["geo_distance": [
                 "distance": "0.2km",
                 "attributes.geoLocation": [
                     "lat": lat,
                     "lon": lon
                 ]
+            ]]]
+
+            esQuery.query.sort = [[
+                "_geo_distance": [
+                    "attributes.geoLocation": [
+                        "lat":  lat,
+                        "lon": lon
+                    ],
+                    "order":         "asc",
+                    "unit":          "km",
+                    "distance_type": "plane"
+                ]
             ]]
         }
 
+        if (isOpen) {
+            String weekday = Integer.toString(DateTime.now().getDayOfWeek())
+
+            esQuery.query.bool.filter += [
+                    [
+                        "nested": [
+                            "path": "attributes.openHours." + weekday,
+                            "filter": [
+                                    [ "range": [
+                                        "attributes.openHours." + weekday + ".start": [
+                                            "lt": "now"
+                                        ]
+                                    ]],
+                                    ["range": [
+                                        "attributes.openHours." + weekday + ".end": [
+                                            "gt": "now"
+                                        ]
+                                     ]]
+                                    ]
+                        ]
+                    ]
+            ]
+
+        }
         esQuery
     }
 }
