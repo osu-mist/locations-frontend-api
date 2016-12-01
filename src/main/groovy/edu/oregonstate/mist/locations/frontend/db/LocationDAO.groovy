@@ -136,39 +136,57 @@ class LocationDAO {
         }
 
         if (lat && lon) {
-            esQuery.query.bool.filter += ["geo_distance": [
-                "distance": "0.5km",
-                "attributes.geoLocation": [
-                    "lat": lat,
-                    "lon": lon
-                ]
-            ]]
-
-            esQuery += [
-                    "sort": [
-                        "_geo_distance": [
-                            "attributes.geoLocation": [
-                                "lat":  lat,
-                                "lon": lon
-                            ],
-                            "order":         "asc",
-                            "unit":          "km",
-                            "distance_type": "plane"]
-                    ]]
+            addLocationQuery(esQuery, lat, lon)
         }
 
         if (isOpen) {
-            String weekday = Integer.toString(DateTime.now().getDayOfWeek())
-            esQuery.query.bool.filter += [
-                    ["nested": [
-                            "path": "attributes.openHours." + weekday,
-                            "filter": [
-                                    [ "range":["attributes.openHours.${weekday}.start":
-                                                       [ "lt": "now"]]],
-                                    ["range": ["attributes.openHours.${weekday}.end":
-                                                       ["gt": "now"]]]]]]]
+            addTimeQuery(esQuery)
         }
 
         esQuery
+    }
+
+    /**
+     * Add ES query for searching by location
+     * @param esQuery
+     * @param lat
+     * @param lon
+     */
+    private void addLocationQuery(def esQuery, Double lat, Double lon) {
+        esQuery.query.bool.filter += ["geo_distance": [
+                "distance": "0.5km",
+                "attributes.geoLocation": [
+                        "lat": lat,
+                        "lon": lon
+                ]
+        ]]
+
+        esQuery += [
+                "sort": [
+                        "_geo_distance": [
+                                "attributes.geoLocation": [
+                                        "lat":  lat,
+                                        "lon": lon
+                                ],
+                                "order":         "asc",
+                                "unit":          "km",
+                                "distance_type": "plane"]
+                ]]
+    }
+
+    /**
+     * Add ES query for filtering currently open restaurants
+     * @param esQuery
+     */
+    private void addTimeQuery(def esQuery) {
+        String weekday = Integer.toString(DateTime.now().getDayOfWeek())
+        esQuery.query.bool.filter += [
+                ["nested": [
+                        "path": "attributes.openHours." + weekday,
+                        "filter": [
+                                [ "range":["attributes.openHours.${weekday}.start":
+                                                   [ "lt": "now"]]],
+                                ["range": ["attributes.openHours.${weekday}.end":
+                                                   ["gt": "now"]]]]]]]
     }
 }
