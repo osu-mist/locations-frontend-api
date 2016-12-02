@@ -22,7 +22,8 @@ class LocationResourceTest {
     public void testList() {
         def mock = new MockFor(LocationDAO)
         mock.demand.search() {
-            String q, String campus, String type, Integer pageNumber, Integer pageSize ->
+            String q, String campus, String type, Double lat,
+            Double lon, Boolean isOpen, Integer pageNumber, Integer pageSize ->
                 '{"hits": {"total": 0, "hits": []}}'
         }
         def dao = mock.proxyInstance()
@@ -36,7 +37,7 @@ class LocationResourceTest {
         assert noResultRsp.entity.data == []
 
         // Test: invalid campus
-        def invalidCampRes = resource.list('dixon', null, null, null,'invalid', null, user)
+        def invalidCampRes = resource.list('dixon', 'invalid', null, null, null, null, user)
         assert invalidCampRes.status == 404
         assert invalidCampRes.entity.developerMessage.contains("Not Found")
         assert invalidCampRes.entity.userMessage.contains("Not Found")

@@ -52,7 +52,7 @@ class LocationMapper {
                 campus: attr.get("campus").asText(null),
                 type: attr.get("type").asText(null),
                 openHours: getOpenHours(attr.get("openHours")),
-                distance: sort.get(0).asDouble()
+                distance: sort == null? null: sort.get(0).asDouble()
         )
 
         attributes

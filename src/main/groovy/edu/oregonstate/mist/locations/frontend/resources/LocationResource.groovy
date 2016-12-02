@@ -70,9 +70,10 @@ class LocationResource extends Resource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
-    Response list(@QueryParam('q') String q, @QueryParam('lat') Double lat,
-                  @QueryParam('lon') Double lon, @QueryParam('isopen') Boolean isOpen,
+    Response list(@QueryParam('q') String q,
                   @QueryParam('campus') String campus, @QueryParam('type') String type,
+                  @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
+                  @QueryParam('isopen') Boolean isOpen,
                   @Auth AuthenticatedUser authenticatedUser) {
         try {
             def trimmedQ = sanitize(q?.trim())
@@ -164,27 +165,6 @@ class LocationResource extends Resource {
         }
     }
 
-//    /**
-//     * Returns string url to use in pagination links.
-//     *
-//     * @param params
-//     * @return
-//     */
-//    private String getPaginationUrl(def params) {
-//        def uriAndPath = locationDAO.getGatewayUrl() + uriInfo.getPath()
-//        def nonNullParams = params.clone()
-//        // convert pageVariable to page[variable]
-//        nonNullParams["page[number]"] = nonNullParams['pageNumber']
-//        nonNullParams["page[size]"] = nonNullParams['pageSize']
-//        nonNullParams.remove('pageSize')
-//        nonNullParams.remove('pageNumber')
-//
-//        // remove empty GET parameters
-//        nonNullParams = nonNullParams.findAll { it.value } .collect { k, v -> "$k=$v" }
-//
-//        uriAndPath + "?" + nonNullParams.join('&')
-//    }
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
@@ -256,32 +236,4 @@ class LocationResource extends Resource {
         null
     }
 
-//    /**
-//     *  Returns the page number used by pagination. The value of: page[number] in the url.
-//     *
-//     * @return
-//     */
-//    private Integer getPageNumber() {
-//        def pageNumber = getArrayParameter("page", "number", uriInfo.getQueryParameters())
-//        if (!pageNumber || !pageNumber.isInteger()) {
-//            return DEFAULT_PAGE_NUMBER
-//        }
-//
-//        pageNumber.toInteger()
-//    }
-//
-//    /**
-//     * Returns the page size used by pagination. The value of: page[size] in the url.
-//     *
-//     * @return
-//     */
-//    private Integer getPageSize() {
-//        def pageSize = getArrayParameter("page", "size", uriInfo.getQueryParameters())
-//        if (!pageSize || !pageSize.isInteger()) {
-//            return DEFAULT_PAGE_SIZE
-//        }
-//
-//        pageSize.toInteger()
-//    }
-//}
 }
