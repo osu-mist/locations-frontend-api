@@ -35,7 +35,8 @@ class LocationsFrontEndApplication extends Application<LocationsFrontendConfigur
      */
     @Override
     public void run(LocationsFrontendConfiguration configuration, Environment environment) {
-        Resource.loadProperties('resource.properties')
+//        Resource.loadProperties('resource.properties')
+        Resource.loadProperties()
         final LocationDAO LOCATION_DAO = new LocationDAO(configuration.locationsConfiguration)
 
         environment.jersey().register(new SampleResource())

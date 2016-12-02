@@ -142,7 +142,7 @@ class LocationResource extends Resource {
         ]
 
         int lastPage = Math.ceil(totalHits / pageSize)
-
+        setEndpointUri(URI.create(locationDAO.getGatewayUrl()))
         resultObject.links["self"] = getPaginationUrl(urlParams)
         urlParams.pageNumber = 1
         resultObject.links["first"] = getPaginationUrl(urlParams)

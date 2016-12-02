@@ -30,13 +30,13 @@ class LocationResourceTest {
         resource.uriInfo = new MockUriInfo()
 
         // Test: no result
-        def noResultRsp = resource.list('dixon', null, null, user)
+        def noResultRsp = resource.list('dixon', null, null, null, null, null, user)
         assert noResultRsp.status == 200
         assert noResultRsp.entity.links == [:]
         assert noResultRsp.entity.data == []
 
         // Test: invalid campus
-        def invalidCampRes = resource.list('dixon', 'invalid', null, user)
+        def invalidCampRes = resource.list('dixon', null, null, null,'invalid', null, user)
         assert invalidCampRes.status == 404
         assert invalidCampRes.entity.developerMessage.contains("Not Found")
         assert invalidCampRes.entity.userMessage.contains("Not Found")
