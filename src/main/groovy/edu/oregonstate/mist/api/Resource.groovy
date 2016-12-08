@@ -114,6 +114,10 @@ abstract class Resource {
         this.endpointUri = endpointUri
     }
 
+    void setUriInfo(UriInfo uriInfo) {
+        this.uriInfo = uriInfo
+    }
+
     /**
      * Constructs a url to use in pagination links.
      *

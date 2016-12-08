@@ -88,7 +88,6 @@ class LocationResource extends Resource {
             if (invalidCampus || invalidType || invalidLocation) {
                 return notFound().build()
             }
-
             String result = locationDAO.search(
                     trimmedQ, trimmedCampus, trimmedType, lat, lon, isOpen, pageNumber, pageSize)
 

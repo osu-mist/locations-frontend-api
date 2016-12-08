@@ -9,6 +9,7 @@ import org.joda.time.DateTime
  */
 class LocationDAO {
     private final Map<String, String> locationConfiguration
+    private final String DEFAULT_SEARCH_DISTANCE = "0.5km"
 
     LocationDAO(Map<String, String> locationConfiguration) {
         this.locationConfiguration = locationConfiguration
@@ -153,7 +154,7 @@ class LocationDAO {
      */
     private void addLocationQuery(def esQuery, Double lat, Double lon) {
         esQuery.query.bool.filter += ["geo_distance": [
-                "distance": "0.5km",
+                "distance": DEFAULT_SEARCH_DISTANCE,
                 "attributes.geoLocation": [
                         "lat": lat,
                         "lon": lon
