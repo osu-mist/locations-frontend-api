@@ -46,9 +46,6 @@ class LocationResource extends Resource {
 
     private final LocationDAO locationDAO
 
-    @Context
-    UriInfo uriInfo
-
     private static final Pattern illegalCharacterPattern = Pattern.compile(
             '''(?x)       # this extended regex defines
                (?!        # any character that is not

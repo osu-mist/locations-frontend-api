@@ -20,30 +20,30 @@ class LocationResourceTest {
     // Test: LocationResource.list()
     @Test
     public void testList() {
-//        def mock = new MockFor(LocationDAO)
-//        mock.demand.search() {
-//            String q, String campus, String type, Double lat,
-//            Double lon, Boolean isOpen, Integer pageNumber, Integer pageSize ->
-//                '{"hits": {"total": 0, "hits": []}}'
-//        }
-//        def dao = mock.proxyInstance()
-//        def resource = new LocationResource(dao)
-//        resource.uriInfo = new MockUriInfo()
-//
-//        // Test: no result
-//        def noResultRsp = resource.list('dixon', null, null, null, null, null, user)
-//        assert noResultRsp.status == 200
-//        assert noResultRsp.entity.links == [:]
-//        assert noResultRsp.entity.data == []
-//
-//        // Test: invalid campus
-//        def invalidCampRes = resource.list('dixon', 'invalid', null, null, null, null, user)
-//        assert invalidCampRes.status == 404
-//        assert invalidCampRes.entity.developerMessage.contains("Not Found")
-//        assert invalidCampRes.entity.userMessage.contains("Not Found")
-//        assert invalidCampRes.entity.code == 1404
-//
-//        mock.verify(dao)
+        def mock = new MockFor(LocationDAO)
+        mock.demand.search() {
+            String q, String campus, String type, Double lat,
+            Double lon, Boolean isOpen, Integer pageNumber, Integer pageSize ->
+                '{"hits": {"total": 0, "hits": []}}'
+        }
+        def dao = mock.proxyInstance()
+        def resource = new LocationResource(dao)
+        resource.uriInfo = new MockUriInfo()
+
+        // Test: no result
+        def noResultRsp = resource.list('dixon', null, null, null, null, null, user)
+        assert noResultRsp.status == 200
+        assert noResultRsp.entity.links == [:]
+        assert noResultRsp.entity.data == []
+
+        // Test: invalid campus
+        def invalidCampRes = resource.list('dixon', 'invalid', null, null, null, null, user)
+        assert invalidCampRes.status == 404
+        assert invalidCampRes.entity.developerMessage.contains("Not Found")
+        assert invalidCampRes.entity.userMessage.contains("Not Found")
+        assert invalidCampRes.entity.code == 1404
+
+        mock.verify(dao)
     }
 
     // Test: LocationResource.getById(): valid ID
