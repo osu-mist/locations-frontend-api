@@ -73,6 +73,7 @@ class LocationResource extends Resource {
                   @QueryParam('isopen') Boolean isOpen,
                   @Auth AuthenticatedUser authenticatedUser) {
         try {
+            String searchDistance = locationDAO.getSearchDistance()
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
             def trimmedType = sanitize(type?.trim()?.toLowerCase())
@@ -86,7 +87,7 @@ class LocationResource extends Resource {
                 return notFound().build()
             }
             String result = locationDAO.search(
-                    trimmedQ, trimmedCampus, trimmedType, lat, lon, isOpen, pageNumber, pageSize)
+                    trimmedQ, trimmedCampus, trimmedType, lat, lon, searchDistance, isOpen, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []

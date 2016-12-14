@@ -9,7 +9,6 @@ import org.joda.time.DateTime
  */
 class LocationDAO {
     private final Map<String, String> locationConfiguration
-    private final String DEFAULT_SEARCH_DISTANCE = "0.5km"
 
     LocationDAO(Map<String, String> locationConfiguration) {
         this.locationConfiguration = locationConfiguration
@@ -28,11 +27,11 @@ class LocationDAO {
      * @return json             JSON search results from ES
      */
     String search(String q, String campus, String type, Double lat,
-                  Double lon, Boolean isOpen, Integer pageNumber, Integer pageSize) {
+                  Double lon, String searchDistance, Boolean isOpen, Integer pageNumber, Integer pageSize) {
         ObjectMapper mapper = new ObjectMapper()
 
         // generate ES query to search for locations
-        def esQuery = getESSearchQuery(q, campus, type, lat, lon, isOpen, pageNumber, pageSize)
+        def esQuery = getESSearchQuery(q, campus, type, lat, lon, searchDistance, isOpen, pageNumber, pageSize)
         String esQueryJson = mapper.writeValueAsString(esQuery)
 
         // get data from ES
@@ -57,6 +56,10 @@ class LocationDAO {
 
     String getGatewayUrl() {
         locationConfiguration.get("gatewayUrl")
+    }
+
+    String getSearchDistance() {
+        locationConfiguration.get("searchDistance")
     }
 
     /**
@@ -106,8 +109,9 @@ class LocationDAO {
      * @param query
      * @return
      */
-    private def getESSearchQuery(String q, String campus, String type, Double lat,
-                                 Double lon, Boolean isOpen,int pageNumber, int pageSize) {
+    private def getESSearchQuery(String q, String campus, String type,
+                                 Double lat, Double lon, String searchDistance,
+                                 Boolean isOpen,int pageNumber, int pageSize) {
         def esQuery = [
             "query": [
                 "bool": [
@@ -136,7 +140,7 @@ class LocationDAO {
         }
 
         if (lat && lon) {
-            addLocationQuery(esQuery, lat, lon)
+            addLocationQuery(esQuery, lat, lon, searchDistance)
         }
 
         if (isOpen) {
@@ -152,9 +156,9 @@ class LocationDAO {
      * @param lat
      * @param lon
      */
-    private void addLocationQuery(def esQuery, Double lat, Double lon) {
+    private void addLocationQuery(def esQuery, Double lat, Double lon, String searchDistance) {
         esQuery.query.bool.filter += ["geo_distance": [
-                "distance": DEFAULT_SEARCH_DISTANCE,
+                "distance": searchDistance,
                 "attributes.geoLocation": [
                         "lat": lat,
                         "lon": lon
