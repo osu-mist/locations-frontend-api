@@ -15,11 +15,9 @@ configuration.yaml
 *.ipr
 *.iws
 .idea/
-<<<<<<< HEAD
 classes/
-=======
 out/
->>>>>>> skeleton/master
+
 
 # Mac OS X
 .DS_Store
@@ -27,24 +25,17 @@ out/
 # Build Properties
 build.properties
 
-<<<<<<< HEAD
 # Integration Tests Configuration
 **/configuration.json
 
 # Python Compiled Bytecode
 *.pyc
 
-# key-pair
-*.cer
-*.keystore
-*.truststore
-
 # virtual_len
 **/virtual_env/*
-=======
+
 # Keytool Files
 *.pem
 *.cer
 *.keystore
 *.truststore
->>>>>>> skeleton/master
