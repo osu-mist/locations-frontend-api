@@ -16,14 +16,16 @@ class LocationResourceTest {
             new DropwizardAppRule<LocationsFrontendConfiguration>(
                     LocationsFrontEndApplication.class,
                     new File("configuration.yaml").absolutePath)
-    
+
     // Test: LocationResource.list()
     @Test
     public void testList() {
         def mock = new MockFor(LocationDAO)
+        mock.demand.getSearchDistance() { "1km" }
         mock.demand.search() {
             String q, String campus, String type, Double lat,
-            Double lon, Boolean isOpen, Integer pageNumber, Integer pageSize ->
+            Double lon, String searchDistance, Boolean isOpen,
+            Integer pageNumber, Integer pageSize ->
                 '{"hits": {"total": 0, "hits": []}}'
         }
         def dao = mock.proxyInstance()
