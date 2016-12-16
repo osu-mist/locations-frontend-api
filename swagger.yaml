@@ -38,6 +38,7 @@ paths:
           format: double
         - in: query
           name: isopen
+          description: "True if only search for open restaurants/buildings. Default: 'false' to search for all the results"
           required: false
           type: boolean
         - in: query
@@ -194,6 +195,10 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/DayHours"
+      distance:
+        description: "Distance from users' location in kilometer"
+        type: number
+        format: double
 
   DayHours:
     properties:

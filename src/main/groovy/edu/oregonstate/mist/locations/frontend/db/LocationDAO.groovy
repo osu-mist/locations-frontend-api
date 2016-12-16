@@ -156,7 +156,7 @@ class LocationDAO {
      * @param lat
      * @param lon
      */
-    private void addLocationQuery(def esQuery, Double lat, Double lon, String searchDistance) {
+    private static void addLocationQuery(def esQuery, Double lat, Double lon, String searchDistance) {
         esQuery.query.bool.filter += ["geo_distance": [
                 "distance": searchDistance,
                 "attributes.geoLocation": [
@@ -181,7 +181,7 @@ class LocationDAO {
      * Add ES query for filtering currently open restaurants
      * @param esQuery
      */
-    private void addTimeQuery(def esQuery) {
+    private static void addTimeQuery(def esQuery) {
         String weekday = Integer.toString(DateTime.now().getDayOfWeek())
         esQuery.query.bool.filter += [
                 ["nested": [
