@@ -93,11 +93,22 @@ class LocationMapper {
         def dayHour = weekHours.get(Integer.toString(weekday))
         List<DayOpenHours> hoursList = dayHour?.asList().collect() {
             new DayOpenHours(
-                    start: (new DateTime(it.get("start").asText())).toDate(),
-                    end: (new DateTime(it.get("end").asText())).toDate()
+                start: buildDate(it, "start"),
+                end:   buildDate(it, "end")
             )
         }
         hoursList
+    }
+
+    /**
+     * Build Date from JsonNode
+     * @param date
+     * @param fieldName
+     * @return
+     */
+    private  static Date buildDate(JsonNode date, String fieldName) {
+        DateTime datetime = new DateTime(getField(date, fieldName))
+        datetime.toDate()
     }
 
     /**
@@ -106,7 +117,7 @@ class LocationMapper {
      * @param fieldName
      * @return
      */
-    private static getField(JsonNode node, String fieldName) {
+    private static String getField(JsonNode node, String fieldName) {
         node.get(fieldName).asText(null)
     }
 
