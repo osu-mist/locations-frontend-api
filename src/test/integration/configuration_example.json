@@ -7,5 +7,7 @@
 	"token_endpoint": "token",
 
 	"client_id": "secret",
-	"client_secret": "sauce"
+	"client_secret": "sauce",
+
+	"single_resource_id": "a5041ecde8b53e54c7479e770825d7c1"
 }
