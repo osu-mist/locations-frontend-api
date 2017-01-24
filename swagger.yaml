@@ -133,7 +133,7 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/ResourceObject"
-        
+
   ResourceObject:
     properties:
       id:
@@ -142,7 +142,7 @@ definitions:
         type: string
       attributes:
         $ref: "#/definitions/Attributes"
-        
+
   Attributes:
     properties:
       name:
@@ -152,7 +152,7 @@ definitions:
       latitude:
         type: string
       longitude:
-        type: string        
+        type: string
       summary:
         type: string
       description:
@@ -208,14 +208,14 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/TimeSlot"
-      
+
   TimeSlot:
     properties:
       start:
         type: string
       end:
         type: string
-        
+
   Links:
     properties:
       self:
