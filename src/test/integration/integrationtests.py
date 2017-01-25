@@ -106,6 +106,12 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a call using SSLv3 is unsuccessful
     def test_ssl_v3(self):
+        try:
+            # openssl can be compiled without SSLv3 support, in which case
+            # the PROTOCOL_SSLv3 constant is not available
+            ssl.PROTOCOL_SSLv3
+        except AttributeError:
+            self.skipTest('SSLv3 support not available')
         self.assertFalse(check_ssl(ssl.PROTOCOL_SSLv3, url, access_token))
 
 if __name__ == '__main__':
