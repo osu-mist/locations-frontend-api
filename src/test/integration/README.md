@@ -38,7 +38,7 @@ $ docker run -v "$PWD"/configuration.json:/usr/src/app/configuration.json:ro loc
 $ docker run -v c:\path\to\configuration.json:/c:\usr\src\app\configuration.json:ro location-frontend-tests
 ```
 
-Currently, there is one failure test which will return wrong error code for POST method:
+Successfully passing all the tests with the command above would output this result:
 
-![failed_test](images/failed-test.png)
+![success_test_02](images/successful-test-02.png)
 
