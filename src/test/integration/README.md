@@ -40,5 +40,5 @@ $ docker run -v c:\path\to\configuration.json:/c:\usr\src\app\configuration.json
 
 Currently, there is one failure test which will return wrong error code for POST method:
 
-![failed_test](images/failed_test-test.png)
+![failed_test](images/failed-test.png)
 
