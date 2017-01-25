@@ -22,7 +22,7 @@ Successfully passing all the tests with the command above would output this resu
 
 Python Version: 2.7.10
 
-#### Docker
+### Docker
 
 This directory contains files that run integration tests against the Locations Frontend API.
 
