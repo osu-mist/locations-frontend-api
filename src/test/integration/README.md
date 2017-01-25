@@ -32,7 +32,7 @@ Next, use these commands to build and run the container. All you need installed 
 
 ```shell
 $ docker build -t location-frontend-tests .
-# Run the integration tests in *nix
+# Run the integration tests in Unix
 $ docker run -v "$PWD"/configuration.json:/usr/src/app/configuration.json:ro location-frontend-tests
 # Run the integration tests in Windows
 $ docker run -v c:\path\to\configuration.json:/c:\usr\src\app\configuration.json:ro location-frontend-tests
