@@ -21,7 +21,6 @@ class LocationResourceTest {
     @Test
     public void testList() {
         def mock = new MockFor(LocationDAO)
-        mock.demand.getSearchDistance() { "1km" }
         mock.demand.search() {
             String q, String campus, String type, Double lat,
             Double lon, String searchDistance, Boolean isOpen,
@@ -33,13 +32,15 @@ class LocationResourceTest {
         resource.uriInfo = new MockUriInfo()
 
         // Test: no result
-        def noResultRsp = resource.list('dixon', null, null, null, null, null, user)
+        def noResultRsp = resource.list('dixon', null,
+                null, null, null, null, null, null, user)
         assert noResultRsp.status == 200
         assert noResultRsp.entity.links == [:]
         assert noResultRsp.entity.data == []
 
         // Test: invalid campus
-        def invalidCampRes = resource.list('dixon', 'invalid', null, null, null, null, user)
+        def invalidCampRes = resource.list('dixon', 'invalid',
+                null, null, null, null, null, null, user)
         assert invalidCampRes.status == 404
         assert invalidCampRes.entity.developerMessage.contains("Not Found")
         assert invalidCampRes.entity.userMessage.contains("Not Found")

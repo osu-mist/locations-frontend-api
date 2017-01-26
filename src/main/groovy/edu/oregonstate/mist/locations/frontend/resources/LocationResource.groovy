@@ -31,6 +31,11 @@ class LocationResource extends Resource {
 
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
+    public static final ArrayList<String> ALLOWED_UNITS = ["mi", "miles", "yd", "yards",
+                                                           "ft", "feet", "in", "inch",
+                                                           "km", "kilometers", "m", "meters",
+                                                           "cm", "centimeters", "mm", "millimeters",
+                                                            "NM", "nmi", "nauticalmiles"]
 
     /**
      * Default page number used in pagination
@@ -70,22 +75,28 @@ class LocationResource extends Resource {
     Response list(@QueryParam('q') String q,
                   @QueryParam('campus') String campus, @QueryParam('type') String type,
                   @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
+                  @QueryParam('distance') Double distance,
+                  @QueryParam('distanceUnit') String distanceUnit,
                   @QueryParam('isopen') Boolean isOpen,
                   @Auth AuthenticatedUser authenticatedUser) {
         try {
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
             def trimmedType = sanitize(type?.trim()?.toLowerCase())
+            def trimmedUnit = sanitize(distanceUnit?.trim()?.toLowerCase())
             isOpen = isOpen == null ? false : isOpen
+            distance = distance == null ? 2 : distance
+            distanceUnit = distanceUnit == null ? "mile": distanceUnit
 
             // validate filtering parameters
             def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
             def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
             def invalidLocation = (lat == null && lon != null) || (lat != null && lon == null)
-            if (invalidCampus || invalidType || invalidLocation) {
+            def invalidUnit = trimmedUnit && !ALLOWED_UNITS.contains(trimmedUnit)
+            if (invalidCampus || invalidType || invalidLocation || invalidUnit) {
                 return notFound().build()
             }
-            String searchDistance = locationDAO.getSearchDistance()
+            String searchDistance = buildSearchDistance(distance, distanceUnit)
             String result = locationDAO.search(
                                 trimmedQ, trimmedCampus, trimmedType,
                                 lat, lon, searchDistance,
@@ -233,6 +244,10 @@ class LocationResource extends Resource {
         }
 
         null
+    }
+
+    public static String buildSearchDistance(Double distance, String distanceUnit) {
+        distance.toString().concat(distanceUnit)
     }
 
 }
