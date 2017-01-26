@@ -53,7 +53,19 @@ class gateway_tests(unittest.TestCase):
         self.assertEqual(len(building_engineering['data']), 2)
 
         # test geo query
-        
+        building_library = query_request(url, access_token, "get",
+            {'lat': 44.56507, 'lon': -123.2761})
+        self.assertEqual(len(building_library['data']), 10)
+        self.assertEqual(building_library['data'][0]['id'], "831ed9ce6311601afba57934adea7a8e")
+
+        building_library = query_request(url, access_token, "get",
+            {'lat': 44.56507, 'lon': -123.2761, 'distance': 1, 'distanceUnit': 'yd'})
+        self.assertEqual(len(building_library['data']), 1)
+
+        extension_columbia_county = query_request(url, access_token, "get",
+            {'lat': 44.56507, 'lon': -123.2761, 'distance': 10, 'distanceUnit': 'mi'})
+        self.assertEqual(len(extension_columbia_county['data']), 1)
+
 
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):

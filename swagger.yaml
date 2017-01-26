@@ -44,7 +44,17 @@ paths:
           format: double
         - in: query
           name: distanceUnit
-          description: "Distance can be specified in following units: mile, km, m... Default: mile"
+          description: "Distance can be specified in following units:
+            Mile - mi or miles (default);
+            Yard - yd or yards;
+            Feet - ft or feet;
+            Inch - in or inch;
+            Kilometer - km or kilometers;
+            Meter - m or meters;
+            Centimeter - cm or centimeters;
+            Millimeter - mm or millimeters;
+            Nautical mile - NM, nmi or nauticalmiles
+          "
           required: false
           type: string
         - in: query

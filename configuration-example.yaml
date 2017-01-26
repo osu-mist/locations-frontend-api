@@ -51,5 +51,3 @@ locations:
   esIndex: elastic-search-index
   estype: elastic-search-type
   gatewayUrl: https://api.example.com
-  searchDistance: "1000km"
-

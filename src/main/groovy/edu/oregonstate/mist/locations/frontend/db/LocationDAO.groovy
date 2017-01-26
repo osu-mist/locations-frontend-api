@@ -61,10 +61,6 @@ class LocationDAO {
         locationConfiguration.get("gatewayUrl")
     }
 
-    String getSearchDistance() {
-        locationConfiguration.get("searchDistance")
-    }
-
     /**
      * Returns url of elastic search collection and type to search.
      *
