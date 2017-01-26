@@ -31,11 +31,9 @@ class LocationResource extends Resource {
 
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
-    public static final ArrayList<String> ALLOWED_UNITS = ["mi", "miles", "yd", "yards",
-                                                           "ft", "feet", "in", "inch",
-                                                           "km", "kilometers", "m", "meters",
-                                                           "cm", "centimeters", "mm", "millimeters",
-                                                            "NM", "nmi", "nauticalmiles"]
+    public static final ArrayList<String> ALLOWED_UNITS = ["mi", "yd", "ft", "in",
+                                                           "km", "m", "cm", "mm",
+                                                           "NM", "nmi"]
 
     /**
      * Default page number used in pagination
@@ -86,7 +84,7 @@ class LocationResource extends Resource {
             def trimmedUnit = sanitize(distanceUnit?.trim()?.toLowerCase())
             isOpen = isOpen == null ? false : isOpen
             distance = distance == null ? 2 : distance
-            distanceUnit = distanceUnit == null ? "mile": distanceUnit
+            distanceUnit = distanceUnit == null ? "mi": distanceUnit
 
             // validate filtering parameters
             def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)

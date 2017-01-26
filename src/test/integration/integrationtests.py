@@ -52,6 +52,9 @@ class gateway_tests(unittest.TestCase):
         building_engineering = query_request(url, access_token, "get", {'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
         self.assertEqual(len(building_engineering['data']), 2)
 
+        # test geo query
+        
+
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
         links = results_with_links(url, access_token)
