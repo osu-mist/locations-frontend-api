@@ -62,9 +62,14 @@ class gateway_tests(unittest.TestCase):
             {'lat': 44.56507, 'lon': -123.2761, 'distance': 1, 'distanceUnit': 'yd'})
         self.assertEqual(len(building_library['data']), 1)
 
-        extension_columbia_county = query_request(url, access_token, "get",
-            {'lat': 44.56507, 'lon': -123.2761, 'distance': 10, 'distanceUnit': 'mi'})
-        self.assertEqual(len(extension_columbia_county['data']), 1)
+        extensions = query_request(url, access_token, "get",
+            {'lat': 44.56507, 'lon': -123.2761, 'distance': 10, 'distanceUnit': 'mi',
+            'campus':'extension'})
+        self.assertEqual(len(extensions['data']), 3)
+
+        dining_java = query_request(url, access_token, "get",
+                        {'lat': 44.56507, 'lon': -123.2761, 'isopen': True, 'distanceUnit': 'yd'})
+        self.assertEqual(len(dining_java['data']), 1)
 
 
     # Tests that a query with more than 10 results contains correct links

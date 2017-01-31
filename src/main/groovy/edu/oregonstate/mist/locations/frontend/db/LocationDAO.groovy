@@ -188,7 +188,7 @@ class LocationDAO {
                         "path": "attributes.openHours." + weekday,
                         "filter": [
                                 [ "range":["attributes.openHours.${weekday}.start":
-                                                   [ "lt": "now"]]],
+                                                   [ "lte": "now"]]],
                                 ["range": ["attributes.openHours.${weekday}.end":
                                                    ["gt": "now"]]]]]]]
     }
