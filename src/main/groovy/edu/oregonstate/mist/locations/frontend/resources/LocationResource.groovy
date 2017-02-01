@@ -70,8 +70,8 @@ class LocationResource extends Resource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
-    Response list(@QueryParam('q') String q, @QueryParam('campus') String campus, @QueryParam('type') String type,
-                  @Auth AuthenticatedUser authenticatedUser) {
+    Response list(@QueryParam('q') String q, @QueryParam('campus') String campus,
+                  @QueryParam('type') String type, @Auth AuthenticatedUser authenticatedUser) {
         try {
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
@@ -84,7 +84,8 @@ class LocationResource extends Resource {
                 return notFound().build()
             }
 
-            String result = locationDAO.search(trimmedQ, trimmedCampus, trimmedType, pageNumber, pageSize)
+            String result = locationDAO.search(trimmedQ, trimmedCampus, trimmedType, pageNumber,
+                    pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []
@@ -137,7 +138,7 @@ class LocationResource extends Resource {
         ]
 
         int lastPage = Math.ceil(totalHits / pageSize)
-
+        setEndpointUri(URI.create(locationDAO.getGatewayUrl()))
         resultObject.links["self"] = getPaginationUrl(urlParams)
         urlParams.pageNumber = 1
         resultObject.links["first"] = getPaginationUrl(urlParams)
@@ -220,7 +221,8 @@ class LocationResource extends Resource {
     /**
      * Returns the value for an array parameter in the GET string.
      *
-     * The JSONAPI format reserves the page parameter for pagination. This API uses page[size] and page[number].
+     * The JSONAPI format reserves the page parameter for pagination.
+     * This API uses page[size] and page[number].
      * This function allows us to get just value for a specific parameter in an array.
      *
      * @param key
@@ -228,7 +230,8 @@ class LocationResource extends Resource {
      * @param queryParameters
      * @return
      */
-    public static String getArrayParameter(String key, String index,  MultivaluedMap<String, String> queryParameters) {
+    public static String getArrayParameter(String key, String index,
+                                           MultivaluedMap<String, String> queryParameters) {
         // @todo: this function should probably be moved to the skeleton
         for (Map.Entry<String, List<String>> entry : queryParameters.entrySet()) {
             // not an array parameter
@@ -254,7 +257,7 @@ class LocationResource extends Resource {
      *
      * @return
      */
-    private Integer getPageNumber() {
+    Integer getPageNumber() {
         def pageNumber = getArrayParameter("page", "number", uriInfo.getQueryParameters())
         if (!pageNumber || !pageNumber.isInteger()) {
             return DEFAULT_PAGE_NUMBER
@@ -268,7 +271,7 @@ class LocationResource extends Resource {
      *
      * @return
      */
-    private Integer getPageSize() {
+    Integer getPageSize() {
         def pageSize = getArrayParameter("page", "size", uriInfo.getQueryParameters())
         if (!pageSize || !pageSize.isInteger()) {
             return DEFAULT_PAGE_SIZE

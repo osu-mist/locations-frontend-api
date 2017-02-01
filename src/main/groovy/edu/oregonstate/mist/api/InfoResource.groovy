@@ -14,6 +14,10 @@ import javax.ws.rs.core.Response
 class InfoResource extends Resource {
     private Info info = new Info()
 
+    public InfoResource(Info info) {
+        this.info = info
+    }
+
     /**
      * Responds to GET requests by returning object containing information.
      *
@@ -22,6 +26,6 @@ class InfoResource extends Resource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getInfo(@Auth AuthenticatedUser authenticatedUser) {
-        ok(info).build()
+        Response.ok(info).build()
     }
 }

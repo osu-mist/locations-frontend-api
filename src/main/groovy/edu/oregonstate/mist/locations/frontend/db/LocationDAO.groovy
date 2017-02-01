@@ -103,7 +103,8 @@ class LocationDAO {
      * @param query
      * @return
      */
-    private def getESSearchQuery(String q, String campus, String type, int pageNumber, int pageSize) {
+    private def getESSearchQuery(String q, String campus, String type, int pageNumber,
+                                 int pageSize) {
         def esQuery = [
             "query": [
                 "bool": [
@@ -114,7 +115,6 @@ class LocationDAO {
             "from": (pageNumber - 1) * pageSize,
             "size": pageSize
         ]
-
 
         if (campus) {
             esQuery.query.bool.must += [ "match": [ "attributes.campus": campus ]]
