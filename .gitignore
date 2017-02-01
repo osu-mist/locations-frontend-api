@@ -8,6 +8,7 @@ bin/
 build/
 logs/
 configuration.yaml
+configuration.json
 
 
 # IntelliJ IDEA
