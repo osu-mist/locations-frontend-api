@@ -11,31 +11,36 @@ class MockUriInfo implements UriInfo {
     @Override
     URI getAbsolutePath() { throw new UnsupportedOperationException('not implemented') }
     @Override
-    UriBuilder getAbsolutePathBuilder() { throw new UnsupportedOperationException('not implemented') }
+    UriBuilder getAbsolutePathBuilder() {
+        throw new UnsupportedOperationException('not implemented') }
     @Override
     URI getBaseUri() { throw new UnsupportedOperationException('not implemented') }
     @Override
     UriBuilder getBaseUriBuilder() { throw new UnsupportedOperationException('not implemented') }
     @Override
-    List <Object> getMatchedResources() { throw new UnsupportedOperationException('not implemented') }
+    List <Object> getMatchedResources() {
+        throw new UnsupportedOperationException('not implemented') }
     @Override
-    List <String> getMatchedURIs(boolean decode) { throw new UnsupportedOperationException('not implemented') }
+    List <String> getMatchedURIs(boolean decode) {
+        throw new UnsupportedOperationException('not implemented') }
     @Override
     String getPath(boolean decode) { throw new UnsupportedOperationException('not implemented') }
     @Override
-    MultivaluedMap<String,String> getPathParameters(boolean decode) { throw new UnsupportedOperationException('not implemented') }
+    MultivaluedMap<String,String> getPathParameters(boolean decode) {
+        throw new UnsupportedOperationException('not implemented') }
     @Override
-    List<PathSegment> getPathSegments(boolean decode){ throw new UnsupportedOperationException('not implemented') }
+    List<PathSegment> getPathSegments(boolean decode) {
+        throw new UnsupportedOperationException('not implemented') }
     @Override
     MultivaluedMap<String,String> getQueryParameters(boolean decode) { this.queryParameters }
     @Override
-    URI getRequestUri(){ throw new UnsupportedOperationException('not implemented') }
+    URI getRequestUri() { throw new UnsupportedOperationException('not implemented') }
     @Override
-    UriBuilder getRequestUriBuilder(){ throw new UnsupportedOperationException('not implemented') }
+    UriBuilder getRequestUriBuilder() { throw new UnsupportedOperationException('not implemented') }
     @Override
-    URI relativize (URI uri){ throw new UnsupportedOperationException('not implemented') }
+    URI relativize (URI uri) { throw new UnsupportedOperationException('not implemented') }
     @Override
-    URI resolve(URI uri){ throw new UnsupportedOperationException('not implemented') }
+    URI resolve(URI uri) { throw new UnsupportedOperationException('not implemented') }
 
     @Override
     List <String> getMatchedURIs() { getMatchedURIs(true) }
@@ -44,7 +49,7 @@ class MockUriInfo implements UriInfo {
     @Override
     MultivaluedMap<String,String> getPathParameters() { getPathParameters(true) }
     @Override
-    List<PathSegment> getPathSegments(){ getPathSegments(true) }
+    List<PathSegment> getPathSegments() { getPathSegments(true) }
     @Override
     MultivaluedMap<String,String> getQueryParameters() { getQueryParameters(true) }
 }

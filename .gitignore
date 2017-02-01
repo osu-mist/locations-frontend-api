@@ -1,6 +1,9 @@
 # Gradle
 .gradle/
 
+# Extra dependencies (database drivers)
+bin/
+
 # Dropwizard
 build/
 logs/
@@ -13,6 +16,7 @@ configuration.yaml
 *.iws
 .idea/
 classes/
+out/
 
 # Mac OS X
 .DS_Store
@@ -26,7 +30,8 @@ build.properties
 # Python Compiled Bytecode
 *.pyc
 
-# key-pair
+# Keytool Files
+*.pem
 *.cer
 *.keystore
 *.truststore
