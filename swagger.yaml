@@ -22,7 +22,7 @@ paths:
       parameters:
         - in: query
           name: q
-          description: "Query to search through buildings. Looks through the building name, abbreviation. Disabled when lat/lon parameter are presented."
+          description: "Query to search through buildings. Looks through the building name, abbreviation."
           required: false
           type: string
         - in: query
