@@ -81,7 +81,7 @@ class LocationResource extends Resource {
                   @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
                   @QueryParam('distance') Double distance,
                   @QueryParam('distanceUnit') String distanceUnit,
-                  @QueryParam('isopen') Boolean isOpen,
+                  @QueryParam('isOpen') Boolean isOpen,
                   @Auth AuthenticatedUser authenticatedUser) {
         try {
             def trimmedQ = sanitize(q?.trim())

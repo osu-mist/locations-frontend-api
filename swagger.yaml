@@ -58,8 +58,8 @@ paths:
           required: false
           type: string
         - in: query
-          name: isopen
-          description: "True if only search for open restaurants/buildings. Default: 'false' to search for all the results"
+          name: isOpen
+          description: "True if only search for open restaurants/buildings. Default: false to search for all the results"
           required: false
           type: boolean
         - in: query
@@ -217,7 +217,9 @@ definitions:
         items:
           $ref: "#/definitions/DayHours"
       distance:
-        description: "Distance from users' location in kilometer"
+        description: "Distance from given location in given distance unit.
+              This is only returned when the query parameters lat and lon are specified.
+              The default distance unit is mile "
         type: number
         format: double
 
