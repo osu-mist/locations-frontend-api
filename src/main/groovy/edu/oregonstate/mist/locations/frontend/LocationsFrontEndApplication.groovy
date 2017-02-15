@@ -1,5 +1,7 @@
 package edu.oregonstate.mist.locations.frontend
 
+import de.thomaskrille.dropwizard_template_config.TemplateConfigBundle
+import edu.oregonstate.mist.api.BuildInfoManager
 import edu.oregonstate.mist.api.Configuration
 import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.api.InfoResource
@@ -8,12 +10,17 @@ import edu.oregonstate.mist.api.BasicAuthenticator
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.health.ElasticSearchHealthCheck
 import edu.oregonstate.mist.locations.frontend.resources.LocationResource
-import edu.oregonstate.mist.locations.frontend.resources.SampleResource
+import edu.oregonstate.mist.api.PrettyPrintResponseFilter
+import edu.oregonstate.mist.api.jsonapi.GenericExceptionMapper
+import edu.oregonstate.mist.api.jsonapi.NotFoundExceptionMapper
 import io.dropwizard.Application
+import io.dropwizard.auth.AuthDynamicFeature
+import io.dropwizard.auth.AuthValueFactoryProvider
+import io.dropwizard.auth.basic.BasicCredentialAuthFilter
+import io.dropwizard.jersey.errors.LoggingExceptionMapper
 import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
-import io.dropwizard.auth.AuthFactory
-import io.dropwizard.auth.basic.BasicAuthFactory
+import javax.ws.rs.WebApplicationException
 
 /**
  * Main application class.
@@ -25,7 +32,27 @@ class LocationsFrontEndApplication extends Application<LocationsFrontendConfigur
      * @param bootstrap
      */
     @Override
-    public void initialize(Bootstrap<Configuration> bootstrap) {}
+    public void initialize(Bootstrap<Configuration> bootstrap) {
+        bootstrap.addBundle(new TemplateConfigBundle())
+    }
+
+    /**
+     * Registers lifecycle managers and Jersey exception mappers
+     * and container response filters
+     *
+     * @param environment
+     * @param buildInfoManager
+     */
+    protected void registerAppManagerLogic(Environment environment,
+                                           BuildInfoManager buildInfoManager) {
+
+        environment.lifecycle().manage(buildInfoManager)
+
+        environment.jersey().register(new NotFoundExceptionMapper())
+        environment.jersey().register(new GenericExceptionMapper())
+        environment.jersey().register(new LoggingExceptionMapper<WebApplicationException>(){})
+        environment.jersey().register(new PrettyPrintResponseFilter())
+    }
 
     /**
      * Parses command-line arguments and runs the application.
@@ -36,21 +63,26 @@ class LocationsFrontEndApplication extends Application<LocationsFrontendConfigur
     @Override
     public void run(LocationsFrontendConfiguration configuration, Environment environment) {
         Resource.loadProperties()
-        final LocationDAO LOCATION_DAO = new LocationDAO(configuration.locationsConfiguration)
+        BuildInfoManager buildInfoManager = new BuildInfoManager()
+        environment.jersey().register(new InfoResource(buildInfoManager.getInfo()))
 
-        environment.jersey().register(new SampleResource())
-        environment.jersey().register(new InfoResource())
-        environment.jersey().register(new LocationResource(LOCATION_DAO))
-        final ElasticSearchHealthCheck HEALTH_CHECK =
+        LocationDAO locationDAO = new LocationDAO(configuration.locationsConfiguration)
+
+        environment.jersey().register(new LocationResource(locationDAO))
+        ElasticSearchHealthCheck healthCheck =
                 new ElasticSearchHealthCheck(configuration.locationsConfiguration)
-        environment.healthChecks().register("elasticSearchCluster", HEALTH_CHECK)
+        environment.healthChecks().register("elasticSearchCluster", healthCheck)
 
-        environment.jersey().register(
-                AuthFactory.binder(
-                        new BasicAuthFactory<AuthenticatedUser>(
-                                new BasicAuthenticator(configuration.getCredentialsList()),
-                                'LocationsFrontEndApplication',
-                                AuthenticatedUser.class)))
+        registerAppManagerLogic(environment, buildInfoManager)
+
+        environment.jersey().register(new AuthDynamicFeature(
+                new BasicCredentialAuthFilter.Builder<AuthenticatedUser>()
+                    .setAuthenticator(new BasicAuthenticator(configuration.getCredentialsList()))
+                    .setRealm('LocationFrontEndApplication')
+                    .buildAuthFilter()
+        ))
+        environment.jersey().register(new AuthValueFactoryProvider.Binder
+                <AuthenticatedUser>(AuthenticatedUser.class))
     }
 
     /**

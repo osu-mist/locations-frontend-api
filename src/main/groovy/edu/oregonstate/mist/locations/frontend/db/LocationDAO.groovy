@@ -108,6 +108,7 @@ class LocationDAO {
      * @param query
      * @return
      */
+
     private def getESSearchQuery(String q, String campus, String type,
                                  Double lat, Double lon, String searchDistance,
                                  Boolean isOpen,int pageNumber, int pageSize) {

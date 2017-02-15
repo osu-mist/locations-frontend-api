@@ -13,6 +13,7 @@ paths:
       tags:
        - locations
       # Describe this verb here. Note: you can use markdown
+      summary: Get information
       description: "Gets all `Location` objects. Can be filtered by parameters."
       operationId: getLocations
       # This is array of GET operation parameters:
@@ -82,6 +83,7 @@ paths:
           description: "Page number of results. Used to paginate through results."
           required: false
           type: string
+        - $ref: '#/parameters/pretty'
 
       # Expected responses for this operation:
       responses:
@@ -138,6 +140,14 @@ securityDefinitions:
     name: locations_api_key
     in: query
 
+parameters:
+  pretty:
+    name: pretty
+    in: query
+    type: boolean
+    required: false
+    description: If true, JSON response will be pretty-printed
+
 definitions:
   ResultObject:
     properties:
@@ -168,6 +178,19 @@ definitions:
     properties:
       name:
         type: string
+        description: Name of the API.
+      time:
+        type: string
+        description: Build time in ISO 8601 format.
+      unixTime:
+        type: integer
+        description: Build time as milliseconds since the unix epoch.
+      commit:
+        type: string
+        description: Git commit hash of the revision which was built.
+      documentation:
+        type: string
+        description: Filename of the swagger specification for the API.
       abbreviation:
         type: string
       latitude:
@@ -251,6 +274,19 @@ definitions:
         type: string
       next:
         type: string
+        description: Name of the API.
+      time:
+        type: string
+        description: Build time in ISO 8601 format.
+      unixTime:
+        type: integer
+        description: Build time as milliseconds since the unix epoch.
+      commit:
+        type: string
+        description: Git commit hash of the revision which was built.
+      documentation:
+        type: string
+        description: Filename of the swagger specification for the API.
 
   Error:
     type: object
@@ -258,6 +294,7 @@ definitions:
       status:
         type: integer
         format: int32
+        description: HTTP status code.
       developerMessage:
         type: string
         description: An error string aimed at developers.
@@ -269,6 +306,7 @@ definitions:
         description: Error code.
       details:
         type: string
+        description: A link to further information about the error.
 
   Errors:
     title: ArrayOfErrors

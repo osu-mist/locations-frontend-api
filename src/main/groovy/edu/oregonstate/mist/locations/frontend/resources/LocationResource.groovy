@@ -11,17 +11,14 @@ import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
 import io.dropwizard.auth.Auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
-import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.MultivaluedMap
 import javax.ws.rs.core.Response
-import javax.ws.rs.core.UriInfo
 import java.util.regex.Pattern
 
 @Path("/locations")
@@ -100,6 +97,7 @@ class LocationResource extends Resource {
             if (invalidCampus || invalidType || invalidLocation || invalidUnit) {
                 return notFound().build()
             }
+
             String searchDistance = buildSearchDistance(distance, distanceUnit)
             String result = locationDAO.search(
                                 trimmedQ, trimmedCampus, trimmedType,
@@ -254,4 +252,31 @@ class LocationResource extends Resource {
         distance.toString().concat(distanceUnit)
     }
 
+    /**
+     *  Returns the page number used by pagination. The value of: page[number] in the url.
+     *
+     * @return
+     */
+    Integer getPageNumber() {
+        def pageNumber = getArrayParameter("page", "number", uriInfo.getQueryParameters())
+        if (!pageNumber || !pageNumber.isInteger()) {
+            return DEFAULT_PAGE_NUMBER
+        }
+
+        pageNumber.toInteger()
+    }
+
+    /**
+     * Returns the page size used by pagination. The value of: page[size] in the url.
+     *
+     * @return
+     */
+    Integer getPageSize() {
+        def pageSize = getArrayParameter("page", "size", uriInfo.getQueryParameters())
+        if (!pageSize || !pageSize.isInteger()) {
+            return DEFAULT_PAGE_SIZE
+        }
+
+        pageSize.toInteger()
+    }
 }

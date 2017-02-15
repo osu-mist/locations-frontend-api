@@ -16,8 +16,7 @@ class MockUriInfo implements UriInfo {
 
     @Override
     UriBuilder getAbsolutePathBuilder() {
-        throw new UnsupportedOperationException('not implemented')
-    }
+        throw new UnsupportedOperationException('not implemented') }
 
     @Override
     URI getBaseUri() {
@@ -30,12 +29,12 @@ class MockUriInfo implements UriInfo {
     }
 
     @Override
-    List<Object> getMatchedResources() {
+    List <Object> getMatchedResources() {
         throw new UnsupportedOperationException('not implemented')
     }
 
     @Override
-    List<String> getMatchedURIs(boolean decode) {
+    List <String> getMatchedURIs(boolean decode) {
         throw new UnsupportedOperationException('not implemented')
     }
 
@@ -45,7 +44,7 @@ class MockUriInfo implements UriInfo {
     }
 
     @Override
-    MultivaluedMap<String, String> getPathParameters(boolean decode) {
+    MultivaluedMap<String,String> getPathParameters(boolean decode) {
         throw new UnsupportedOperationException('not implemented')
     }
 
@@ -70,7 +69,7 @@ class MockUriInfo implements UriInfo {
     }
 
     @Override
-    URI relativize(URI uri) {
+    URI relativize (URI uri) {
         throw new UnsupportedOperationException('not implemented')
     }
 
@@ -95,9 +94,7 @@ class MockUriInfo implements UriInfo {
     }
 
     @Override
-    List<PathSegment> getPathSegments() {
-        getPathSegments(true)
-    }
+    List<PathSegment> getPathSegments() { getPathSegments(true) }
 
     @Override
     MultivaluedMap<String, String> getQueryParameters() {
