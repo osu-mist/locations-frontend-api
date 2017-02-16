@@ -18,10 +18,6 @@ configuration.json
 .idea/
 classes/
 out/
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
 
 # Mac OS X
 .DS_Store
@@ -35,20 +31,11 @@ build.properties
 # Python Compiled Bytecode
 *.pyc
 
-<<<<<<< HEAD
 # virtual_len
 **/virtual_env/*
 
-=======
->>>>>>> develop
 # Keytool Files
 *.pem
 *.cer
 *.keystore
 *.truststore
-<<<<<<< HEAD
-=======
-
-# virtual_len
-**/virtual_env/*
->>>>>>> develop
