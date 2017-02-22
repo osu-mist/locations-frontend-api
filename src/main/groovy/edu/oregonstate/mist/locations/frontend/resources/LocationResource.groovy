@@ -6,22 +6,19 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
-import edu.oregonstate.mist.locations.frontend.jsonapi.ResourceObject
 import edu.oregonstate.mist.locations.frontend.jsonapi.ResultObject
+import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
 import io.dropwizard.auth.Auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
-import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.MultivaluedMap
 import javax.ws.rs.core.Response
-import javax.ws.rs.core.UriInfo
 import java.util.regex.Pattern
 
 @Path("/locations")
@@ -31,6 +28,15 @@ class LocationResource extends Resource {
 
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
+    public static final ArrayList<String> ALLOWED_UNITS = ["mi", "miles",
+                                                           "yd", "yards",
+                                                           "ft", "feet",
+                                                           "in", "inch",
+                                                           "km", "kilometers",
+                                                           "m", "meters",
+                                                           "cm", "centimeters",
+                                                           "mm", "millimeters",
+                                                           "NM", "nmi", "nauticalmiles"]
 
     /**
      * Default page number used in pagination
@@ -45,9 +51,6 @@ class LocationResource extends Resource {
     public static final Integer DEFAULT_PAGE_SIZE = 10
 
     private final LocationDAO locationDAO
-
-    @Context
-    UriInfo uriInfo
 
     private static final Pattern illegalCharacterPattern = Pattern.compile(
             '''(?x)       # this extended regex defines
@@ -70,41 +73,55 @@ class LocationResource extends Resource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
-    Response list(@QueryParam('q') String q, @QueryParam('campus') String campus,
-                  @QueryParam('type') String type, @Auth AuthenticatedUser authenticatedUser) {
+    Response list(@QueryParam('q') String q,
+                  @QueryParam('campus') String campus, @QueryParam('type') String type,
+                  @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
+                  @QueryParam('distance') Double distance,
+                  @QueryParam('distanceUnit') String distanceUnit,
+                  @QueryParam('isOpen') Boolean isOpen,
+                  @Auth AuthenticatedUser authenticatedUser) {
         try {
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
             def trimmedType = sanitize(type?.trim()?.toLowerCase())
+            def trimmedUnit = sanitize(distanceUnit?.trim()?.toLowerCase())
+            isOpen = isOpen == null ? false : isOpen
+            distance = distance == null ? 2 : distance
+            distanceUnit = distanceUnit == null ? "miles": distanceUnit
 
             // validate filtering parameters
             def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
             def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
-            if (invalidCampus || invalidType) {
+            def invalidLocation = (lat == null && lon != null) || (lat != null && lon == null)
+            def invalidUnit = trimmedUnit && !ALLOWED_UNITS.contains(trimmedUnit)
+            if (invalidCampus || invalidType || invalidLocation || invalidUnit) {
                 return notFound().build()
             }
 
-            String result = locationDAO.search(trimmedQ, trimmedCampus, trimmedType, pageNumber,
-                    pageSize)
+            String searchDistance = buildSearchDistance(distance, distanceUnit)
+            String result = locationDAO.search(
+                                trimmedQ, trimmedCampus, trimmedType,
+                                lat, lon, searchDistance,
+                                isOpen, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []
 
             // parse ES into JSON Node
             ObjectMapper mapper = new ObjectMapper() // can reuse, share globally
+            LocationMapper locationMapper = new LocationMapper()
             JsonNode actualObj = mapper.readTree(result)
 
             def topLevelHits = actualObj.get("hits")
             topLevelHits.get("hits").asList().each {
-                String singleLocation = it.get("_source").toString()
-                resultObject.data += (ResourceObject) mapper.readValue(singleLocation, Object.class)
+                resultObject.data += locationMapper.map(it)
             }
 
             setPaginationLinks(topLevelHits, q, type, campus, resultObject)
 
             ok(resultObject).build()
         } catch (Exception e) {
-            LOGGER.error("Exception while getting locations.",e)
+            LOGGER.error("Exception while getting locations.", e)
             internalServerError("Woot you found a bug for us to fix!").build()
         }
 
@@ -113,7 +130,7 @@ class LocationResource extends Resource {
     /**
      * Add pagination links to the data search results.
      *
-     * @param topLevelHits          First "hits" node in the json document
+     * @param topLevelHits First "hits" node in the json document
      * @param q
      * @param type
      * @param campus
@@ -130,10 +147,10 @@ class LocationResource extends Resource {
         Integer pageNumber = getPageNumber()
         Integer pageSize = getPageSize()
         def urlParams = [
-                "q": q,
-                "type": type,
-                "campus": campus,
-                "pageSize": pageSize,
+                "q"         : q,
+                "type"      : type,
+                "campus"    : campus,
+                "pageSize"  : pageSize,
                 "pageNumber": pageNumber
         ]
 
@@ -160,27 +177,6 @@ class LocationResource extends Resource {
         }
     }
 
-    /**
-     * Returns string url to use in pagination links.
-     *
-     * @param params
-     * @return
-     */
-    private String getPaginationUrl(def params) {
-        def uriAndPath = locationDAO.getGatewayUrl() + uriInfo.getPath()
-        def nonNullParams = params.clone()
-        // convert pageVariable to page[variable]
-        nonNullParams["page[number]"] = nonNullParams['pageNumber']
-        nonNullParams["page[size]"] = nonNullParams['pageSize']
-        nonNullParams.remove('pageSize')
-        nonNullParams.remove('pageNumber')
-
-        // remove empty GET parameters
-        nonNullParams = nonNullParams.findAll { it.value } .collect { k, v -> "$k=$v" }
-
-        uriAndPath + "?" + nonNullParams.join('&')
-    }
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Timed
@@ -188,7 +184,7 @@ class LocationResource extends Resource {
     Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
         try {
             ResultObject resultObject = new ResultObject()
-            String esResponse  = locationDAO.getById(id)
+            String esResponse = locationDAO.getById(id)
 
             if (!esResponse) {
                 return notFound().build()
@@ -250,6 +246,10 @@ class LocationResource extends Resource {
         }
 
         null
+    }
+
+    public static String buildSearchDistance(Double distance, String distanceUnit) {
+        distance.toString().concat(distanceUnit)
     }
 
     /**

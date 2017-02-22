@@ -58,6 +58,26 @@ class gateway_tests(unittest.TestCase):
         building_engineering = query_request(url, access_token, "get", {'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
         self.assertEqual(len(building_engineering['data']), 2)
 
+        # test geo query
+        building_library = query_request(url, access_token, "get",
+            {'lat': 44.56507, 'lon': -123.2761})
+        self.assertEqual(len(building_library['data']), 10)
+        self.assertEqual(building_library['data'][0]['id'], "831ed9ce6311601afba57934adea7a8e")
+
+        building_library = query_request(url, access_token, "get",
+            {'lat': 44.56507, 'lon': -123.2761, 'distance': 1, 'distanceUnit': 'yd'})
+        self.assertEqual(len(building_library['data']), 1)
+
+        extensions = query_request(url, access_token, "get",
+            {'lat': 44.56507, 'lon': -123.2761, 'distance': 10, 'distanceUnit': 'mi',
+            'campus':'extension'})
+        self.assertEqual(len(extensions['data']), 3)
+
+        dining_java = query_request(url, access_token, "get",
+                        {'lat': 44.56507, 'lon': -123.2761, 'isopen': True, 'distanceUnit': 'yd'})
+        self.assertEqual(len(dining_java['data']), 1)
+
+
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
         links = results_with_links(url, access_token)

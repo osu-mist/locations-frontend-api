@@ -1,6 +1,7 @@
 package edu.oregonstate.mist.locations.frontend.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.joda.time.DateTime
 
 /**
  * Handles HTTP requests against ElasticSearch. Operation supported are:
@@ -25,11 +26,15 @@ class LocationDAO {
      *
      * @return json             JSON search results from ES
      */
-    String search(String q, String campus, String type, Integer pageNumber, Integer pageSize) {
+    String search(String q, String campus, String type, Double lat,
+                  Double lon, String searchDistance, Boolean isOpen,
+                  Integer pageNumber, Integer pageSize) {
         ObjectMapper mapper = new ObjectMapper()
 
         // generate ES query to search for locations
-        def esQuery = getESSearchQuery(q, campus, type, pageNumber, pageSize)
+        def esQuery = getESSearchQuery(q, campus, type,
+                                       lat, lon, searchDistance,
+                                       isOpen, pageNumber, pageSize)
         String esQueryJson = mapper.writeValueAsString(esQuery)
 
         // get data from ES
@@ -103,8 +108,10 @@ class LocationDAO {
      * @param query
      * @return
      */
-    private def getESSearchQuery(String q, String campus, String type, int pageNumber,
-                                 int pageSize) {
+
+    private def getESSearchQuery(String q, String campus, String type,
+                                 Double lat, Double lon, String searchDistance,
+                                 Boolean isOpen,int pageNumber, int pageSize) {
         def esQuery = [
             "query": [
                 "bool": [
@@ -112,6 +119,7 @@ class LocationDAO {
                     "filter": []
                 ]
             ],
+            "sort": [],
             "from": (pageNumber - 1) * pageSize,
             "size": pageSize
         ]
@@ -125,12 +133,64 @@ class LocationDAO {
         }
 
         if (q) {
-            esQuery.query.bool.filter = [ "multi_match" : [
+            esQuery.query.bool.filter += [ "multi_match" : [
                     "query":    q,
                     "fields": [ "attributes.name", "attributes.abbreviation" ]
             ]]
         }
 
+        if (lat && lon) {
+            addLocationQuery(esQuery, lat, lon, searchDistance)
+        }
+
+        if (isOpen) {
+            addTimeQuery(esQuery)
+        }
+
         esQuery
+    }
+
+    /**
+     * Add ES query for searching by location
+     * @param esQuery
+     * @param lat
+     * @param lon
+     */
+    private static void addLocationQuery(def esQuery, Double lat,
+                                         Double lon, String searchDistance) {
+        esQuery.query.bool.filter += ["geo_distance": [
+                "distance": searchDistance,
+                "attributes.geoLocation": [
+                        "lat": lat,
+                        "lon": lon
+                ]
+        ]]
+
+        esQuery.sort = [
+                        "_geo_distance": [
+                                "attributes.geoLocation": [
+                                        "lat":  lat,
+                                        "lon": lon
+                                ],
+                                "order":         "asc",
+                                "unit":          "km",
+                                "distance_type": "plane"]
+                ]
+    }
+
+    /**
+     * Add ES query for filtering currently open restaurants
+     * @param esQuery
+     */
+    private static void addTimeQuery(def esQuery) {
+        String weekday = Integer.toString(DateTime.now().getDayOfWeek())
+        esQuery.query.bool.filter += [
+                ["nested": [
+                        "path": "attributes.openHours." + weekday,
+                        "filter": [
+                                [ "range":["attributes.openHours.${weekday}.start":
+                                                   [ "lte": "now"]]],
+                                ["range": ["attributes.openHours.${weekday}.end":
+                                                   ["gt": "now"]]]]]]]
     }
 }

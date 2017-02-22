@@ -50,7 +50,7 @@ locations:
   gatewayUrl: https://api.example.com
 
 api:
-  endpointUri: https://api.oregonstate.edu/v1/web-api-skeleton/
+  endpointUri: https://api.oregonstate.edu/v1/
 
 #
 ## Example Oracle configuration
@@ -87,3 +87,4 @@ api:
 #  autoCommentsEnabled: true
 #  evictionInterval: 5 # seconds
 #  validationInterval: 30 # seconds
+

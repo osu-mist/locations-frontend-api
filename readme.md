@@ -157,7 +157,6 @@ Merge the skeleton into your codebase:
     ...
     $ git commit -v
 
-
 ## Incorporate Updates from the Skeleton
 
 Fetch updates from the skeleton:

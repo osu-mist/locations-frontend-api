@@ -72,7 +72,7 @@ abstract class Resource {
                 status: 400,
                 developerMessage: message,
                 userMessage: properties.get('badRequest.userMessage'),
-                code: Integer.parseInt(properties.get('badRequest.code')),
+                code: Integer.parseInt(properties.get('badRequest.code').toString()),
                 details: properties.get('badRequest.details')
         ))
     }
@@ -88,7 +88,7 @@ abstract class Resource {
                 status: 404,
                 developerMessage: properties.get('notFound.developerMessage'),
                 userMessage: properties.get('notFound.userMessage'),
-                code: Integer.parseInt(properties.get('notFound.code')),
+                code: Integer.parseInt(properties.get('notFound.code').toString()),
                 details: properties.get('notFound.details')
         ))
     }
@@ -105,13 +105,17 @@ abstract class Resource {
                 status: 500,
                 developerMessage: message,
                 userMessage: properties.get('internalServerError.userMessage'),
-                code: Integer.parseInt(properties.get('internalServerError.code')),
+                code: Integer.parseInt(properties.get('internalServerError.code').toString()),
                 details: properties.get('internalServerError.details')
         ))
     }
 
     void setEndpointUri(URI endpointUri) {
         this.endpointUri = endpointUri
+    }
+
+    void setUriInfo(UriInfo uriInfo) {
+        this.uriInfo = uriInfo
     }
 
     /**
