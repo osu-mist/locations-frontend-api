@@ -4,6 +4,8 @@ import javax.ws.rs.core.Context
 import javax.ws.rs.core.Response
 import javax.ws.rs.core.Response.ResponseBuilder
 import org.apache.http.client.utils.URIBuilder
+
+import javax.ws.rs.core.UriBuilder
 import javax.ws.rs.core.UriInfo
 
 /**
@@ -94,6 +96,22 @@ abstract class Resource {
     }
 
     /**
+     * Returns a builder for an HTTP 409 ("conflict") response with an error message as body.
+     *
+     * @return conflict response builder
+     */
+    protected static ResponseBuilder conflict() {
+        ResponseBuilder responseBuilder = Response.status(Response.Status.CONFLICT)
+        responseBuilder.entity(new Error(
+                status: 409,
+                developerMessage: properties.get('conflict.developerMessage'),
+                userMessage: properties.get('conflict.userMessage'),
+                code: Integer.parseInt(properties.get('conflict.code')),
+                details: properties.get('conflict.details')
+        ))
+    }
+
+    /**
      * Returns a builder for an HTTP 500 ("internal server error") response with an error message
      * as body.
      *
@@ -129,11 +147,12 @@ abstract class Resource {
      * converted to page[number] and page[size].
      *
      * @param params a map of query parameters for the url
+     * @param resourceEndpoint: the endpoint to be appended on the uri.
      * @return the url
      */
-    protected String getPaginationUrl(Map params) {
-        URIBuilder uriBuilder = new URIBuilder(endpointUri).setPath(uriInfo.requestUri.path)
-
+    protected String getPaginationUrl(Map params, String resourceEndpoint) {
+        URI baseUri = UriBuilder.fromUri(endpointUri).path(resourceEndpoint).build()
+        URIBuilder uriBuilder = new URIBuilder(endpointUri).setPath(baseUri.path)
         // use a copy of params since other parameters could be present
         def nonNullParams = params.clone()
         nonNullParams.remove('pageSize')
