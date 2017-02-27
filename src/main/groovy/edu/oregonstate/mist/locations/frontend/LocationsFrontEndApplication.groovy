@@ -68,7 +68,8 @@ class LocationsFrontEndApplication extends Application<LocationsFrontendConfigur
 
         LocationDAO locationDAO = new LocationDAO(configuration.locationsConfiguration)
 
-        environment.jersey().register(new LocationResource(locationDAO))
+        environment.jersey().register(new LocationResource(
+                locationDAO, configuration.api.endpointUri))
         ElasticSearchHealthCheck healthCheck =
                 new ElasticSearchHealthCheck(configuration.locationsConfiguration)
         environment.healthChecks().register("elasticSearchCluster", healthCheck)

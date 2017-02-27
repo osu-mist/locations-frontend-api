@@ -8,16 +8,19 @@ import io.dropwizard.testing.junit.DropwizardAppRule
 import org.junit.Test
 import org.junit.ClassRule
 
+import javax.ws.rs.core.UriBuilder
+
 class LocationResourceTest {
     static def user = new AuthenticatedUser('nobody')
+    static URI endpointUri = UriBuilder.fromPath('https://api.unit.test.edu/v1/').build()
 
     @ClassRule
     public static final DropwizardAppRule<LocationsFrontendConfiguration> APPLICATION =
             new DropwizardAppRule<LocationsFrontendConfiguration>(
                     LocationsFrontEndApplication.class,
                     new File("configuration.yaml").absolutePath)
-
     // Test: LocationResource.list()
+
     @Test
     public void testList() {
         def mock = new MockFor(LocationDAO)
@@ -28,7 +31,7 @@ class LocationResourceTest {
                 '{"hits": {"total": 0, "hits": []}}'
         }
         def dao = mock.proxyInstance()
-        def resource = new LocationResource(dao)
+        def resource = new LocationResource(dao, endpointUri)
         resource.uriInfo = new MockUriInfo()
 
         // Test: no result
@@ -57,7 +60,7 @@ class LocationResourceTest {
             String id -> '{"id":"","type":"locations","attributes":{}}'
         }
         def dao = mock.proxyInstance()
-        def resource = new LocationResource(dao)
+        def resource = new LocationResource(dao, endpointUri)
         resource.uriInfo = new MockUriInfo()
 
         def validIdRes = resource.getById('valid-id', user)
@@ -76,7 +79,7 @@ class LocationResourceTest {
             String id -> null
         }
         def dao = mock.proxyInstance()
-        def resource = new LocationResource(dao)
+        def resource = new LocationResource(dao, endpointUri)
         resource.uriInfo = new MockUriInfo()
 
         def invalidIdRes = resource.getById(null, user)

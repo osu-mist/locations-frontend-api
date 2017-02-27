@@ -35,7 +35,7 @@ class MockUriInfo implements UriInfo {
 
     @Override
     List <String> getMatchedURIs(boolean decode) {
-        throw new UnsupportedOperationException('not implemented')
+        ["test", "data"]
     }
 
     @Override

@@ -16,12 +16,14 @@ import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
+import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.MultivaluedMap
 import javax.ws.rs.core.Response
+import javax.ws.rs.core.UriInfo
 import java.util.regex.Pattern
 
-@Path("/locations")
+@Path("locations")
 @Produces(MediaType.APPLICATION_JSON)
 class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
@@ -66,9 +68,13 @@ class LocationResource extends Resource {
                .          # to be an illegal character.
             ''')
 
-    LocationResource(LocationDAO locationDAO) {
+    LocationResource(LocationDAO locationDAO, URI endpointUri) {
         this.locationDAO = locationDAO
+        this.endpointUri = endpointUri
     }
+
+    @Context
+    UriInfo uriInfo
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -80,6 +86,7 @@ class LocationResource extends Resource {
                   @QueryParam('distanceUnit') String distanceUnit,
                   @QueryParam('isOpen') Boolean isOpen,
                   @Auth AuthenticatedUser authenticatedUser) {
+
         try {
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
@@ -143,7 +150,8 @@ class LocationResource extends Resource {
         if (!totalHits) {
             return
         }
-
+        
+        String baseResource = uriInfo.getMatchedURIs().get(uriInfo.getMatchedURIs().size() - 1)
         Integer pageNumber = getPageNumber()
         Integer pageSize = getPageSize()
         def urlParams = [
@@ -155,23 +163,22 @@ class LocationResource extends Resource {
         ]
 
         int lastPage = Math.ceil(totalHits / pageSize)
-        setEndpointUri(URI.create(locationDAO.getGatewayUrl()))
-        resultObject.links["self"] = getPaginationUrl(urlParams)
+        resultObject.links["self"] = getPaginationUrl(urlParams, baseResource)
         urlParams.pageNumber = 1
-        resultObject.links["first"] = getPaginationUrl(urlParams)
+        resultObject.links["first"] = getPaginationUrl(urlParams, baseResource)
         urlParams.pageNumber = lastPage
-        resultObject.links["last"] = getPaginationUrl(urlParams)
+        resultObject.links["last"] = getPaginationUrl(urlParams, baseResource)
 
         if (pageNumber > DEFAULT_PAGE_NUMBER) {
             urlParams.pageNumber = pageNumber - 1
-            resultObject.links["prev"] = getPaginationUrl(urlParams)
+            resultObject.links["prev"] = getPaginationUrl(urlParams, baseResource)
         } else {
             resultObject.links["prev"] = null
         }
 
         if (totalHits > (pageNumber * pageSize)) {
             urlParams.pageNumber = pageNumber + 1
-            resultObject.links["next"] = getPaginationUrl(urlParams)
+            resultObject.links["next"] = getPaginationUrl(urlParams, baseResource)
         } else {
             resultObject.links["next"] = null
         }
