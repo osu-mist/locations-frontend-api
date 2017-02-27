@@ -29,8 +29,8 @@ class LocationMapper {
         Attributes attributes = new Attributes(
                 name:           getField(attr, "name"),
                 abbreviation:   getField(attr, "abbreviation"),
-                latitude:       attr.get("geoLocation").get("lat").asText(null),
-                longitude:      attr.get("geoLocation").get("lon").asText(null),
+                latitude:       getField(attr.get("geoLocation"), "lat"),
+                longitude:      getField(attr.get("geoLocation"), "lon"),
                 summary:        getField(attr, "summary"),
                 description:    getField(attr, "description"),
                 address:        getField(attr, "address"),
@@ -118,7 +118,11 @@ class LocationMapper {
      * @return
      */
     private static String getField(JsonNode node, String fieldName) {
-        node.get(fieldName).asText(null)
+        String field = null
+        if (node.has(fieldName)) {
+            field = node.get(fieldName).asText(null)
+        }
+        field
     }
 
 }

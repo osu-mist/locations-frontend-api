@@ -57,10 +57,6 @@ class LocationDAO {
         }
     }
 
-    String getGatewayUrl() {
-        locationConfiguration.get("gatewayUrl")
-    }
-
     /**
      * Returns url of elastic search collection and type to search.
      *

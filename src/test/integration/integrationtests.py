@@ -112,6 +112,11 @@ class gateway_tests(unittest.TestCase):
     def test_blank_result(self):
         self.assertTrue(blank_result(url, access_token))
 
+    # Tests that a request for all locations is successful
+    def test_all_locations(self):
+        query_params = {'page[number]': 1, 'page[size]': 5000}
+        self.assertEqual(query_request(url, access_token, "get", query_params).status_code, 200)
+
     # Tests that API response time is less than a value
     def test_response_time(self):
         self.assertLess(response_time(url, access_token), 1)

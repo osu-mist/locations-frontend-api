@@ -47,7 +47,6 @@ locations:
   esUrl: http://elastic-search-url.example.com
   esIndex: elastic-search-index
   estype: elastic-search-type
-  gatewayUrl: https://api.example.com
 
 api:
   endpointUri: https://api.oregonstate.edu/v1/
