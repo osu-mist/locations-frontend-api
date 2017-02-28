@@ -24,12 +24,11 @@ class gateway_tests(unittest.TestCase):
 
         self.assertEqual(query_request(url, access_token, "get", query_params).status_code, 200)
 
-        # Apigee cache bug - JIRA ticket CO-699
-        if query_request(url, access_token, "post", query_params).status_code == 200:
-            self.skipTest('Apigee cache bug - JIRA ticket CO-699')
-        else:
-            self.assertEqual(query_request(url, access_token, "post", query_params).status_code, 405)
+        # DW not returning allowed methods headers, Apigee returning bad gateway
+        if query_request(url, access_token, "post", query_params).status_code == 502:
+            self.skipTest('DW not returning allowed methods headers that Apigee is expecting')
 
+        self.assertEqual(query_request(url, access_token, "post", query_params).status_code, 405)
         self.assertEqual(query_request(url, access_token, "put", query_params).status_code, 405)
         self.assertEqual(query_request(url, access_token, "delete", query_params).status_code, 405)
 
@@ -52,29 +51,30 @@ class gateway_tests(unittest.TestCase):
         self.assertEqual(len(building_library['data']), 1)
 
         # test filter
-        dinning_library = query_request(url, access_token, "get", {'q': 'library', 'type': 'dining'}).json()
-        self.assertEqual(len(dinning_library['data']), 0)
+        dining_library = query_request(url, access_token, "get", {'q': 'library', 'type': 'dining'}).json()
+        self.assertEqual(len(dining_library['data']), 0)
 
-        building_engineering = query_request(url, access_token, "get", {'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
+        building_engineering = query_request(url, access_token, "get",
+            {'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
         self.assertEqual(len(building_engineering['data']), 2)
 
         # test geo query
         building_library = query_request(url, access_token, "get",
-            {'lat': 44.56507, 'lon': -123.2761})
+            {'lat': 44.56507, 'lon': -123.2761}).json()
         self.assertEqual(len(building_library['data']), 10)
         self.assertEqual(building_library['data'][0]['id'], "831ed9ce6311601afba57934adea7a8e")
 
         building_library = query_request(url, access_token, "get",
-            {'lat': 44.56507, 'lon': -123.2761, 'distance': 1, 'distanceUnit': 'yd'})
+            {'lat': 44.56507, 'lon': -123.2761, 'distance': 1, 'distanceUnit': 'yd'}).json()
         self.assertEqual(len(building_library['data']), 1)
 
         extensions = query_request(url, access_token, "get",
             {'lat': 44.56507, 'lon': -123.2761, 'distance': 10, 'distanceUnit': 'mi',
-            'campus':'extension'})
+            'campus':'extension'}).json()
         self.assertEqual(len(extensions['data']), 3)
 
         dining_java = query_request(url, access_token, "get",
-                        {'lat': 44.56507, 'lon': -123.2761, 'isopen': True, 'distanceUnit': 'yd'})
+                        {'lat': 44.56507, 'lon': -123.2761, 'isopen': True, 'distanceUnit': 'yd'}).json()
         self.assertEqual(len(dining_java['data']), 1)
 
 
