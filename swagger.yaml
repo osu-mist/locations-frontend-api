@@ -173,6 +173,16 @@ definitions:
         type: string
       attributes:
         $ref: "#/definitions/Attributes"
+      links:
+        $ref: "#/definitions/SelfLink"
+      relationships:
+        $ref: "#/definitions/Relationships"
+
+  SelfLink:
+    properties:
+      self:
+        type: string
+        description: Url to this resource / location.
 
   Attributes:
     properties:
@@ -245,6 +255,30 @@ definitions:
               The default distance unit is mile "
         type: number
         format: double
+      tags:
+        description: "Tags associated with this location"
+        type: array
+        items:
+          type: string
+
+  Relationships:
+    properties:
+      services:
+          $ref: "#/definitions/ServicesRelationship"
+
+  ServicesRelationship:
+    properties:
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/ResourceObjectIdentifier"
+
+  ResourceObjectIdentifier:
+    properties:
+      id:
+        type: string
+      type:
+        type: string
 
   DayHours:
     properties:
