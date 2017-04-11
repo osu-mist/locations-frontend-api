@@ -70,7 +70,7 @@ paths:
           type: string
         - in: query
           name: type
-          description: "Type of location. Valid options are: building and dining"
+          description: "Type of location. Valid options are: building, dining and cultural-center"
           required: false
           type: string
         - in: query
@@ -103,18 +103,18 @@ paths:
       security:
         - locations_api_key: []
 
-  /locations/{buildingID}:
+  /locations/{locationID}:
     get:
       tags:
         - locations
-      description: "Finds location by buildingID"
-      operationId: getLocationByBuildingID
+      description: "Finds location by ID"
+      operationId: getLocationByID
       produces:
         - application/json
       parameters:
-        - name: buildingID
+        - name: locationID
           in: path
-          description: "buildingID of location to be searched by"
+          description: "ID of location to be searched by"
           required: true
           type: string
       responses:
@@ -122,6 +122,37 @@ paths:
           description: "Successful response"
           schema:
             $ref: "#/definitions/ResultObject"
+        "404":
+          description: "Resource not found"
+          schema:
+            $ref: "#/definitions/Errors"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/Errors"
+      security:
+        - locations_api_key: []
+
+  /locations/{locationID}/services:
+    get:
+      tags:
+        - locations
+        - services
+      description: "Lists services related to a location"
+      operationId: getServices
+      produces:
+        - application/json
+      parameters:
+        - name: locationID
+          in: path
+          description: "ID of location"
+          required: true
+          type: string
+      responses:
+        "200":
+          description: "Successful response"
+          schema:
+            $ref: "#/definitions/ServicesResultObjects"
         "404":
           description: "Resource not found"
           schema:
@@ -178,6 +209,24 @@ definitions:
       relationships:
         $ref: "#/definitions/Relationships"
 
+  ServicesResultObjects:
+    properties:
+      links:
+        $ref: "#/definitions/Links"
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/ServicesResourceObject"
+
+  ServicesResourceObject:
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      attributes:
+        $ref: "#/definitions/ServicesAttributes"
+
   SelfLink:
     properties:
       self:
@@ -188,19 +237,7 @@ definitions:
     properties:
       name:
         type: string
-        description: Name of the API.
-      time:
-        type: string
-        description: Build time in ISO 8601 format.
-      unixTime:
-        type: integer
-        description: Build time as milliseconds since the unix epoch.
-      commit:
-        type: string
-        description: Git commit hash of the revision which was built.
-      documentation:
-        type: string
-        description: Filename of the swagger specification for the API.
+        description: Name of the location.
       abbreviation:
         type: string
       latitude:
@@ -245,7 +282,7 @@ definitions:
         type: string
       type:
         type: string
-      open_hours:
+      openHours:
         type: array
         items:
           $ref: "#/definitions/DayHours"
@@ -260,6 +297,24 @@ definitions:
         type: array
         items:
           type: string
+
+  ServicesAttributes:
+    properties:
+      name:
+        type: string
+        description: Name of the Service.
+      type:
+        type: string
+        description: Unique identifier for this service
+      tags:
+        description: "Tags associated with this location"
+        type: array
+        items:
+          type: string
+      openHours:
+        type: array
+        items:
+          $ref: "#/definitions/DayHours"
 
   Relationships:
     properties:
