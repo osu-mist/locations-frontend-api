@@ -3,14 +3,14 @@ package edu.oregonstate.mist.locations.frontend.resources
 import com.codahale.metrics.annotation.Timed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import edu.oregonstate.mist.api.AuthenticatedUser
 import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
-import io.dropwizard.auth.Auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
+import javax.annotation.security.PermitAll
 import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
@@ -25,11 +25,12 @@ import java.util.regex.Pattern
 
 @Path("locations")
 @Produces(MediaType.APPLICATION_JSON)
+@PermitAll
 class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
 
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
-    public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining"]
+    public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining", "cultural-centers"]
     public static final ArrayList<String> ALLOWED_UNITS = ["mi", "miles",
                                                            "yd", "yards",
                                                            "ft", "feet",
@@ -77,15 +78,13 @@ class LocationResource extends Resource {
     UriInfo uriInfo
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Timed
     Response list(@QueryParam('q') String q,
                   @QueryParam('campus') String campus, @QueryParam('type') String type,
                   @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
                   @QueryParam('distance') Double distance,
                   @QueryParam('distanceUnit') String distanceUnit,
-                  @QueryParam('isOpen') Boolean isOpen,
-                  @Auth AuthenticatedUser authenticatedUser) {
+                  @QueryParam('isOpen') Boolean isOpen) {
 
         try {
             def trimmedQ = sanitize(q?.trim())
@@ -97,11 +96,7 @@ class LocationResource extends Resource {
             distanceUnit = distanceUnit == null ? "miles": distanceUnit
 
             // validate filtering parameters
-            def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
-            def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
-            def invalidLocation = (lat == null && lon != null) || (lat != null && lon == null)
-            def invalidUnit = trimmedUnit && !ALLOWED_UNITS.contains(trimmedUnit)
-            if (invalidCampus || invalidType || invalidLocation || invalidUnit) {
+            if (validateParameters(trimmedCampus, trimmedType, lat, lon, trimmedUnit)) {
                 return notFound().build()
             }
 
@@ -132,6 +127,25 @@ class LocationResource extends Resource {
             internalServerError("Woot you found a bug for us to fix!").build()
         }
 
+    }
+
+    /**
+     * Validates search parameters.
+     *
+     * @param trimmedCampus
+     * @param trimmedType
+     * @param lat
+     * @param lon
+     * @param trimmedUnit
+     * @return
+     */
+    private boolean validateParameters(String trimmedCampus, String trimmedType, Double lat,
+                                       Double lon, String trimmedUnit) {
+        def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
+        def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
+        def invalidLocation = (lat == null && lon != null) || (lat != null && lon == null)
+        def invalidUnit = trimmedUnit && !ALLOWED_UNITS.contains(trimmedUnit)
+        invalidCampus || invalidType || invalidLocation || invalidUnit
     }
 
     /**
@@ -185,10 +199,9 @@ class LocationResource extends Resource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Timed
     @Path('{id: [0-9a-zA-Z]+}')
-    Response getById(@PathParam('id') String id, @Auth AuthenticatedUser authenticatedUser) {
+    Response getById(@PathParam('id') String id) {
         try {
             ResultObject resultObject = new ResultObject()
             String esResponse = locationDAO.getById(id)

@@ -2,6 +2,8 @@ package edu.oregonstate.mist.locations.frontend.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.joda.time.DateTime
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Handles HTTP requests against ElasticSearch. Operation supported are:
@@ -9,6 +11,8 @@ import org.joda.time.DateTime
  */
 class LocationDAO {
     private final Map<String, String> locationConfiguration
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocationDAO.class)
 
     LocationDAO(Map<String, String> locationConfiguration) {
         this.locationConfiguration = locationConfiguration
@@ -35,6 +39,9 @@ class LocationDAO {
         def esQuery = getESSearchQuery(q, campus, type,
                                        lat, lon, searchDistance,
                                        isOpen, pageNumber, pageSize)
+
+        LOGGER.debug("elastic search query: " + esQuery)
+
         String esQueryJson = mapper.writeValueAsString(esQuery)
 
         // get data from ES
@@ -125,7 +132,11 @@ class LocationDAO {
         }
 
         if (type) {
-            esQuery.query.bool.must += [ "match": [ "attributes.type": type ]]
+            if (type == "cultural-centers") {
+                esQuery.query.bool.must += [ "match": [ "attributes.tags": type ]]
+            } else {
+                esQuery.query.bool.must += ["match": ["attributes.type": type]]
+            }
         }
 
         if (q) {
