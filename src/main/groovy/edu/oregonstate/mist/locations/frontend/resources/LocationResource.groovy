@@ -90,13 +90,12 @@ class LocationResource extends Resource {
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
             def trimmedType = sanitize(type?.trim()?.toLowerCase())
-            def trimmedUnit = sanitize(distanceUnit?.trim()?.toLowerCase())
             isOpen = isOpen == null ? false : isOpen
-            distance = distance == null ? 2 : distance
-            distanceUnit = distanceUnit == null ? "miles": distanceUnit
+            distance = getDistance(distance)
+            distanceUnit = getDistanceUnit(distanceUnit)
 
             // validate filtering parameters
-            if (validateParameters(trimmedCampus, trimmedType, lat, lon, trimmedUnit)) {
+            if (validateParameters(trimmedCampus, trimmedType, lat, lon, distanceUnit)) {
                 return notFound().build()
             }
 
@@ -111,12 +110,11 @@ class LocationResource extends Resource {
 
             // parse ES into JSON Node
             ObjectMapper mapper = new ObjectMapper() // can reuse, share globally
-            LocationMapper locationMapper = new LocationMapper()
             JsonNode actualObj = mapper.readTree(result)
 
             def topLevelHits = actualObj.get("hits")
             topLevelHits.get("hits").asList().each {
-                resultObject.data += locationMapper.map(it)
+                resultObject.data += LocationMapper.map(it)
             }
 
             setPaginationLinks(topLevelHits, q, type, campus, resultObject)
@@ -129,6 +127,20 @@ class LocationResource extends Resource {
 
     }
 
+    private static Double getDistance(Double distance) {
+        distance ?: 2
+    }
+
+    /**
+     * Returns the distanceUnit if not null. Otherwise, provides the default value.
+     *
+     * @param distanceUnit
+     * @return
+     */
+    private static String getDistanceUnit(String distanceUnit) {
+        distanceUnit?.trim()?.toLowerCase() ?: "miles"
+    }
+
     /**
      * Validates search parameters.
      *
@@ -139,7 +151,7 @@ class LocationResource extends Resource {
      * @param trimmedUnit
      * @return
      */
-    private boolean validateParameters(String trimmedCampus, String trimmedType, Double lat,
+    private static boolean validateParameters(String trimmedCampus, String trimmedType, Double lat,
                                        Double lon, String trimmedUnit) {
         def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
         def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
