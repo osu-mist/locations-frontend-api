@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.jsonapi.ResourceObject
 
 class LocationMapper {
-
     public static ResourceObject map(JsonNode hit) {
         def hitSource = hit.get("_source").toString()
         buildResourceObject(hitSource, hit)

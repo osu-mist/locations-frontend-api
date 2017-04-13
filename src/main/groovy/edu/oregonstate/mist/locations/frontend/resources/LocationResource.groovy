@@ -16,11 +16,8 @@ import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
-import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.MultivaluedMap
 import javax.ws.rs.core.Response
-import javax.ws.rs.core.UriInfo
 import java.util.regex.Pattern
 
 @Path("locations")
@@ -40,18 +37,6 @@ class LocationResource extends Resource {
                                                            "cm", "centimeters",
                                                            "mm", "millimeters",
                                                            "NM", "nmi", "nauticalmiles"]
-
-    /**
-     * Default page number used in pagination
-     * @todo: should this be coming from skeleton or configuration file?
-     */
-    public static final Integer DEFAULT_PAGE_NUMBER = 1
-
-    /**
-     * Default page size used in pagination
-     * @todo: should this be coming from skeleton or configuration file?
-     */
-    public static final Integer DEFAULT_PAGE_SIZE = 10
 
     private final LocationDAO locationDAO
 
@@ -73,9 +58,6 @@ class LocationResource extends Resource {
         this.locationDAO = locationDAO
         this.endpointUri = endpointUri
     }
-
-    @Context
-    UriInfo uriInfo
 
     @GET
     @Timed
@@ -245,69 +227,7 @@ class LocationResource extends Resource {
         illegalCharacterPattern?.matcher(searchQuery)?.replaceAll(' ')
     }
 
-    /**
-     * Returns the value for an array parameter in the GET string.
-     *
-     * The JSONAPI format reserves the page parameter for pagination.
-     * This API uses page[size] and page[number].
-     * This function allows us to get just value for a specific parameter in an array.
-     *
-     * @param key
-     * @param index
-     * @param queryParameters
-     * @return
-     */
-    public static String getArrayParameter(String key, String index,
-                                           MultivaluedMap<String, String> queryParameters) {
-        // @todo: this function should probably be moved to the skeleton
-        for (Map.Entry<String, List<String>> entry : queryParameters.entrySet()) {
-            // not an array parameter
-            if (!entry.key.contains("[") && !entry.key.contains("]")) {
-                continue
-            }
-
-            int a = entry.key.indexOf('[')
-            int b = entry.key.indexOf(']')
-
-            if (entry.key.substring(0, a).equals(key)) {
-                if (entry.key.substring(a + 1, b).equals(index)) {
-                    return entry.value?.get(0)
-                }
-            }
-        }
-
-        null
-    }
-
     public static String buildSearchDistance(Double distance, String distanceUnit) {
         distance.toString().concat(distanceUnit)
-    }
-
-    /**
-     *  Returns the page number used by pagination. The value of: page[number] in the url.
-     *
-     * @return
-     */
-    Integer getPageNumber() {
-        def pageNumber = getArrayParameter("page", "number", uriInfo.getQueryParameters())
-        if (!pageNumber || !pageNumber.isInteger()) {
-            return DEFAULT_PAGE_NUMBER
-        }
-
-        pageNumber.toInteger()
-    }
-
-    /**
-     * Returns the page size used by pagination. The value of: page[size] in the url.
-     *
-     * @return
-     */
-    Integer getPageSize() {
-        def pageSize = getArrayParameter("page", "size", uriInfo.getQueryParameters())
-        if (!pageSize || !pageSize.isInteger()) {
-            return DEFAULT_PAGE_SIZE
-        }
-
-        pageSize.toInteger()
     }
 }
