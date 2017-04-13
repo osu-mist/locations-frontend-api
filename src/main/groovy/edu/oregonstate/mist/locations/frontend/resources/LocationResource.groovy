@@ -215,15 +215,14 @@ class LocationResource extends Resource {
     @Path('{id: [0-9a-zA-Z]+}')
     Response getById(@PathParam('id') String id) {
         try {
-            ResultObject resultObject = new ResultObject()
             String esResponse = locationDAO.getById(id)
-
             if (!esResponse) {
                 return notFound().build()
             }
 
-            ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally
-            resultObject.data = mapper.readValue(esResponse, Object.class)
+            ResultObject resultObject = new ResultObject()
+            resultObject.data = LocationMapper.map(esResponse)
+
             ok(resultObject).build()
         } catch (Exception e) {
             LOGGER.error("Exception while getting location by ID", e)
