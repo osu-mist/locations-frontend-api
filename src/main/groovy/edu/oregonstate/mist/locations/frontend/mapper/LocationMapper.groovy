@@ -1,10 +1,8 @@
 package edu.oregonstate.mist.locations.frontend.mapper
 
 import com.fasterxml.jackson.databind.JsonNode
-import edu.oregonstate.mist.locations.frontend.core.Attributes
-import edu.oregonstate.mist.locations.frontend.core.DayOpenHours
-import edu.oregonstate.mist.locations.frontend.jsonapi.ResourceObject
-import org.joda.time.DateTime
+import com.fasterxml.jackson.databind.ObjectMapper
+import edu.oregonstate.mist.api.jsonapi.ResourceObject
 
 class LocationMapper {
 

@@ -1,8 +1,7 @@
 package edu.oregonstate.mist.api.jsonapi
 
-class ResourceObject {
-    String id
-    String type
+class ResourceObject extends ResourceIdentifierObject {
     def attributes
     def links
+    def relationships
 }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
-import edu.oregonstate.mist.locations.frontend.jsonapi.ResultObject
+import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
