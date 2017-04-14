@@ -213,6 +213,38 @@ class LocationResource extends Resource {
 
     }
 
+    @GET
+    @Timed
+    @Path('{id: [0-9a-zA-Z]+}/services')
+    Response getRelatedServices(@PathParam('id') String id) {
+        try {
+            String result = locationDAO.getRelatedServices(id, pageNumber, pageSize)
+            if (!result) {
+                return notFound().build()
+            }
+
+            ResultObject resultObject = new ResultObject()
+            resultObject.data = []
+
+            // parse ES into JSON Node
+            ObjectMapper mapper = new ObjectMapper() // can reuse, share globally
+            JsonNode actualObj = mapper.readTree(result)
+
+            def topLevelHits = actualObj.get("hits")
+            topLevelHits.get("hits").asList().each {
+                resultObject.data += LocationMapper.map(it)
+            }
+
+            //@todo: in the future we may add pagination. For now, let's keep it simple
+
+            ok(resultObject).build()
+        } catch (Exception e) {
+            LOGGER.error("Exception while getting location by ID", e)
+            internalServerError("Woot you found a bug for us to fix!").build()
+        }
+
+    }
+
     /**
      * Sanitizes the search query string by replacing illegal characters with spaces.
      *

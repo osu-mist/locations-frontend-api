@@ -30,14 +30,19 @@ class LocationMapper {
      */
     private static void adjustLocationsResource(ResourceObject ro, JsonNode hit) {
         // setup the individual latitude, longitude and remove ES geoLocation object
-        ro?.attributes?.latitude = ro?.attributes?.geoLocation?.lat
-        ro?.attributes?.longitude = ro?.attributes?.geoLocation?.lon
+        if (ro?.type != "services") { // services don't have lat / lon
+            ro?.attributes?.latitude = ro?.attributes?.geoLocation?.lat
+            ro?.attributes?.longitude = ro?.attributes?.geoLocation?.lon
+        }
 
         // add the sort ES metadata to attributes
-        ro?.attributes?.distance = hit?.get('sort')?.get(0)?.asDouble()
+        if (hit?.get('sort')?.get(0)) {
+            ro?.attributes?.distance = hit?.get('sort')?.get(0)?.asDouble()
+        }
 
         // remove attributes not part of the api spec
         ro?.attributes?.remove("geoLocation")
         ro?.attributes?.remove("parent")
+        ro?.attributes?.remove("locationId")
     }
 }

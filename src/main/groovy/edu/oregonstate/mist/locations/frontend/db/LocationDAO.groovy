@@ -45,7 +45,59 @@ class LocationDAO {
         String esQueryJson = mapper.writeValueAsString(esQuery)
 
         // get data from ES
-        def url = new URL("${ESFullUrl}/_search")
+        def url = new URL("${locationsESFullUrl}/_search")
+        URLConnection connection = postRequest(url, esQueryJson)
+        connection.content.text
+    }
+
+    /**
+     * Performs a search / list against the services index.
+     *
+     * @param q
+     * @param isOpen
+     * @param pageNumber
+     * @param pageSize
+     * @return
+     */
+    String searchService(String q, Boolean isOpen, Integer pageNumber,
+                         Integer pageSize) {
+        ObjectMapper mapper = new ObjectMapper()
+
+        // generate ES query to search for locations
+        def esQuery = getESSearchQuery(q, null, null,
+                                       null, null, null,
+                                       isOpen, pageNumber, pageSize)
+
+        LOGGER.debug("elastic search query: " + esQuery)
+
+        String esQueryJson = mapper.writeValueAsString(esQuery)
+
+        // get data from ES
+        def url = new URL("${servicesESFullUrl}/_search")
+        URLConnection connection = postRequest(url, esQueryJson)
+        connection.content.text
+    }
+
+    /**
+     * Returns the related services mapped to a building / location
+     *
+     * @param locationId
+     * @param pageNumber
+     * @param pageSize
+     * @return
+     */
+    String getRelatedServices(String locationId, Integer pageNumber, Integer pageSize) {
+        ObjectMapper mapper = new ObjectMapper()
+
+        // generate ES query to search for locations
+        def esQuery = getESQueryRelatedServices(locationId, pageNumber, pageSize)
+
+        LOGGER.debug("elastic search query: " + esQuery)
+
+        String esQueryJson = mapper.writeValueAsString(esQuery)
+
+        // get data from ES
+        def url = new URL("${servicesESFullUrl}/_search")
         URLConnection connection = postRequest(url, esQueryJson)
         connection.content.text
     }
@@ -58,7 +110,21 @@ class LocationDAO {
      */
     String getById(String id) {
         try {
-            return "${ESFullUrl}/${id?.toLowerCase()}/_source".toURL().text
+            return "${locationsESFullUrl}/${id?.toLowerCase()}/_source".toURL().text
+        } catch (FileNotFoundException e) {
+            return null
+        }
+    }
+
+    /**
+     * Returns a single service
+     *
+     * @param id
+     * @return
+     */
+    String getServiceById(String id) {
+        try {
+            return "${servicesESFullUrl}/${id?.toLowerCase()}/_source".toURL().text
         } catch (FileNotFoundException e) {
             return null
         }
@@ -69,12 +135,19 @@ class LocationDAO {
      *
      * @return
      */
-    private GString getESFullUrl() {
+    private GString getESFullUrl(String esIndex, String esType) {
         String esUrl = locationConfiguration.get("esUrl")
-        String esIndex = locationConfiguration.get("esIndex")
-        String esType = locationConfiguration.get("estype")
 
         "${esUrl}/${esIndex}/${esType}"
+    }
+
+    private GString getLocationsESFullUrl() {
+        getESFullUrl(locationConfiguration.get("esIndex"), locationConfiguration.get("estype"))
+    }
+
+    private GString getServicesESFullUrl() {
+        getESFullUrl(locationConfiguration.get("esIndexService"),
+                locationConfiguration.get("estypeService"))
     }
 
     /**
@@ -111,7 +184,6 @@ class LocationDAO {
      * @param query
      * @return
      */
-
     private def getESSearchQuery(String q, String campus, String type,
                                  Double lat, Double lon, String searchDistance,
                                  Boolean isOpen,int pageNumber, int pageSize) {
@@ -155,6 +227,19 @@ class LocationDAO {
         }
 
         esQuery
+    }
+
+    private def getESQueryRelatedServices(String locationId, int pageNumber, int pageSize) {
+        [
+            "query": [
+                "bool": [
+                    "must": [ "match": [ "attributes.locationId": locationId ]]
+                ]
+            ],
+            "sort": [],
+            "from": (pageNumber - 1) * pageSize,
+            "size": pageSize
+        ]
     }
 
     /**
