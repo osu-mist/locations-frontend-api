@@ -204,7 +204,7 @@ class LocationDAO {
         }
 
         if (type) {
-            if (type == "cultural-centers") {
+            if (type == "cultural-center") {
                 esQuery.query.bool.must += [ "match": [ "attributes.tags": type ]]
             } else {
                 esQuery.query.bool.must += ["match": ["attributes.type": type]]

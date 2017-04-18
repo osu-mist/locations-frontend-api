@@ -33,6 +33,9 @@ class LocationMapper {
         if (ro?.type != "services") { // services don't have lat / lon
             ro?.attributes?.latitude = ro?.attributes?.geoLocation?.lat
             ro?.attributes?.longitude = ro?.attributes?.geoLocation?.lon
+        } else if (ro?.type == "services") {
+            // Services don't have a concept of type
+            ro?.attributes?.remove("type")
         }
 
         // add the sort ES metadata to attributes
@@ -44,5 +47,8 @@ class LocationMapper {
         ro?.attributes?.remove("geoLocation")
         ro?.attributes?.remove("parent")
         ro?.attributes?.remove("locationId")
+
+        // hashCode is used as metadata in ES. No need to expose it
+        ro?.attributes?.remove("hashCode")
     }
 }

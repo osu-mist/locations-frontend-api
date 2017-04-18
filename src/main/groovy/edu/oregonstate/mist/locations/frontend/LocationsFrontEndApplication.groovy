@@ -13,6 +13,7 @@ import edu.oregonstate.mist.locations.frontend.resources.LocationResource
 import edu.oregonstate.mist.api.PrettyPrintResponseFilter
 import edu.oregonstate.mist.api.jsonapi.GenericExceptionMapper
 import edu.oregonstate.mist.api.jsonapi.NotFoundExceptionMapper
+import edu.oregonstate.mist.locations.frontend.resources.ServiceResource
 import io.dropwizard.Application
 import io.dropwizard.auth.AuthDynamicFeature
 import io.dropwizard.auth.AuthValueFactoryProvider
@@ -69,6 +70,8 @@ class LocationsFrontEndApplication extends Application<LocationsFrontendConfigur
         LocationDAO locationDAO = new LocationDAO(configuration.locationsConfiguration)
 
         environment.jersey().register(new LocationResource(
+                locationDAO, configuration.api.endpointUri))
+        environment.jersey().register(new ServiceResource(
                 locationDAO, configuration.api.endpointUri))
         ElasticSearchHealthCheck healthCheck =
                 new ElasticSearchHealthCheck(configuration.locationsConfiguration)

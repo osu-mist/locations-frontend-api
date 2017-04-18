@@ -27,7 +27,7 @@ class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
 
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
-    public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining", "cultural-centers"]
+    public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining", "cultural-center"]
     public static final ArrayList<String> ALLOWED_UNITS = ["mi", "miles",
                                                            "yd", "yards",
                                                            "ft", "feet",
