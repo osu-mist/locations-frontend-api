@@ -54,7 +54,6 @@ class ServiceResource extends Resource {
             def trimmedQ = sanitize(q?.trim())
             isOpen = isOpen == null ? false : isOpen
 
-
             String result = locationDAO.searchService(trimmedQ, isOpen, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
