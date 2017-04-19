@@ -122,10 +122,6 @@ paths:
           description: "Successful response"
           schema:
             $ref: "#/definitions/ResultObject"
-        "404":
-          description: "Resource not found"
-          schema:
-            $ref: "#/definitions/Errors"
         "500":
           description: "Internal Server Error"
           schema:
@@ -201,10 +197,6 @@ paths:
           description: "Successful response"
           schema:
             $ref: "#/definitions/ServicesResultObjects"
-        "404":
-          description: "Not Found"
-          schema:
-            $ref: "#/definitions/Error"
         "500":
           description: "Internal Server Error"
           schema:
