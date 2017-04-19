@@ -50,7 +50,6 @@ locations:
   estype: elastic-search-type
   esIndexService: elastic-search-services-index
   estypeService: elastic-search-services-type
-  gatewayUrl: https://api.example.com/v1/
   searchDistance: "1km"
 
 api:

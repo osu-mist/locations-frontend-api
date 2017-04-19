@@ -91,7 +91,7 @@ paths:
         "200":
           description: "Successful response"
           schema:
-            $ref: "#/definitions/ResultObjects"
+            $ref: "#/definitions/LocationsResultObjects"
         "404":
           description: "Not Found"
           schema:
@@ -121,7 +121,7 @@ paths:
         "200":
           description: "Successful response"
           schema:
-            $ref: "#/definitions/ResultObject"
+            $ref: "#/definitions/LocationsResultObject"
         "500":
           description: "Internal Server Error"
           schema:
@@ -250,21 +250,21 @@ parameters:
     description: If true, JSON response will be pretty-printed
 
 definitions:
-  ResultObject:
+  LocationsResultObject:
     properties:
       links:
         $ref: "#/definitions/Links"
       data:
-        $ref: "#/definitions/ResourceObject"
+        $ref: "#/definitions/LocationsResourceObject"
 
-  ResultObjects:
+  LocationsResultObjects:
     properties:
       links:
         $ref: "#/definitions/Links"
       data:
         type: array
         items:
-          $ref: "#/definitions/ResourceObject"
+          $ref: "#/definitions/LocationsResourceObject"
 
   ServicesResultObject:
     properties:
@@ -273,7 +273,7 @@ definitions:
       data:
         $ref: "#/definitions/ServicesResourceObject"
 
-  ResourceObject:
+  LocationsResourceObject:
     properties:
       id:
         type: string
