@@ -11,7 +11,7 @@ def get_url(config_path):
 
 def get_access_token(config_path):
     config_data = get_config_data(config_path)
-    access_token_url = get_url(config_path) + config_data["token_endpoint"]
+    access_token_url = config_data["token_api"]
     client_id = config_data["client_id"]
     client_secret = config_data["client_secret"]
     post_data = {'client_id': client_id, 'client_secret': client_secret, 'grant_type': 'client_credentials'}
