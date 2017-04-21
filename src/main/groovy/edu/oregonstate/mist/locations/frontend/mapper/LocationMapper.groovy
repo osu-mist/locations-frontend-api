@@ -31,8 +31,8 @@ class LocationMapper {
     private static void adjustLocationsResource(ResourceObject ro, JsonNode hit) {
         // setup the individual latitude, longitude and remove ES geoLocation object
         if (ro?.type != "services") { // services don't have lat / lon
-            ro?.attributes?.latitude = ro?.attributes?.geoLocation?.lat
-            ro?.attributes?.longitude = ro?.attributes?.geoLocation?.lon
+            ro?.attributes?.latitude = ro?.attributes?.geoLocation?.lat?.toString()
+            ro?.attributes?.longitude = ro?.attributes?.geoLocation?.lon?.toString()
         } else if (ro?.type == "services") {
             // Services don't have a concept of type
             ro?.attributes?.remove("type")
