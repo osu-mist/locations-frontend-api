@@ -329,20 +329,20 @@ definitions:
         format: float
       geometry:
         properties:
-          rings:
+          type:
+            type: string
+            description: Polygon or MultiPolygon
+          coordinates:
             description: Array of ring arrays for each physical structure of a location
             type: array
             items:
               description: Array of points that make up a ring. 
               type: array
               items:
-                properties:
-                  latitude:
-                    type: number
-                    format: float
-                  longitude:
-                    type: number
-                    format: float
+                type: array
+                items:
+                  type: number
+                  format: float
       summary:
         type: string
       description:
