@@ -62,7 +62,7 @@ class gateway_tests(unittest.TestCase):
         building_library = query_request(url, access_token, "get",
             {'lat': 44.56507, 'lon': -123.2761}).json()
         self.assertEqual(len(building_library['data']), 10)
-        self.assertEqual(building_library['data'][0]['id'], "831ed9ce6311601afba57934adea7a8e")
+        self.assertEqual(building_library['data'][0]['id'], "7cea585e9a1fd7a58b271ab198a461e6")
 
         building_library = query_request(url, access_token, "get",
             {'lat': 44.56507, 'lon': -123.2761, 'distance': 1, 'distanceUnit': 'yd'}).json()
