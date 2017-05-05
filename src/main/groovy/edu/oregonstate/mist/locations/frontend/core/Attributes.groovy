@@ -5,6 +5,7 @@ class Attributes {
     String abbreviation
     String latitude
     String longitude
+    Geometry geometry
     String summary
     String description
     String address
