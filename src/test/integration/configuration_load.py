@@ -7,7 +7,7 @@ def get_config_data(config_path):
 
 def get_url(config_path):
     config_data = get_config_data(config_path)
-    return config_data["hostname"] + config_data["version"] + config_data["api"]
+    return config_data["hostname"] + config_data["version"]
 
 def get_access_token(config_path):
     config_data = get_config_data(config_path)

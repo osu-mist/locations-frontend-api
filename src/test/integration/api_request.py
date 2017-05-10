@@ -5,7 +5,7 @@ import ssl
 from configuration_load import *
 
 def id_request(url, access_token, id):
-    url += id
+    url += "/%s" % id
     headers = {'Authorization': access_token}
     request = requests.get(url, headers=headers)
     return request.json()
