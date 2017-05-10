@@ -58,6 +58,7 @@ class gateway_tests(unittest.TestCase):
             {'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
         self.assertEqual(len(building_engineering['data']), 2)
 
+    def test_geo_location(self):
         # test geo query
         building_library = query_request(url, access_token, "get",
             {'lat': 44.56507, 'lon': -123.2761}).json()
@@ -79,6 +80,27 @@ class gateway_tests(unittest.TestCase):
                         {'lat': 44.56507, 'lon': -123.2761, 'isopen': True, 'distanceUnit': 'yd'}).json()
         self.assertEqual(len(dining_java['data']), 1)
 
+    def test_geometries(self):
+        # MultiPolygon location
+        building_kerr = query_request(url, access_token, "get",
+            {'q': 'kerr', 'type': 'building', 'campus': 'corvallis'}).json()
+        kerr_geometry = building_kerr['data'][0]['attributes']['geometry']
+        self.assertEqual(kerr_geometry['type'], "MultiPolygon")
+        self.assertEqual(len(kerr_geometry['coordinates']), 2)
+        self.assertEqual(len(kerr_geometry['coordinates'][0][0]), 2)
+        self.assertEqual(type(kerr_geometry['coordinates'][0][0][0]), float)
+        self.assertEqual(type(kerr_geometry['coordinates'][0][0][1]), float)
+        # First and last coordinate pairs in a ring should be equal: https://tools.ietf.org/html/rfc7946#section-3.1.6
+        self.assertEqual(kerr_geometry['coordinates'][0][0], kerr_geometry['coordinates'][0][-1])
+        self.assertEqual(kerr_geometry['coordinates'][-1][0], kerr_geometry['coordinates'][-1][-1])
+
+        # Polygon location
+        building_mu = query_request(url, access_token, "get",
+            {'q': 'memorial', 'type': 'building', 'campus': 'corvallis'}).json()
+        mu_geometry = building_mu['data'][0]['attributes']['geometry']
+        self.assertEqual(mu_geometry['type'], "Polygon")
+        self.assertEqual(len(mu_geometry['coordinates']), 1)
+        self.assertEqual(mu_geometry['coordinates'][0][0], mu_geometry['coordinates'][0][-1])
 
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
