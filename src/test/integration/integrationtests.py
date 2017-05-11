@@ -6,6 +6,22 @@ from configuration_load import *
 
 class gateway_tests(unittest.TestCase):
 
+    def test_services(self):
+        buildings = get_buildings_with_services(services_url, access_token)
+
+        for building_id in buildings:
+            # Test that a building's service links back to the same building
+            building_object = id_request(locations_url, access_token, building_id)
+            for service in building_object['data']['relationships']['services']['data']:
+                service_object = id_request(services_url, access_token, service['id'])
+                parent_id = service_object['data']['relationships']['locations']['data'][0]['id']
+
+                self.assertEqual(building_id, str(parent_id))
+
+            # Test that the relationships object and the services endpoint have the same number of services
+            building_services = id_request(locations_url, access_token, building_id + "/services")
+            self.assertEqual(len(building_object['data']['relationships']['services']['data']), len(building_services['data']))
+
     # Tests a single resource ID in different case styles
     def test_id(self):
         response = id_request(locations_url, access_token, single_resourse_id)
@@ -189,5 +205,5 @@ if __name__ == '__main__':
 
     locations_url = url + "/locations"
     services_url = url + "/services"
-    
+
     unittest.main()

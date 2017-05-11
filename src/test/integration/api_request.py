@@ -4,6 +4,17 @@ import urllib2
 import ssl
 from configuration_load import *
 
+def get_buildings_with_services(url, access_token):
+    query_params = {'page[size]': 1000}
+    services = query_request(url, access_token, "get", query_params).json()
+    building_ids = []
+    for service in services['data']:
+        building_id = service['relationships']['locations']['data'][0]['id']
+        if building_id not in building_ids:
+            building_ids.append(building_id)
+
+    return building_ids
+
 def id_request(url, access_token, id):
     url += "/%s" % id
     headers = {'Authorization': access_token}
