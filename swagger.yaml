@@ -381,6 +381,9 @@ definitions:
         type: string
       type:
         type: string
+      giRestrooms:
+        description: Number of gender inclusive restrooms available in the location.
+        type: integer
       openHours:
         type: array
         items:
