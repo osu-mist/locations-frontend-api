@@ -381,9 +381,15 @@ definitions:
         type: string
       type:
         type: string
-      giRestrooms:
+      giRestroomCount:
         description: Number of gender inclusive restrooms available in the location.
         type: integer
+      giRestroomLimits:
+        description: > 
+          Limit on the use of gender inclusive restrooms for a location, if applicable.
+          A residence hall might restrict bathroom use or building access to 
+          residents only.
+        type: string
       openHours:
         type: array
         items:
