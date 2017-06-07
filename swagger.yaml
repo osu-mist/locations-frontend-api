@@ -384,11 +384,16 @@ definitions:
       giRestroomCount:
         description: Number of gender inclusive restrooms available in the location.
         type: integer
-      giRestroomLimits:
-        description: > 
-          Limit on the use of gender inclusive restrooms for a location, if applicable.
+      giRestroomLimit:
+        description: >
+          If true, access to this location's restrooms may be limited. 
           A residence hall might restrict bathroom use or building access to 
           residents only.
+        type: boolean
+      giRestroomLocations:
+        description: >
+          Room numbers of gender inclusive restrooms within location. 
+          Some restrooms may not be ADA compliant.
         type: string
       openHours:
         type: array
