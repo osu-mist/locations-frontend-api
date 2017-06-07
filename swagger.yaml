@@ -74,6 +74,13 @@ paths:
           required: false
           type: string
         - in: query
+          name: giRestroom
+          description: >
+            If true, locations without gender inclusive restrooms will be filtered out.
+            If false, locations with gender inclusive restrooms will be filtered out.
+          required: false
+          type: boolean
+        - in: query
           name: page[size]
           description: "Number of results to return. Used in pagination. Default value is 10."
           required: false
