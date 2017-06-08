@@ -74,6 +74,13 @@ paths:
           required: false
           type: string
         - in: query
+          name: giRestroom
+          description: >
+            If true, locations without gender inclusive restrooms will be filtered out.
+            If false, locations with gender inclusive restrooms will be filtered out.
+          required: false
+          type: boolean
+        - in: query
           name: page[size]
           description: "Number of results to return. Used in pagination. Default value is 10."
           required: false
@@ -380,6 +387,20 @@ definitions:
       campus:
         type: string
       type:
+        type: string
+      giRestroomCount:
+        description: Number of gender inclusive restrooms available in the location.
+        type: integer
+      giRestroomLimit:
+        description: >
+          If true, access to this location's restrooms may be limited. 
+          A residence hall might restrict bathroom use or building access to 
+          residents only.
+        type: boolean
+      giRestroomLocations:
+        description: >
+          Room numbers of gender inclusive restrooms within location. 
+          Some restrooms may not be ADA compliant.
         type: string
       openHours:
         type: array
