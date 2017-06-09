@@ -338,7 +338,9 @@ definitions:
         properties:
           type:
             type: string
-            description: Polygon or MultiPolygon
+            enum:
+              - Polygon
+              - MultiPolygon
           coordinates:
             description: Array of ring arrays for each physical structure of a location
             type: array
