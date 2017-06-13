@@ -118,6 +118,7 @@ class gateway_tests(unittest.TestCase):
         self.assertEqual(len(mu_geometry['coordinates']), 1)
         self.assertEqual(mu_geometry['coordinates'][0][0], mu_geometry['coordinates'][0][-1])
 
+    # Tests results of a query that should return only locations with gender inclusive restrooms
     def test_gender_inclusive_rr(self):
         gi_rr = query_request(locations_url, access_token, "get",
               {'giRestroom': 'true', 'page[size]': 5000}).json()
