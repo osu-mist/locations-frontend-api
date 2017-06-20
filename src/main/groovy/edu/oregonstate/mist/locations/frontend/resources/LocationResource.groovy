@@ -66,13 +66,15 @@ class LocationResource extends Resource {
                   @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
                   @QueryParam('distance') Double distance,
                   @QueryParam('distanceUnit') String distanceUnit,
-                  @QueryParam('isOpen') Boolean isOpen) {
+                  @QueryParam('isOpen') Boolean isOpen,
+                  @QueryParam('giRestroom') Boolean giRestroom) {
 
         try {
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
             def trimmedType = sanitize(type?.trim()?.toLowerCase())
             isOpen = isOpen == null ? false : isOpen
+            giRestroom = giRestroom == null ? false : giRestroom
             distance = getDistance(distance)
             distanceUnit = getDistanceUnit(distanceUnit)
 
@@ -85,7 +87,7 @@ class LocationResource extends Resource {
             String result = locationDAO.search(
                                 trimmedQ, trimmedCampus, trimmedType,
                                 lat, lon, searchDistance,
-                                isOpen, pageNumber, pageSize)
+                                isOpen, giRestroom, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []

@@ -25,4 +25,7 @@ class Attributes {
     String type // used for searching. values: building, dining.
     Map<Integer, List<DayOpenHours>> openHours = new HashMap<Integer, List<DayOpenHours>>()
     Double distance
+    Integer giRestroomCount
+    Boolean giRestroomLimit
+    String giRestroomLocations
 }

@@ -118,6 +118,16 @@ class gateway_tests(unittest.TestCase):
         self.assertEqual(len(mu_geometry['coordinates']), 1)
         self.assertEqual(mu_geometry['coordinates'][0][0], mu_geometry['coordinates'][0][-1])
 
+    # Tests results of a query that should return only locations with gender inclusive restrooms
+    def test_gender_inclusive_rr(self):
+        gi_rr = query_request(locations_url, access_token, "get",
+              {'giRestroom': 'true', 'page[size]': 5000}).json()
+
+        for location in gi_rr['data']:
+            attributes = location['attributes']
+            self.assertGreater(attributes['giRestroomCount'], 0)
+            self.assertIsNotNone(attributes['giRestroomLimit'])
+
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
         links = results_with_links(locations_url, access_token)
@@ -148,6 +158,7 @@ class gateway_tests(unittest.TestCase):
         self.assertIsNotNone(response["userMessage"])
         self.assertIsNotNone(response["code"])
         self.assertIsNotNone(response["details"])
+
     # Tests that that a certain query returns no data
     def test_blank_result(self):
         self.assertTrue(blank_result(locations_url, access_token))

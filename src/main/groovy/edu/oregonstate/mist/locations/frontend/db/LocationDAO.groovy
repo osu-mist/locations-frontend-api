@@ -32,13 +32,13 @@ class LocationDAO {
      */
     String search(String q, String campus, String type, Double lat,
                   Double lon, String searchDistance, Boolean isOpen,
-                  Integer pageNumber, Integer pageSize) {
+                  Boolean giRestroom, Integer pageNumber, Integer pageSize) {
         ObjectMapper mapper = new ObjectMapper()
 
         // generate ES query to search for locations
         def esQuery = getESSearchQuery(q, campus, type,
                                        lat, lon, searchDistance,
-                                       isOpen, pageNumber, pageSize)
+                                       isOpen, giRestroom, pageNumber, pageSize)
 
         LOGGER.debug("elastic search query: " + esQuery)
 
@@ -66,7 +66,7 @@ class LocationDAO {
         // generate ES query to search for locations
         def esQuery = getESSearchQuery(q, null, null,
                                        null, null, null,
-                                       isOpen, pageNumber, pageSize)
+                                       isOpen, null, pageNumber, pageSize)
 
         LOGGER.debug("elastic search query: " + esQuery)
 
@@ -186,7 +186,7 @@ class LocationDAO {
      */
     private def getESSearchQuery(String q, String campus, String type,
                                  Double lat, Double lon, String searchDistance,
-                                 Boolean isOpen,int pageNumber, int pageSize) {
+                                 Boolean isOpen, Boolean giRestroom, int pageNumber, int pageSize) {
         def esQuery = [
             "query": [
                 "bool": [
@@ -207,7 +207,7 @@ class LocationDAO {
             if (type == "cultural-center") {
                 esQuery.query.bool.must += [ "match": [ "attributes.tags": type ]]
             } else {
-                esQuery.query.bool.must += ["match": ["attributes.type": type]]
+                esQuery.query.bool.must += [ "match": [ "attributes.type": type]]
             }
         }
 
@@ -224,6 +224,10 @@ class LocationDAO {
 
         if (isOpen) {
             addTimeQuery(esQuery)
+        }
+
+        if (giRestroom) {
+            esQuery.query.bool.must += [ "range": [ "attributes.giRestroomCount": [ "gt": 0]]]
         }
 
         esQuery
