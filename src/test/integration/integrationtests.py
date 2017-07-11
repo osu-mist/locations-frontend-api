@@ -8,6 +8,7 @@ class gateway_tests(unittest.TestCase):
 
     def test_services(self):
         buildings = get_buildings_with_services(services_url, access_token)
+        query_params = {'page[size]': 500}
 
         for building_id in buildings:
             # Test that a building's service links back to the same building
@@ -19,7 +20,8 @@ class gateway_tests(unittest.TestCase):
                 self.assertEqual(building_id, str(parent_id))
 
             # Test that the relationships object and the services endpoint have the same number of services
-            building_services = id_request(locations_url, access_token, building_id + "/services")
+            request_url = locations_url + "/" + building_id + "/services"
+            building_services = query_request(request_url, access_token, "get", query_params).json()
             self.assertEqual(len(building_object['data']['relationships']['services']['data']), len(building_services['data']))
 
     # Tests a single resource ID in different case styles

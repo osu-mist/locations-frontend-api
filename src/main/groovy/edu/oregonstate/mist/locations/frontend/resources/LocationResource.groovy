@@ -27,7 +27,8 @@ class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
 
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
-    public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining", "cultural-center"]
+    public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining",
+                                                           "cultural-center", "other"]
     public static final ArrayList<String> ALLOWED_UNITS = ["mi", "miles",
                                                            "yd", "yards",
                                                            "ft", "feet",
@@ -70,6 +71,10 @@ class LocationResource extends Resource {
                   @QueryParam('giRestroom') Boolean giRestroom) {
 
         try {
+            if (maxPageSizeExceeded()) {
+                return pageSizeExceededError().build()
+            }
+
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
             def trimmedType = sanitize(type?.trim()?.toLowerCase())

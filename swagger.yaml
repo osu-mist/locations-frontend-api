@@ -81,9 +81,11 @@ paths:
           type: boolean
         - in: query
           name: page[size]
-          description: "Number of results to return. Used in pagination. Default value is 10."
+          description: "Number of results to return. Used in pagination."
           required: false
           type: string
+          maximum: 10000
+          default: 10
         - in: query
           name: page[number]
           description: "Page number of results. Used to paginate through results."
