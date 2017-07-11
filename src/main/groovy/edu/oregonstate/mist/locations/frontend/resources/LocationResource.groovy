@@ -26,7 +26,6 @@ import java.util.regex.Pattern
 class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
 
-    private final Integer MAX_PAGE_SIZE = 10000
     public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining",
                                                            "cultural-center", "other"]
@@ -72,8 +71,8 @@ class LocationResource extends Resource {
                   @QueryParam('giRestroom') Boolean giRestroom) {
 
         try {
-            if (pageSize > MAX_PAGE_SIZE) {
-                return badRequest("page[size] cannot exceed ${MAX_PAGE_SIZE}").build()
+            if (maxPageSizeExceeded()) {
+                return pageSizeExceededError().build()
             }
 
             def trimmedQ = sanitize(q?.trim())
