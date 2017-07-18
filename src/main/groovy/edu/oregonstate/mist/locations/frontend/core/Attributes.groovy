@@ -28,4 +28,5 @@ class Attributes {
     Integer giRestroomCount
     Boolean giRestroomLimit
     String giRestroomLocations
+    List<String> synonyms
 }
