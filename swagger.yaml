@@ -405,6 +405,10 @@ definitions:
           Room numbers of gender inclusive restrooms within location. 
           Some restrooms may not be ADA compliant.
         type: string
+      synonyms:
+        type: array
+        items:
+          type: string
       openHours:
         type: array
         items:

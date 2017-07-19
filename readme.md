@@ -14,13 +14,12 @@ This API is based on the web-api-skeleton. For more documentation on the skeleto
 ## Prerequisites
 
 + Install [elasticsearch](https://www.elastic.co/)
-+ Use [location-api](https://github.com/osu-mist/locations-api) to fetch `locations-dining.json`, `locations-extension.json` and `locations-arcgis.json` by calling `/locations/dining`, `/locations/extension` and `/locations/arcgis`
++ Use [location-api](https://github.com/osu-mist/locations-api) to fetch `locations-combined.json` and `services.json` by calling `/locations/combined` and `/locations/services`
 + Post binary data to elasticsearch
 
 ```bash
-curl -s -XPOST localhost:9200/locations/locations/_bulk --data-binary "@path-to-locations-arcgis.json"; echo
-curl -s -XPOST localhost:9200/locations/locations/_bulk --data-binary "@path-to-locations-extension.json"; echo
-curl -s -XPOST localhost:9200/locations/locations/_bulk --data-binary "@path-to-locations-dining.json"; echo
+curl -s -XPOST localhost:9200/locations/locations/_bulk --data-binary "@locations-combined.json"; echo
+curl -s -XPOST localhost:9200/services/services/_bulk --data-binary "@services.json"; echo
 ```
 
 ## Generate Keys
@@ -179,34 +178,161 @@ The Web API definition is contained in the [Swagger specification](swagger.yaml)
 
 This resource returns the information for a given building:
 
-    $ curl https://localhost:8088/api/v0/locations/a5041ecde8b53e54c7479e770825d7c1 --cacert doej.pem --user "username:password"
+    $ curl https://localhost:8088/api/v0/locations/bacf847d8bf54ee7b6359b5f45751217 --cacert doej.pem --user "username:password"
 
 ```json
 {
-    "links":{},
-    "data":{"id":"a5041ecde8b53e54c7479e770825d7c1",
-            "type":"locations",
-            "attributes":{"name":"Indoor Target Range",
-                          "abbreviation":"ITR",
-                          "latitude":"44.56302",
-                          "longitude":"-123.2753",
-                          "summary":null,
-                          "description":null,
-                          "address":null,
-                          "city":null,
-                          "state":null,
-                          "zip":null,
-                          "county":null,
-                          "telephone":null,
-                          "fax":null,
-                          "thumbnails":null,
-                          "images":null,
-                          "departments":null,
-                          "website":null,
-                          "sqft":null,
-                          "calendar":null,
-                          "campus":"corvallis",
-                          "type":"building","openHours":{}},
-            "links":{"self":"https://api.oregonstate.edu/v1/locations/a5041ecde8b53e54c7479e770825d7c1"}}
+  "links": {},
+  "data": {
+    "id": "bacf847d8bf54ee7b6359b5f45751217",
+    "type": "locations",
+    "attributes": {
+      "name": "Indoor Target Range",
+      "tags": [],
+      "openHours": {},
+      "type": "building",
+      "abbreviation": "ITR",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -123.275167,
+              44.563115
+            ],
+            [
+              -123.275348,
+              44.563116
+            ],
+            [
+              -123.275348,
+              44.563032
+            ],
+            [
+              -123.275353,
+              44.563032
+            ],
+            [
+              -123.275353,
+              44.56298
+            ],
+            [
+              -123.275349,
+              44.56298
+            ],
+            [
+              -123.275349,
+              44.562924
+            ],
+            [
+              -123.275344,
+              44.562924
+            ],
+            [
+              -123.275344,
+              44.562925
+            ],
+            [
+              -123.27527,
+              44.562925
+            ],
+            [
+              -123.27527,
+              44.562924
+            ],
+            [
+              -123.275263,
+              44.562924
+            ],
+            [
+              -123.275263,
+              44.562925
+            ],
+            [
+              -123.275221,
+              44.562924
+            ],
+            [
+              -123.275221,
+              44.562924
+            ],
+            [
+              -123.275215,
+              44.562924
+            ],
+            [
+              -123.275215,
+              44.562924
+            ],
+            [
+              -123.275168,
+              44.562924
+            ],
+            [
+              -123.275168,
+              44.562924
+            ],
+            [
+              -123.275163,
+              44.562924
+            ],
+            [
+              -123.275162,
+              44.562972
+            ],
+            [
+              -123.275168,
+              44.562972
+            ],
+            [
+              -123.275168,
+              44.562979
+            ],
+            [
+              -123.275162,
+              44.562979
+            ],
+            [
+              -123.275162,
+              44.563031
+            ],
+            [
+              -123.275168,
+              44.563031
+            ],
+            [
+              -123.275167,
+              44.563115
+            ]
+          ]
+        ]
+      },
+      "summary": null,
+      "description": null,
+      "address": null,
+      "city": null,
+      "state": null,
+      "zip": null,
+      "county": null,
+      "telephone": null,
+      "fax": null,
+      "thumbnails": [],
+      "images": [],
+      "departments": null,
+      "website": null,
+      "sqft": null,
+      "calendar": null,
+      "campus": "corvallis",
+      "giRestroomCount": 0,
+      "giRestroomLimit": null,
+      "giRestroomLocations": null,
+      "latitude": "44.56302",
+      "longitude": "-123.2753"
+    },
+    "links": {
+      "self": "https://api.oregonstate.edu/v1/locations/bacf847d8bf54ee7b6359b5f45751217"
+    },
+    "relationships": null
+  }
 }
 ```
