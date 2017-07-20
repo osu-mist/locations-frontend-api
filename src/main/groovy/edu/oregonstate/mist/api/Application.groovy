@@ -9,6 +9,10 @@ import io.dropwizard.auth.basic.BasicCredentialAuthFilter
 import io.dropwizard.jersey.errors.LoggingExceptionMapper
 import io.dropwizard.setup.Bootstrap
 import io.dropwizard.setup.Environment
+import org.eclipse.jetty.servlets.CrossOriginFilter
+
+import javax.servlet.DispatcherType
+import javax.servlet.FilterRegistration
 import javax.ws.rs.WebApplicationException
 
 /**
@@ -39,6 +43,13 @@ class Application<T extends Configuration> extends io.dropwizard.Application<T> 
      * @param environment
      */
     protected void setup(T configuration, Environment environment) {
+        final FilterRegistration.Dynamic CORS =
+                environment.servlets().addFilter("CORS", CrossOriginFilter.class)
+
+        CORS.setInitParameter("allowedOrigins", "*")
+        CORS.setInitParameter("allowedHeaders", "X-Requested-With,Content-Type,Accept,Origin")
+        CORS.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*")
+
         BuildInfoManager buildInfoManager = new BuildInfoManager()
         environment.lifecycle().manage(buildInfoManager)
 
