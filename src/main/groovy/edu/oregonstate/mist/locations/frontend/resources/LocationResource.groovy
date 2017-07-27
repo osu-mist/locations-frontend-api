@@ -106,7 +106,9 @@ class LocationResource extends Resource {
                 resultObject.data += LocationMapper.map(it)
             }
 
-            setPaginationLinks(topLevelHits, q, type, campus, resultObject)
+            setPaginationLinks(topLevelHits, q, type, campus,
+                    lat, lon, distance, distanceUnit,
+                    isOpen, giRestroom, resultObject)
 
             ok(resultObject).build()
         } catch (Exception e) {
@@ -159,7 +161,9 @@ class LocationResource extends Resource {
      * @param resultObject
      */
     private void setPaginationLinks(JsonNode topLevelHits, String q, String type, String campus,
-                                    ResultObject resultObject) {
+                                    Double lat, Double lon, Double distance, String distanceUnit,
+                                    Boolean isOpen, Boolean giRestroom, ResultObject resultObject) {
+
         def totalHits = topLevelHits.get("total").asInt()
         // If no results were found, no need to add links
         if (!totalHits) {
@@ -173,6 +177,12 @@ class LocationResource extends Resource {
                 "q"         : q,
                 "type"      : type,
                 "campus"    : campus,
+                "lat"       : lat,
+                "lon"       : lon,
+                "distance"  : distance,
+                "distanceUnit"  : distanceUnit,
+                "isOpen"    : isOpen,
+                "giRestroom": giRestroom,
                 "pageSize"  : pageSize,
                 "pageNumber": pageNumber
         ]
