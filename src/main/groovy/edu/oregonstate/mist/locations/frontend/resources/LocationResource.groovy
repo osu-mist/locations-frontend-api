@@ -169,22 +169,22 @@ class LocationResource extends Resource {
         if (!totalHits) {
             return
         }
-        
+
         String baseResource = uriInfo.getMatchedURIs().get(uriInfo.getMatchedURIs().size() - 1)
         Integer pageNumber = getPageNumber()
         Integer pageSize = getPageSize()
         def urlParams = [
-                "q"         : q,
-                "type"      : type,
-                "campus"    : campus,
-                "lat"       : lat,
-                "lon"       : lon,
-                "distance"  : distance,
+                "q"             : q,
+                "type"          : type,
+                "campus"        : campus,
+                "lat"           : lat,
+                "lon"           : lon,
+                "distance"      : distance,
                 "distanceUnit"  : distanceUnit,
-                "isOpen"    : isOpen,
-                "giRestroom": giRestroom,
-                "pageSize"  : pageSize,
-                "pageNumber": pageNumber
+                "isOpen"        : isOpen,
+                "giRestroom"    : giRestroom,
+                "pageSize"      : pageSize,
+                "pageNumber"    : pageNumber
         ]
 
         int lastPage = Math.ceil(totalHits / pageSize)
