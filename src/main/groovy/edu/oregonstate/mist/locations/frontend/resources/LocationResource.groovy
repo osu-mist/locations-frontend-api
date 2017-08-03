@@ -80,8 +80,11 @@ class LocationResource extends Resource {
             def trimmedType = sanitize(type?.trim()?.toLowerCase())
             isOpen = isOpen == null ? false : isOpen
             giRestroom = giRestroom == null ? false : giRestroom
-            distance = getDistance(distance)
-            distanceUnit = getDistanceUnit(distanceUnit)
+
+            if(lat && lon) {
+                distance = getDistance(distance)
+                distanceUnit = getDistanceUnit(distanceUnit)
+            }
 
             // validate filtering parameters
             if (validateParameters(trimmedCampus, trimmedType, lat, lon, distanceUnit)) {
@@ -277,6 +280,6 @@ class LocationResource extends Resource {
     }
 
     public static String buildSearchDistance(Double distance, String distanceUnit) {
-        distance.toString().concat(distanceUnit)
+        distance?.toString()?.concat(distanceUnit)
     }
 }
