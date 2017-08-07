@@ -81,9 +81,11 @@ class LocationResource extends Resource {
             isOpen = isOpen == null ? false : isOpen
             giRestroom = giRestroom == null ? false : giRestroom
 
+            String searchDistance
             if(lat && lon) {
                 distance = getDistance(distance)
                 distanceUnit = getDistanceUnit(distanceUnit)
+                searchDistance = buildSearchDistance(distance, distanceUnit)
             }
 
             // validate filtering parameters
@@ -91,7 +93,6 @@ class LocationResource extends Resource {
                 return notFound().build()
             }
 
-            String searchDistance = buildSearchDistance(distance, distanceUnit)
             String result = locationDAO.search(
                                 trimmedQ, trimmedCampus, trimmedType,
                                 lat, lon, searchDistance,
