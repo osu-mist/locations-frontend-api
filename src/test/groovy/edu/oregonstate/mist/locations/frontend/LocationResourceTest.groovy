@@ -106,7 +106,7 @@ class LocationResourceTest {
     }
 
     @Test
-    public void testURLParamsReflection() {
+    public void testListEndpointURLParams() {
         String esStubData = new File("src/test/groovy/edu/oregonstate/mist/locations/frontend/esMockData.json").text
 
         def jsonNodeMock = new MockFor(JsonNode)
@@ -157,10 +157,8 @@ class LocationResourceTest {
         params.each {
             String p = URLDecoder.decode(it, "UTF-8")
             def keyValPair = p.split('=')
-            def key = keyValPair[0]
-            def val = keyValPair[1]
-            println(key + " " + val)
-            actualParams[key] = val
+
+            actualParams[keyValPair[0]] = keyValPair[1]
         }
 
         println("Actual")
@@ -169,7 +167,7 @@ class LocationResourceTest {
         println(expectedParams)
 
         expectedParams.each { param, value ->
-            assert actualParams[param].toString() == value.toString()
+            assert actualParams[param] == value.toString()
         }
     }
 }
