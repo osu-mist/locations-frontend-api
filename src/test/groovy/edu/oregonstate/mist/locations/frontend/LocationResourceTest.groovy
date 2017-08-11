@@ -161,11 +161,6 @@ class LocationResourceTest {
             actualParams[keyValPair[0]] = keyValPair[1]
         }
 
-        println("Actual")
-        println(actualParams)
-        println("Expected")
-        println(expectedParams)
-
         expectedParams.each { param, value ->
             assert actualParams[param] == value.toString()
         }
