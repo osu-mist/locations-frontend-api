@@ -128,15 +128,15 @@ class LocationResourceTest {
         //This mocking is to ensure LocationsResource.groovy#L177 passes\
 
         def expectedParams = [
-                'q': 'dixon',
-                'campus': "corvallis",
-                'type': "building",
-                'lat': 44.55,
-                'lon': 77.77,
-                'distance': 2.0,
-                'distanceUnit': "mi",
-                'isOpen': true,
-                'giRestroom': true
+                'q'             : 'dixon',
+                'campus'        : "corvallis",
+                'type'          : "building",
+                'lat'           : 44.55,
+                'lon'           : 77.77,
+                'distance'      : 2.0,
+                'distanceUnit'  : "mi",
+                'isOpen'        : true,
+                'giRestroom'    : true
         ]
 
         Response res = resource.list((String) expectedParams['q'],
