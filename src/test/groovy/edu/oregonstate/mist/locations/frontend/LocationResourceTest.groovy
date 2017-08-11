@@ -107,7 +107,8 @@ class LocationResourceTest {
 
     @Test
     public void testListEndpointURLParams() {
-        String esStubData = new File("src/test/groovy/edu/oregonstate/mist/locations/frontend/esMockData.json").text
+        String esStubData = new File(
+                "src/test/groovy/edu/oregonstate/mist/locations/frontend/esMockData.json").text
 
         def jsonNodeMock = new MockFor(JsonNode)
         jsonNodeMock.demand.get() {
