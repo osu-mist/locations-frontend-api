@@ -1,0 +1,815 @@
+{
+    "took": 25,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "failed": 0
+    },
+    "hits": {
+        "total": 218,
+        "max_score": null,
+        "hits": [{
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "c9290ee9b3cd17934d583da40cc13b89",
+            "_score": null,
+            "_source": {
+                "id": "c9290ee9b3cd17934d583da40cc13b89",
+                "type": "locations",
+                "attributes": {
+                    "name": "MF Building",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "FFSH",
+                    "geoLocation": {
+                        "lat": 44.5505,
+                        "lon": -123.2818
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-123.281762, 44.550455],
+                                [-123.28175, 44.550527],
+                                [-123.281823, 44.550533],
+                                [-123.281834, 44.550461],
+                                [-123.281762, 44.550455]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thumbnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "hashCode": 499090246
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/c9290ee9b3cd17934d583da40cc13b89"
+                },
+                "relationships": null
+            },
+            "sort": [1.4758707148847501E-5]
+        }, {
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "47c88592a5dfdcace3b002c3a291b3a1",
+            "_score": null,
+            "_source": {
+                "id": "47c88592a5dfdcace3b002c3a291b3a1",
+                "type": "locations",
+                "attributes": {
+                    "name": "FF Lab Feed",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "FFFD",
+                    "geoLocation": {
+                        "lat": 44.55048,
+                        "lon": -123.2816
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-123.281749, 44.550446],
+                                [-123.281506, 44.550421],
+                                [-123.281491, 44.550496],
+                                [-123.281628, 44.55051],
+                                [-123.281622, 44.550543],
+                                [-123.281727, 44.550554],
+                                [-123.281749, 44.550446]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thumbnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "hashCode": 1040674701
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/47c88592a5dfdcace3b002c3a291b3a1"
+                },
+                "relationships": null
+            },
+            "sort": [0.022359897382771728]
+        }, {
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "be93c7f4a14b91a18b1be885b6963cf9",
+            "_score": null,
+            "_source": {
+                "id": "be93c7f4a14b91a18b1be885b6963cf9",
+                "type": "locations",
+                "attributes": {
+                    "name": "FF Mink House-F",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "FFMK",
+                    "geoLocation": {
+                        "lat": 44.55072,
+                        "lon": -123.2813
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-123.281346, 44.550576],
+                                [-123.281303, 44.550572],
+                                [-123.28125, 44.550874],
+                                [-123.281292, 44.550877],
+                                [-123.281346, 44.550576]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thumbnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "hashCode": 846844500
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/be93c7f4a14b91a18b1be885b6963cf9"
+                },
+                "relationships": null
+            },
+            "sort": [0.06079940667396762]
+        }, {
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "f83281f3b54c27c45630c5818ac9034e",
+            "_score": null,
+            "_source": {
+                "id": "f83281f3b54c27c45630c5818ac9034e",
+                "type": "locations",
+                "attributes": {
+                    "name": "FF Residence",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "FFRS",
+                    "geoLocation": {
+                        "lat": 44.55142,
+                        "lon": -123.2805
+                    },
+                    "geometry": {
+                        "type": "MultiPolygon",
+                        "coordinates": [
+                            [
+                                [
+                                    [-123.280433, 44.551458],
+                                    [-123.280496, 44.551463],
+                                    [-123.280502, 44.551425],
+                                    [-123.280548, 44.551428],
+                                    [-123.280559, 44.551358],
+                                    [-123.280399, 44.551345],
+                                    [-123.28039, 44.551399],
+                                    [-123.280433, 44.551402],
+                                    [-123.280431, 44.551416],
+                                    [-123.28044, 44.551417],
+                                    [-123.280433, 44.551458]
+                                ]
+                            ],
+                            [
+                                [
+                                    [-123.280372, 44.551505],
+                                    [-123.280464, 44.551513],
+                                    [-123.280472, 44.551468],
+                                    [-123.280379, 44.55146],
+                                    [-123.280372, 44.551505]
+                                ]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thum                                                                bnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "hashCode": 295808859
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/f83281f3b54c27c45630c5818ac9034e"
+                },
+                "relationships": null
+            },
+            "sort": [0.17727854767429854]
+        }, {
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "d2ab96b301b13d46af8c8ef121d62b4e",
+            "_score": null,
+            "_source": {
+                "id": "d2ab96b301b13d46af8c8ef121d62b4e",
+                "type": "locations",
+                "attributes": {
+                    "name": "SF Indust Waste Res Lab",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "SFWR",
+                    "geoLocation": {
+                        "lat": 44.55164,
+                        "lon": -123.2804
+                    },
+                    "geometry": {
+                        "type": "MultiPolygon",
+                        "coordinates": [
+                            [
+                                [
+                                    [-123.280308, 44.551659],
+                                    [-123.280368, 44.551664],
+                                    [-123.280379, 44.551598],
+                                    [-123.280319, 44.551593],
+                                    [-123.280308, 44.551659]
+                                ]
+                            ],
+                            [
+                                [
+                                    [-123.280373, 44.551698],
+                                    [-123.280416, 44.551701],
+                                    [-123.280422, 44.551667],
+                                    [-123.280433, 44.551668],
+                                    [-123.28043, 44.551688],
+                                    [-123.280457, 44.551691],
+                                    [-123.280461, 44.55167],
+                                    [-123.280471, 44.551607],
+                                    [-123.280388, 44.5516],
+                                    [-123.280378, 44.551663],
+                                    [-123.280373, 44.551698]
+                                ]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thumbnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "hashCode": 710553469
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/d2ab96b301b13d46af8c8ef121d62b4e"
+                },
+                "relationships": null
+            },
+            "sort": [0.20097362882504222]
+        }, {
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "1c89084234e43d9b90b9fcb49a2d3019",
+            "_score": null,
+            "_source": {
+                "id": "1c89084234e43d9b90b9fcb49a2d3019",
+                "type": "locations",
+                "attributes": {
+                    "name": "SF Poultry Cage-Layer Hse",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "SFPC",
+                    "geoLocation": {
+                        "lat": 44.55372,
+                        "lon": -123.2821
+                    },
+                    "geometry": {
+                        "type": "MultiPolygon",
+                        "coordinates": [
+                            [
+                                [
+                                    [-123.281996, 44.553887],
+                                    [-123.281995, 44.553887],
+                                    [-123.281994, 44.553887],
+                                    [-123.281992, 44.553887],
+                                    [-123.281991, 44.553888],
+                                    [-123.28199, 44.553888],
+                                    [-123.281989, 44.553889],
+                                    [-123.281988, 44.553889],
+                                    [-123.281987, 44.55389],
+                                    [-123.281986, 44.55389],
+                                    [-123.281986, 44.553891],
+                                    [-123.281985, 44.553892],
+                                    [-123.281985, 44.553893],
+                                    [-123.281984, 44.553894],
+                                    [-123.281984, 44.553894],
+                                    [-123.281984, 44.553895],
+                                    [-123.281983, 44.553896],
+                                    [-123.281983, 44.553897],
+                                    [-123.281983, 44.553898],
+                                    [-123.281984, 44.553899],
+                                    [-123.281984, 44.5539],
+                                    [-123.281984, 44.553901],
+                                    [-123.281985, 44.553901],
+                                    [-123.281986, 44.553902],
+                                    [-123.281986, 44.553903],
+                                    [-123.281987, 44.553904],
+                                    [-123.281988, 44.553904],
+                                    [-123.281989, 44.553905],
+                                    [-123.28199, 44.553905],
+                                    [-123.281991, 44.553906],
+                                    [-123.281992, 44.553906],
+                                    [-123.281993, 44.553907],
+                                    [-123.281995, 44.553907],
+                                    [-123.281996, 44.553907],
+                                    [-123.281997, 44.553907],
+                                    [-123.281998, 44.553907],
+                                    [-123.282, 44.553907],
+                                    [-123.282001, 44.553907],
+                                    [-123.282002, 44.553907],
+                                    [-123.282003, 44.553906],
+                                    [-123.282004, 44.553906],
+                                    [-123.282005, 44.553905],
+                                    [-123.282006, 44.553905],
+                                    [-123.282007, 44.553904],
+                                    [-123.282008, 44.553904],
+                                    [-123.282009, 44.553903],
+                                    [-123.28201, 44.553902],
+                                    [-123.28201, 44.553902],
+                                    [-123.282011, 44.553901],
+                                    [-123.282011, 44.5539],
+                                    [-123.282012, 44.553899],
+                                    [-123.282012, 44.553898],
+                                    [-123.282012, 44.553897],
+                                    [-123.282012, 44.553896],
+                                    [-123.282012, 44.553896],
+                                    [-123.282012, 44.553895],
+                                    [-123.282012, 44.553894],
+                                    [-123.282011, 44.553893],
+                                    [-123.282011, 44.553892],
+                                    [-123.28201, 44.553891],
+                                    [-123.282009, 44.553891],
+                                    [-123.282008, 44.55389],
+                                    [-123.282008, 44.553889],
+                                    [-123.282007, 44.553889],
+                                    [-123.282006, 44.553888],
+                                    [-123.282005, 44.553888],
+                                    [-123.282003, 44.553887],
+                                    [-123.282002, 44.553887],
+                                    [-123.282001, 44.553887],
+                                    [-123.282, 44.553887],
+                                    [-123.281999, 44.553886],
+                                    [-123.281997, 44.553886],
+                                    [-123.281996, 44.553887]
+                                ]
+                            ],
+                            [
+                                [
+                                    [-123.281993, 44.55391],
+                                    [-123.281991, 44.55391],
+                                    [-123.28199, 44.55391],
+                                    [-123.281989, 44.553911],
+                                    [-123.281988, 44.553911],
+                                    [-123.281987, 44.553911],
+                                    [-123.281986, 44.553912],
+                                    [-123.281985, 44.553912],
+                                    [-123.281984, 44.553913],
+                                    [-123.281983, 44.553914],
+                                    [-123.281982, 44.553915],
+                                    [-123.281982, 44.553915],
+                                    [-123.281981, 44.553916],
+                                    [-123.281981, 44.553917],
+                                    [-123.28198, 44.553918],
+                                    [-123.28198, 44.553919],
+                                    [-123.28198, 44.55392],
+                                    [-123.28198, 44.55392],
+                                    [-123.28198, 44.553921],
+                                    [-123.28198, 44.553922],
+                                    [-123.281981, 44.553923],
+                                    [-123.281981, 44.553924],
+                                    [-123.281982, 44.553925],
+                                    [-123.281982, 44.553926],
+                                    [-123.281983, 44.553926],
+                                    [-123.281984, 44.553927],
+                                    [-123.281985, 44.553928],
+                                    [-123.281986, 44.553928],
+                                    [-123.281987, 44.553929],
+                                    [-123.281988, 44.553929],
+                                    [-123.281989, 44.55393],
+                                    [-123.28199, 44.55393],
+                                    [-123.281991, 44.55393],
+                                    [-123.281992, 44.55393],
+                                    [-123.281994, 44.55393],
+                                    [-123.281995, 44.55393],
+                                    [-123.281996, 44.55393],
+                                    [-123.281997, 44.55393],
+                                    [-123.281999, 44.55393],
+                                    [-123.282, 44.55393],
+                                    [-123.282001, 44.553929],
+                                    [-123.282002, 44.553929],
+                                    [-123.282003, 44.553928],
+                                    [-123.282004, 44.553928],
+                                    [-123.282005, 44.553927],
+                                    [-123.282006, 44.553926],
+                                    [-123.282006, 44.553926],
+                                    [-123.282007, 44.553925],
+                                    [-123.282008, 44.553924],
+                                    [-123.282008, 44.553923],
+                                    [-123.282008, 44.553922],
+                                    [-123.282009, 44.553922],
+                                    [-123.282009, 44.553921],
+                                    [-123.282009, 44.55392],
+                                    [-123.282009, 44.553919],
+                                    [-123.282008, 44.553918],
+                                    [-123.282008, 44.553917],
+                                    [-123.282008, 44.553916],
+                                    [-123.282007, 44.553915],
+                                    [-123.282007, 44.553915],
+                                    [-123.282006, 44.553914],
+                                    [-123.282005, 44.553913],
+                                    [-123.282004, 44.553913],
+                                    [-123.282003, 44.553912],
+                                    [-123.282002, 44.553911],
+                                    [-123.282001, 44.553911],
+                                    [-123.282, 44.553911],
+                                    [-123.281999, 44.55391],
+                                    [-123.281998, 44.55391],
+                                    [-123.281996, 44.55391],
+                                    [-123.281995, 44.55391],
+                                    [-123.281994, 44.55391],
+                                    [-123.281993, 44.55391]
+                                ]
+                            ],
+                            [
+                                [
+                                    [-123.28201, 44.55392],
+                                    [-123.282007, 44.553938],
+                                    [-123.282192, 44.553953],
+                                    [-123.282198, 44.553916],
+                                    [-123.282261, 44.553506],
+                                    [-123.282076, 44.553491],
+                                    [-123.28201, 44.55392]
+                                ]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thumbnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "hashCode": 407353828
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/1c89084234e43d9b90b9fcb49a2d3019"
+                },
+                "relationships": null
+            },
+            "sort": [0.3599995464023936]
+        }, {
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "488132b3f5f47879895a969b1ce5cc35",
+            "_score": null,
+            "_source": {
+                "id": "488132b3f5f47879895a969b1ce5cc35",
+                "type": "locations",
+                "attributes": {
+                    "name": "SF Poultry Brooder",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "SFPB",
+                    "geoLocation": {
+                        "lat": 44.55378,
+                        "lon": -123.2818
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-123.281878, 44.553923],
+                                [-123.28192, 44.553638],
+                                [-123.281745, 44.553625],
+                                [-123.281703, 44.553912],
+                                [-123.281805, 44.553919],
+                                [-123.281804, 44.553925],
+                                [-123.281802, 44.553935],
+                                [-123.281822, 44.553936],
+                                [-123.281822, 44.553939],
+                                [-123.281875, 44.553943],
+                                [-123.281878, 44.553923],
+                                [-123.281878, 44.553923]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thumbnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "hashCode": 467210420
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/488132b3f5f47879895a969b1ce5cc35"
+                },
+                "relationships": null
+            },
+            "sort": [0.3651275885207913]
+        }, {
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "795cb5d2efcf328261e0c418fd9becf4",
+            "_score": null,
+            "_source": {
+                "id": "795cb5d2efcf328261e0c418fd9becf4",
+                "type": "locations",
+                "attributes": {
+                    "name": "Oceanography Instrumentation Lab",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "OILR",
+                    "geoLocation": {
+                        "lat": 44.55712,
+                        "lon": -123.2841
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-123.283957, 44.557184],
+                                [-123.28421, 44.557183],
+                                [-123.284209, 44.557053],
+                                [-123.283955, 44.557054],
+                                [-123.283957, 44.557184]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thumbnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "h                                                                ashCode": 263034665
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/795cb5d2efcf328261e0c418fd9becf4"
+                },
+                "relationships": null
+            },
+            "sort": [0.7801432133870847]
+        }, {
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "92d1fa2666005f3ffd64c5bd2fac2128",
+            "_score": null,
+            "_source": {
+                "id": "92d1fa2666005f3ffd64c5bd2fac2128",
+                "type": "locations",
+                "attributes": {
+                    "name": "Coastal Oceanography Lab",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "COL",
+                    "geoLocation": {
+                        "lat": 44.5573,
+                        "lon": -123.2841
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-123.283964, 44.557367],
+                                [-123.284219, 44.557366],
+                                [-123.284218, 44.557237],
+                                [-123.283963, 44.557237],
+                                [-123.283964, 44.557367]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thumbnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "hashCode": 518309000
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/92d1fa2666005f3ffd64c5bd2fac2128"
+                },
+                "relationships": null
+            },
+            "sort": [0.7991023825567193]
+        }, {
+            "_index": "locations",
+            "_type": "locations",
+            "_id": "e74f3ecbb89d832b2a654c96ec400ec7",
+            "_score": null,
+            "_source": {
+                "id": "e74f3ecbb89d832b2a654c96ec400ec7",
+                "type": "locations",
+                "attributes": {
+                    "name": "Marine Technician Building",
+                    "tags": [],
+                    "openHours": {},
+                    "type": "building",
+                    "parent": null,
+                    "locationId": null,
+                    "abbreviation": "MTB",
+                    "geoLocation": {
+                        "lat": 44.55723,
+                        "lon": -123.2843
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-123.284256, 44.557322],
+                                [-123.284437, 44.55732],
+                                [-123.284434, 44.557139],
+                                [-123.284255, 44.557138],
+                                [-123.284256, 44.557322]
+                            ]
+                        ]
+                    },
+                    "summary": null,
+                    "description": null,
+                    "address": null,
+                    "city": null,
+                    "state": null,
+                    "zip": null,
+                    "county": null,
+                    "telephone": null,
+                    "fax": null,
+                    "thumbnails": [],
+                    "images": [],
+                    "departments": [],
+                    "website": null,
+                    "sqft": null,
+                    "calendar": null,
+                    "campus": "corvallis",
+                    "giRestroomCount": 0,
+                    "giRestroomLimit": null,
+                    "giRestroomLocations": null,
+                    "synonyms": [],
+                    "hashCode": 1276027543
+                },
+                "links": {
+                    "self": "https://api.oregonstate.edu/v1/locations/e74f3ecbb89d832b2a654c96ec400ec7"
+                },
+                "relationships": null
+            },
+            "sort": [0.799203673447272]
+        }]
+    }
+}

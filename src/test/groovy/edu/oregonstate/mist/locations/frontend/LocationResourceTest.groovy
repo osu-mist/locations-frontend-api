@@ -1,12 +1,15 @@
 package edu.oregonstate.mist.locations.frontend
 
+import com.fasterxml.jackson.databind.JsonNode
+import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.resources.LocationResource
 import groovy.mock.interceptor.MockFor
 import io.dropwizard.testing.junit.DropwizardAppRule
-import org.junit.Test
 import org.junit.ClassRule
+import org.junit.Test
 
+import javax.ws.rs.core.Response
 import javax.ws.rs.core.UriBuilder
 
 class LocationResourceTest {
@@ -100,5 +103,67 @@ class LocationResourceTest {
         assert LocationResource.sanitize(illegalStr).replaceAll(" ", "") == ""
         assert LocationResource.sanitize(mixStr).replaceAll(" ", "") == legalStr
         assert !LocationResource.sanitize(null)
+    }
+
+    @Test
+    public void testListEndpointURLParams() {
+        String esStubData = new File(
+                "src/test/groovy/edu/oregonstate/mist/locations/frontend/esMockData.json").text
+
+        def jsonNodeMock = new MockFor(JsonNode)
+        jsonNodeMock.demand.get() {
+            1
+        }
+        def usable = jsonNodeMock.proxyInstance()
+        assert(usable.get("total") == 1)
+
+        def mock = new MockFor(LocationDAO)
+        mock.demand.search() {
+            String q, String campus, String type, Double lat,
+            Double lon, String searchDistance, Boolean isOpen,
+            Boolean giRestroom, Integer pageNumber, Integer pageSize -> esStubData
+        }
+        def dao = mock.proxyInstance()
+        def resource = new LocationResource(dao, endpointUri)
+        resource.uriInfo = new MockUriInfo()
+        //This mocking is to ensure LocationsResource.groovy#L177 passes\
+
+        def expectedParams = [
+                'q'             : 'dixon',
+                'campus'        : "corvallis",
+                'type'          : "building",
+                'lat'           : 44.55,
+                'lon'           : 77.77,
+                'distance'      : 2.0,
+                'distanceUnit'  : "mi",
+                'isOpen'        : true,
+                'giRestroom'    : true
+        ]
+
+        Response res = resource.list((String) expectedParams['q'],
+                (String) expectedParams['campus'],
+                (String) expectedParams['type'],
+                (Double) expectedParams['lat'],
+                (Double) expectedParams['lon'],
+                (Double) expectedParams['distance'],
+                (String) expectedParams['distanceUnit'],
+                (Boolean) expectedParams['isOpen'],
+                (Boolean) expectedParams['giRestroom'])
+
+        ResultObject resObj = res.entity
+        String selfLinks = resObj.links["self"]
+
+        def params = selfLinks.substring(selfLinks.indexOf('?') + 1).split('&')
+        def actualParams = [:]
+        params.each {
+            String p = URLDecoder.decode(it, "UTF-8")
+            def keyValPair = p.split('=')
+
+            actualParams[keyValPair[0]] = keyValPair[1]
+        }
+
+        expectedParams.each { param, value ->
+            assert actualParams[param] == value.toString()
+        }
     }
 }

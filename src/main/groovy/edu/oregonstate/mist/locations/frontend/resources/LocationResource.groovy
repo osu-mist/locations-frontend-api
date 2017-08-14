@@ -80,15 +80,19 @@ class LocationResource extends Resource {
             def trimmedType = sanitize(type?.trim()?.toLowerCase())
             isOpen = isOpen == null ? false : isOpen
             giRestroom = giRestroom == null ? false : giRestroom
-            distance = getDistance(distance)
-            distanceUnit = getDistanceUnit(distanceUnit)
+
+            String searchDistance
+            if(lat && lon) {
+                distance = getDistance(distance)
+                distanceUnit = getDistanceUnit(distanceUnit)
+                searchDistance = buildSearchDistance(distance, distanceUnit)
+            }
 
             // validate filtering parameters
             if (validateParameters(trimmedCampus, trimmedType, lat, lon, distanceUnit)) {
                 return notFound().build()
             }
 
-            String searchDistance = buildSearchDistance(distance, distanceUnit)
             String result = locationDAO.search(
                                 trimmedQ, trimmedCampus, trimmedType,
                                 lat, lon, searchDistance,
@@ -106,7 +110,9 @@ class LocationResource extends Resource {
                 resultObject.data += LocationMapper.map(it)
             }
 
-            setPaginationLinks(topLevelHits, q, type, campus, resultObject)
+            setPaginationLinks(topLevelHits, q, type, campus,
+                    lat, lon, distance, distanceUnit,
+                    isOpen, giRestroom, resultObject)
 
             ok(resultObject).build()
         } catch (Exception e) {
@@ -159,22 +165,30 @@ class LocationResource extends Resource {
      * @param resultObject
      */
     private void setPaginationLinks(JsonNode topLevelHits, String q, String type, String campus,
-                                    ResultObject resultObject) {
+                                    Double lat, Double lon, Double distance, String distanceUnit,
+                                    Boolean isOpen, Boolean giRestroom, ResultObject resultObject) {
+
         def totalHits = topLevelHits.get("total").asInt()
         // If no results were found, no need to add links
         if (!totalHits) {
             return
         }
-        
+
         String baseResource = uriInfo.getMatchedURIs().get(uriInfo.getMatchedURIs().size() - 1)
         Integer pageNumber = getPageNumber()
         Integer pageSize = getPageSize()
         def urlParams = [
-                "q"         : q,
-                "type"      : type,
-                "campus"    : campus,
-                "pageSize"  : pageSize,
-                "pageNumber": pageNumber
+                "q"             : q,
+                "type"          : type,
+                "campus"        : campus,
+                "lat"           : lat,
+                "lon"           : lon,
+                "distance"      : distance,
+                "distanceUnit"  : distanceUnit,
+                "isOpen"        : isOpen,
+                "giRestroom"    : giRestroom,
+                "pageSize"      : pageSize,
+                "pageNumber"    : pageNumber
         ]
 
         int lastPage = Math.ceil(totalHits / pageSize)
@@ -267,6 +281,6 @@ class LocationResource extends Resource {
     }
 
     public static String buildSearchDistance(Double distance, String distanceUnit) {
-        distance.toString().concat(distanceUnit)
+        distance?.toString()?.concat(distanceUnit)
     }
 }
