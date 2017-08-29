@@ -26,7 +26,9 @@ import java.util.regex.Pattern
 class LocationResource extends Resource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationResource.class)
 
-    public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension"]
+    public static final ArrayList<String> ALLOWED_CAMPUSES = ["corvallis", "extension",
+                                                              "cascades", "hmsc", "other"]
+
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining",
                                                            "cultural-center", "other"]
     public static final ArrayList<String> ALLOWED_UNITS = ["mi", "miles",
