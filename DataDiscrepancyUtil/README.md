@@ -1,6 +1,6 @@
 # Locations Data Discrepancy Checking Script README
 
-[dataDiffCheck.py](dataDiffCheck.py) is a small Python script that inspects [locations-api-frontend](https://github.com/osu-mist/locations-frontend-api) json data from its /locations endpoint between revisions to determine any data discrepancies.
+[dataDiffCheck.py](dataDiffCheck.py) is a small Python script that inspects [locations-api-frontend](https://github.com/osu-mist/locations-frontend-api) json data from its [/locations](../swagger.yaml#L12) endpoint between revisions to determine any data discrepancies.
 
 It'll report any locations that no longer exist in the new data. (Peavy Hall, which was torn down, is an example of this)
 

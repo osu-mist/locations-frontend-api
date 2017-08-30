@@ -16,9 +16,6 @@ if __name__ == "__main__":
             old_building_data_json = json.loads(old_file.read())
         with open(sys.argv[2],"r") as new_file:
             new_building_data_json = json.loads(new_file.read())
-            
-        #new_building_data_json = #open json file with the new data or setup logic to make api request. https://localhost:8080/v0/locations?page[size]=4500&type=building
-        #old_building_data_json = #open json file with hold data or setup logic to make api request. https://oregonstateuniversity-dev.apigee.net/v1/locations?page[size]=4500&type=building
 
         new_building_data_dict = {}
         old_building_data_dict = {}
