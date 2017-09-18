@@ -53,16 +53,16 @@ class gateway_tests(unittest.TestCase):
     # Tests that certain parameters return expected number of results
     def test_results(self):
         all_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon'}).json()
-        self.assertEqual(len(all_dixon['data']), 3)
+        self.assertEqual(len(all_dixon['data']), 2)
 
         dining_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon', 'type': 'dining'}).json()
         self.assertEqual(len(dining_dixon['data']), 1)
 
         building_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon', 'type': 'building'}).json()
-        self.assertEqual(len(building_dixon['data']), 2)
+        self.assertEqual(len(building_dixon['data']), 1)
 
         # test search only from name + abbr
-        building_library = query_request(locations_url, access_token, "get", {'q': 'library'}).json()
+        building_library = query_request(locations_url, access_token, "get", {'q': 'library', 'campus': 'corvallis'}).json()
         self.assertEqual(len(building_library['data']), 1)
 
         building_library = query_request(locations_url, access_token, "get", {'q': 'vlib'}).json()
@@ -79,23 +79,23 @@ class gateway_tests(unittest.TestCase):
     def test_geo_location(self):
         # test geo query
         building_library = query_request(locations_url, access_token, "get",
-            {'lat': 44.56507, 'lon': -123.2761}).json()
+            {'lat': 44.565066, 'lon': -123.276147}).json()
         self.assertEqual(len(building_library['data']), 10)
         self.assertEqual(building_library['data'][0]['id'], "7cea585e9a1fd7a58b271ab198a461e6")
         self.assertEqual(type(building_library['data'][0]['attributes']['latitude']), unicode)
         self.assertEqual(type(building_library['data'][0]['attributes']['longitude']), unicode)
 
         building_library = query_request(locations_url, access_token, "get",
-            {'lat': 44.56507, 'lon': -123.2761, 'distance': 1, 'distanceUnit': 'yd'}).json()
+            {'lat': 44.565066, 'lon': -123.276147, 'distance': 1, 'distanceUnit': 'yd'}).json()
         self.assertEqual(len(building_library['data']), 1)
 
         extensions = query_request(locations_url, access_token, "get",
-            {'lat': 44.56507, 'lon': -123.2761, 'distance': 10, 'distanceUnit': 'mi',
+            {'lat': 44.565066, 'lon': -123.276147, 'distance': 10, 'distanceUnit': 'mi',
             'campus':'extension'}).json()
         self.assertEqual(len(extensions['data']), 3)
 
         dining_java = query_request(locations_url, access_token, "get",
-                        {'lat': 44.56507, 'lon': -123.2761, 'isopen': True, 'distanceUnit': 'yd'}).json()
+                        {'lat': 44.565066, 'lon': -123.276147, 'isopen': True, 'distanceUnit': 'yd'}).json()
         self.assertEqual(len(dining_java['data']), 1)
 
     def test_geometries(self):
