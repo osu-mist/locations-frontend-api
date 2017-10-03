@@ -20,16 +20,39 @@ if __name__ == "__main__":
         new_building_data_dict = {}
         old_building_data_dict = {}
 
-        #Create a dict of the new building data to make the next loop simpler
+        # TODO Rename this name view dict
+        # This is for the NAME : {OLD, NEW} stuff
+        new_bdata_name_dict = {}
+        old_bdata_name_dict = {}
         for new_building in new_building_data_json['data']:
             new_building_data_dict[new_building['id']] = new_building
 
         for old_building in old_building_data_json['data']:
             old_building_data_dict[old_building['id']] = old_building
+            old_bdata_name_dict[old_building['attributes']
+                                ['name']] = old_building['id']
 
         old_bdict_view = old_building_data_dict.viewkeys()
         new_bdict_view = new_building_data_dict.viewkeys()
-        
+
+        # NAME : {OLD, NEW} Processing
+        new_bdata_name_view = new_bdata_name_dict.viewkeys()
+        old_bdata_name_view = old_bdata_name_dict.viewkeys()
+        building_key_intersection = old_bdata_name_view & new_bdata_name_view
+
+        bkey_intersection_dict = {}
+
+        for k in building_key_intersection:
+            bkey_intersection_dict[k] = {
+                "old": old_bdata_name_dict[k],
+                "new": new_bdata_name_dict[k]
+            }
+        # TODO Add -o output filename option for (OLD,NEW) keyed building json file
+        print "\n Outputing buildings with new and old keys to buildingsWithOldNewKeys.json\n"
+        with open("buildingsWithOldNewKeys.json", "w") as intersection_file:
+            intersection_file.write(json.dumps(
+                {"buildings": bkey_intersection_dict}))
+        # Report Processing
         rekeyCheckDict = {}
         rekeyedBuildings = []
         totallyNewBuildings = []
