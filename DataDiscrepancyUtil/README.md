@@ -6,6 +6,8 @@ It'll report any locations that no longer exist in the new data. (Peavy Hall, wh
 
 It'll report locations that recieved a new key (rekeyed in Elastic Search) but still exists in the new data set. (Johnson Hall is an example of this)
 
+The buildings that have both an old and new key will be outputed to a json file called [buildingsWithOldNewKeys.json](buildingsWithOldNewKeys.json).
+
 Finally it'll report any new locations that weren't in the old data at all. (Tykeson Hall is an example of this)
 
 ## Invocation
