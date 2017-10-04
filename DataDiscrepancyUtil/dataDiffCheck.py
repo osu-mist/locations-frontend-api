@@ -55,7 +55,7 @@ if __name__ == "__main__":
         print "\n Outputing buildings with new and old keys to buildingsWithOldNewKeys.json\n"
         with open("buildingsWithOldNewKeys.json", "w") as intersection_file:
             intersection_file.write(json.dumps(
-                {"buildings": bkey_intersection_dict}))
+                {"buildings": bkey_intersection_dict},indent=4, sort_keys=True))
         # Report Processing
         rekeyCheckDict = {}
         rekeyedBuildings = []
