@@ -81,7 +81,7 @@ class gateway_tests(unittest.TestCase):
         building_library = query_request(locations_url, access_token, "get",
             {'lat': 44.565066, 'lon': -123.276147}).json()
         self.assertEqual(len(building_library['data']), 10)
-        self.assertEqual(building_library['data'][0]['id'], "7cea585e9a1fd7a58b271ab198a461e6")
+        self.assertEqual(building_library['data'][0]['id'], "d409d908ecc6010a04a3b0387f063145")
         self.assertEqual(type(building_library['data'][0]['attributes']['latitude']), unicode)
         self.assertEqual(type(building_library['data'][0]['attributes']['longitude']), unicode)
 
