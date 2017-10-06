@@ -1,6 +1,9 @@
 package edu.oregonstate.mist.locations.frontend.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.elasticsearch.action.get.GetResponse
+import org.elasticsearch.client.transport.TransportClient
+import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.joda.time.DateTime
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -10,12 +13,28 @@ import org.slf4j.LoggerFactory
  * search and findById.
  */
 class LocationDAO {
-    private final Map<String, String> locationConfiguration
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationDAO.class)
 
+    private final URL esUrl
+    private final String esIndex
+    private final String esType
+    private final String esIndexService
+    private final String esTypeService
+
+    private TransportClient esClient // TODO should be managed
+
     LocationDAO(Map<String, String> locationConfiguration) {
-        this.locationConfiguration = locationConfiguration
+        esUrl = new URL(locationConfiguration.get("esUrl"))
+        esIndex = locationConfiguration.get("esIndex")
+        esType = locationConfiguration.get("estype")
+        esIndexService = locationConfiguration.get("esIndexService")
+        esTypeService = locationConfiguration.get("estypeService")
+
+        this.esClient = TransportClient.builder().build()
+        this.esClient.addTransportAddress(
+                new InetSocketTransportAddress(
+                        new InetSocketAddress(esUrl.host, 9300)))
+        // TODO: don't hardcode port
     }
 
     /**
@@ -109,11 +128,9 @@ class LocationDAO {
      * @return
      */
     String getById(String id) {
-        try {
-            return "${locationsESFullUrl}/${id?.toLowerCase()}/_source".toURL().text
-        } catch (FileNotFoundException e) {
-            return null
-        }
+        GetResponse response = esClient.prepareGet(esIndex, esType, id.toLowerCase())
+                .execute().actionGet()
+        response.sourceAsString
     }
 
     /**
@@ -123,11 +140,9 @@ class LocationDAO {
      * @return
      */
     String getServiceById(String id) {
-        try {
-            return "${servicesESFullUrl}/${id?.toLowerCase()}/_source".toURL().text
-        } catch (FileNotFoundException e) {
-            return null
-        }
+        GetResponse response = esClient.prepareGet(esIndexService, esTypeService, id.toLowerCase())
+                .execute().actionGet()
+        response.sourceAsString
     }
 
     /**
@@ -136,18 +151,15 @@ class LocationDAO {
      * @return
      */
     private GString getESFullUrl(String esIndex, String esType) {
-        String esUrl = locationConfiguration.get("esUrl")
-
         "${esUrl}/${esIndex}/${esType}"
     }
 
     private GString getLocationsESFullUrl() {
-        getESFullUrl(locationConfiguration.get("esIndex"), locationConfiguration.get("estype"))
+        getESFullUrl(esIndex, esType)
     }
 
     private GString getServicesESFullUrl() {
-        getESFullUrl(locationConfiguration.get("esIndexService"),
-                locationConfiguration.get("estypeService"))
+        getESFullUrl(esIndexService, esTypeService)
     }
 
     /**
@@ -233,7 +245,7 @@ class LocationDAO {
         esQuery
     }
 
-    private def getESQueryRelatedServices(String locationId, int pageNumber, int pageSize) {
+    private static def getESQueryRelatedServices(String locationId, int pageNumber, int pageSize) {
         [
             "query": [
                 "bool": [
