@@ -64,27 +64,15 @@ class LocationDAO {
     String search(String q, String campus, String type, Double lat,
                   Double lon, String searchDistance, Boolean isOpen,
                   Boolean giRestroom, Integer pageNumber, Integer pageSize) {
-        ObjectMapper mapper = new ObjectMapper()
+        def esQuery = prepareLocationSearch()
+        esQuery = buildSearchRequest(esQuery, q, campus, type, lat, lon, searchDistance,
+                                     isOpen, giRestroom, pageNumber, pageSize)
+        LOGGER.debug("elastic search query: " + esQuery.toString())
 
-        def esQuery = getESSearchQueryUsingAPI(q, campus, type, lat, lon, searchDistance, isOpen, giRestroom, pageNumber, pageSize)
-        println(esQuery.toString())
-        def resp = esQuery.execute().actionGet()
+        def resp = esQuery.get()
+        // TODO: think about error conditions
 
         return resp.toString()
-
-        // generate ES query to search for locations
-//        def esQuery = getESSearchQuery(q, campus, type,
-//                                       lat, lon, searchDistance,
-//                                       isOpen, giRestroom, pageNumber, pageSize)
-//
-//        LOGGER.debug("elastic search query: " + esQuery)
-//
-//        String esQueryJson = mapper.writeValueAsString(esQuery)
-//
-//        // get data from ES
-//        def url = new URL("${locationsESFullUrl}/_search")
-//        URLConnection connection = postRequest(url, esQueryJson)
-//        connection.content.text
     }
 
     /**
@@ -98,21 +86,19 @@ class LocationDAO {
      */
     String searchService(String q, Boolean isOpen, Integer pageNumber,
                          Integer pageSize) {
-        ObjectMapper mapper = new ObjectMapper()
 
         // generate ES query to search for locations
-        def esQuery = getESSearchQuery(q, null, null,
-                                       null, null, null,
-                                       isOpen, null, pageNumber, pageSize)
+        // TODO: test
+        def esQuery = prepareServiceSearch()
+        esQuery = buildSearchRequest(esQuery, q, null, null,
+                                     null, null, null,
+                                     isOpen, null, pageNumber, pageSize)
 
-        LOGGER.debug("elastic search query: " + esQuery)
+        LOGGER.debug("elastic search query: " + esQuery.toString())
 
-        String esQueryJson = mapper.writeValueAsString(esQuery)
+        def resp = esQuery.get()
 
-        // get data from ES
-        def url = new URL("${servicesESFullUrl}/_search")
-        URLConnection connection = postRequest(url, esQueryJson)
-        connection.content.text
+        resp.toString()
     }
 
     /**
@@ -172,10 +158,6 @@ class LocationDAO {
         "${esUrl}/${esIndex}/${esType}"
     }
 
-    private GString getLocationsESFullUrl() {
-        getESFullUrl(esIndex, esType)
-    }
-
     private GString getServicesESFullUrl() {
         getESFullUrl(esIndexService, esTypeService)
     }
@@ -203,86 +185,40 @@ class LocationDAO {
         connection
     }
 
-    /**
-     * Generate ElasticSearch query to list locations by campus, type and full text search.
-     *
-     * @param campus
-     * @param type
-     * @param q
-     * @param pageNumber
-     * @param pageSize
-     * @param query
-     * @return
-     */
-    private def getESSearchQuery(String q, String campus, String type,
-                                 Double lat, Double lon, String searchDistance,
-                                 Boolean isOpen, Boolean giRestroom, int pageNumber, int pageSize) {
-        def esQuery = [
-            "query": [
-                "bool": [
-                    "must": [],
-                    "filter": []
-                ]
-            ],
-            "sort": [],
-            "from": (pageNumber - 1) * pageSize,
-            "size": pageSize
-        ]
+    private SearchRequestBuilder prepareLocationSearch() {
+        def req = esClient.prepareSearch(esIndex)
+        req.setTypes(esType)
+        req
+    }
 
-        if (campus) {
-            esQuery.query.bool.must += [ "match": [ "attributes.campus": campus ]]
-        }
-
-        if (type) {
-            if (type == "cultural-center") {
-                esQuery.query.bool.must += [ "match": [ "attributes.tags": type ]]
-            } else {
-                esQuery.query.bool.must += [ "match": [ "attributes.type": type]]
-            }
-        }
-
-        if (q) {
-            esQuery.query.bool.filter += [ "multi_match" : [
-                    "query":    q,
-                    "fields": [ "attributes.name", "attributes.abbreviation" ]
-            ]]
-        }
-
-        if (lat && lon) {
-            addLocationQuery(esQuery, lat, lon, searchDistance)
-        }
-
-        if (isOpen) {
-            addTimeQuery(esQuery)
-        }
-
-        if (giRestroom) {
-            esQuery.query.bool.must += [ "range": [ "attributes.giRestroomCount": [ "gt": 0]]]
-        }
-
-        esQuery
+    private SearchRequestBuilder prepareServiceSearch() {
+        def req = esClient.prepareSearch(esIndexService)
+        req.setTypes(esTypeService)
+        req
     }
 
     /**
      * Generate ElasticSearch query to list locations by campus, type and full text search.
-     *
-     * @param campus
-     * @param type
-     * @param q
-     * @param pageNumber
-     * @param pageSize
-     * @param query
+     * @param q             search for locations with this name
+     * @param campus        restrict results to this campus (corvallis, cascade)
+     * @param type          restrict results to this type (building, dining, cultural-center...)
+     * @param lat           latitute for geo search
+     * @param lon           longitude for geo search
+     * @param searchDistance    restrict results to be at most this far from (lat,lon)
+     * @param isOpen        only include dining locations which are open at the time of the search
+     * @param giRestroom    only include building with gender inclusive restrooms
+     * @param pageNumber    page number (1..)
+     * @param pageSize      page size
      * @return
      */
     @groovy.transform.TypeChecked
-    @groovy.transform.PackageScope
-    SearchRequestBuilder getESSearchQueryUsingAPI(String q, String campus, String type,
-                                                  Double lat, Double lon, String searchDistance,
-                                                  Boolean isOpen, Boolean giRestroom, int pageNumber, int pageSize) {
+    @groovy.transform.PackageScope // for testing
+    SearchRequestBuilder buildSearchRequest(SearchRequestBuilder req,
+                                            String q, String campus, String type,
+                                            Double lat, Double lon, String searchDistance,
+                                            Boolean isOpen,
+                                            Boolean giRestroom, int pageNumber, int pageSize) {
 
-
-        def req = esClient.prepareSearch(esIndex)
-        req.setTypes(esType)
         req.setFrom((pageNumber - 1) * pageSize)
         req.setSize(pageSize)
 
@@ -324,8 +260,8 @@ class LocationDAO {
 
             query.filter(
                     QueryBuilders.nestedQuery(path, QueryBuilders.boolQuery()
-                        .filter(QueryBuilders.rangeQuery(path+".start").lte("now"))
-                        .filter(QueryBuilders.rangeQuery(path+".end").gt("now"))))
+                        .filter(QueryBuilders.rangeQuery(path + ".start").lte("now"))
+                        .filter(QueryBuilders.rangeQuery(path + ".end").gt("now"))))
         }
 
         if (giRestroom) {
@@ -347,49 +283,5 @@ class LocationDAO {
             "from": (pageNumber - 1) * pageSize,
             "size": pageSize
         ]
-    }
-
-    /**
-     * Add ES query for searching by location
-     * @param esQuery
-     * @param lat
-     * @param lon
-     */
-    private static void addLocationQuery(def esQuery, Double lat,
-                                         Double lon, String searchDistance) {
-        esQuery.query.bool.filter += ["geo_distance": [
-                "distance": searchDistance,
-                "attributes.geoLocation": [
-                        "lat": lat,
-                        "lon": lon
-                ]
-        ]]
-
-        esQuery.sort = [
-                        "_geo_distance": [
-                                "attributes.geoLocation": [
-                                        "lat":  lat,
-                                        "lon": lon
-                                ],
-                                "order":         "asc",
-                                "unit":          "km",
-                                "distance_type": "plane"]
-                ]
-    }
-
-    /**
-     * Add ES query for filtering currently open restaurants
-     * @param esQuery
-     */
-    private static void addTimeQuery(def esQuery) {
-        String weekday = Integer.toString(DateTime.now().getDayOfWeek())
-        esQuery.query.bool.filter += [
-                ["nested": [
-                        "path": "attributes.openHours." + weekday,
-                        "filter": [
-                                [ "range":["attributes.openHours.${weekday}.start":
-                                                   [ "lte": "now"]]],
-                                ["range": ["attributes.openHours.${weekday}.end":
-                                                   ["gt": "now"]]]]]]]
     }
 }
