@@ -1,9 +1,19 @@
 package edu.oregonstate.mist.locations.frontend.db
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.elasticsearch.action.get.GetRequest
 import org.elasticsearch.action.get.GetResponse
+import org.elasticsearch.action.search.SearchRequest
+import org.elasticsearch.action.search.SearchRequestBuilder
+import org.elasticsearch.action.search.SearchType
 import org.elasticsearch.client.transport.TransportClient
+import org.elasticsearch.common.geo.GeoDistance
 import org.elasticsearch.common.transport.InetSocketTransportAddress
+import org.elasticsearch.common.unit.DistanceUnit
+import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.search.sort.GeoDistanceSortBuilder
+import org.elasticsearch.search.sort.SortBuilders
+import org.elasticsearch.search.sort.SortOrder
 import org.joda.time.DateTime
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,6 +22,8 @@ import org.slf4j.LoggerFactory
  * Handles HTTP requests against ElasticSearch. Operation supported are:
  * search and findById.
  */
+//@groovy.transform.TypeChecked
+@groovy.transform.InheritConstructors
 class LocationDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationDAO.class)
 
@@ -54,19 +66,25 @@ class LocationDAO {
                   Boolean giRestroom, Integer pageNumber, Integer pageSize) {
         ObjectMapper mapper = new ObjectMapper()
 
+        def esQuery = getESSearchQueryUsingAPI(q, campus, type, lat, lon, searchDistance, isOpen, giRestroom, pageNumber, pageSize)
+        println(esQuery.toString())
+        def resp = esQuery.execute().actionGet()
+
+        return resp.toString()
+
         // generate ES query to search for locations
-        def esQuery = getESSearchQuery(q, campus, type,
-                                       lat, lon, searchDistance,
-                                       isOpen, giRestroom, pageNumber, pageSize)
-
-        LOGGER.debug("elastic search query: " + esQuery)
-
-        String esQueryJson = mapper.writeValueAsString(esQuery)
-
-        // get data from ES
-        def url = new URL("${locationsESFullUrl}/_search")
-        URLConnection connection = postRequest(url, esQueryJson)
-        connection.content.text
+//        def esQuery = getESSearchQuery(q, campus, type,
+//                                       lat, lon, searchDistance,
+//                                       isOpen, giRestroom, pageNumber, pageSize)
+//
+//        LOGGER.debug("elastic search query: " + esQuery)
+//
+//        String esQueryJson = mapper.writeValueAsString(esQuery)
+//
+//        // get data from ES
+//        def url = new URL("${locationsESFullUrl}/_search")
+//        URLConnection connection = postRequest(url, esQueryJson)
+//        connection.content.text
     }
 
     /**
@@ -243,6 +261,79 @@ class LocationDAO {
         }
 
         esQuery
+    }
+
+    /**
+     * Generate ElasticSearch query to list locations by campus, type and full text search.
+     *
+     * @param campus
+     * @param type
+     * @param q
+     * @param pageNumber
+     * @param pageSize
+     * @param query
+     * @return
+     */
+    @groovy.transform.TypeChecked
+    @groovy.transform.PackageScope
+    SearchRequestBuilder getESSearchQueryUsingAPI(String q, String campus, String type,
+                                                  Double lat, Double lon, String searchDistance,
+                                                  Boolean isOpen, Boolean giRestroom, int pageNumber, int pageSize) {
+
+
+        def req = esClient.prepareSearch(esIndex)
+        req.setTypes(esType)
+        req.setFrom((pageNumber - 1) * pageSize)
+        req.setSize(pageSize)
+
+        def query = QueryBuilders.boolQuery()
+
+        if (campus) {
+            query.must(QueryBuilders.matchQuery("attributes.campus", campus))
+        }
+
+        if (type) {
+            if (type == "cultural-center") {
+                query.must(QueryBuilders.matchQuery("attributes.tags", type))
+            } else {
+                query.must(QueryBuilders.matchQuery("attributes.type", type))
+            }
+        }
+
+        if (q) {
+            // TODO: should this also search bldgID?
+            query.filter(QueryBuilders.multiMatchQuery(q, "attributes.name", "attributes.abbreviation"))
+        }
+
+        if (lat && lon) {
+            query.filter(QueryBuilders.geoDistanceQuery("attributes.geoLocation")
+                        .distance(searchDistance)
+                        .point(lat, lon))
+
+            req.addSort(SortBuilders.geoDistanceSort("attributes.geoLocation")
+                        .point(lat, lon)
+                        .order(SortOrder.ASC)
+                        .unit(DistanceUnit.KILOMETERS)
+                        .geoDistance(GeoDistance.PLANE))
+        }
+
+        if (isOpen) {
+            // TODO: weekday should be a function argument
+            String weekday = Integer.toString(DateTime.now().getDayOfWeek())
+            String path = "attributes.openHours." + weekday
+
+            query.filter(
+                    QueryBuilders.nestedQuery(path, QueryBuilders.boolQuery()
+                        .filter(QueryBuilders.rangeQuery(path+".start").lte("now"))
+                        .filter(QueryBuilders.rangeQuery(path+".end").gt("now"))))
+        }
+
+        if (giRestroom) {
+            query.must(QueryBuilders.rangeQuery("attributes.giRestroomCount").gt(0))
+        }
+
+        req.setQuery(query)
+        return req
     }
 
     private static def getESQueryRelatedServices(String locationId, int pageNumber, int pageSize) {

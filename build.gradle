@@ -38,6 +38,8 @@ dependencies {
     testCompile "junit:junit:4.12"
     testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     codenarc "org.codenarc:CodeNarc:${codenarcVersion}"
+    compile "com.spatial4j:spatial4j:0.5"
+    compile "com.vividsolutions:jts:1.13"
     compile "de.thomaskrille:dropwizard-template-config:1.4.0"
     compile "io.dropwizard:dropwizard-auth:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-client:${dropwizardVersion}"
