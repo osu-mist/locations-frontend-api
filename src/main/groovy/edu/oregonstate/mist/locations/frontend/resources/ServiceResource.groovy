@@ -7,6 +7,7 @@ import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
+import org.joda.time.DateTime
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -54,7 +55,8 @@ class ServiceResource extends Resource {
             def trimmedQ = sanitize(q?.trim())
             isOpen = isOpen == null ? false : isOpen
 
-            String result = locationDAO.searchService(trimmedQ, isOpen, pageNumber, pageSize)
+            Integer weekday = DateTime.now().getDayOfWeek()
+            String result = locationDAO.searchService(trimmedQ, isOpen, weekday, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []

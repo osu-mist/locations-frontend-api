@@ -13,8 +13,10 @@ public class LocationDAOTest {
                 esIndex: "locations",
                 estype : "locations",
         ]
+        Integer weekday = 1
         def dao = new LocationDAO(configuration)
-        def request = dao.getESSearchQueryUsingAPI("hello", null, null, null, null, null, null, null, 1, 10)
+        def request = dao.prepareLocationSearch()
+        request = dao.buildSearchRequest(request, "hello", null, null, null, null, null, null, null, null, 1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -30,7 +32,8 @@ public class LocationDAOTest {
   }
 }''', request.toString())
 
-        request = dao.getESSearchQueryUsingAPI("building", "corvallis", null, null, null, null, null, null, 1, 10)
+        request = dao.prepareLocationSearch()
+        request = dao.buildSearchRequest(request, "building", "corvallis", null, null, null, null, null, null, null, 1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -54,7 +57,8 @@ public class LocationDAOTest {
   }
 }''', request.toString())
 
-        request = dao.getESSearchQueryUsingAPI("building", "", "cultural-center", null, null, null, null, null, 1, 10)
+        request = dao.prepareLocationSearch()
+        request = dao.buildSearchRequest(request, "building", "", "cultural-center", null, null, null, null, null, null, 1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -78,7 +82,8 @@ public class LocationDAOTest {
   }
 }''', request.toString())
 
-        request = dao.getESSearchQueryUsingAPI("building", "", "dining", null, null, null, null, null, 1, 10)
+        request = dao.prepareLocationSearch()
+        request = dao.buildSearchRequest(request, "building", "", "dining", null, null, null, null, null, null, 1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -102,8 +107,8 @@ public class LocationDAOTest {
   }
 }''', request.toString())
 
-
-        request = dao.getESSearchQueryUsingAPI("building", "", "", (Double) 42.39561, (Double) -71.13051, "2miles", null, null, 1, 10)
+        request = dao.prepareLocationSearch()
+        request = dao.buildSearchRequest(request, "building", "", "", (Double) 42.39561, (Double) -71.13051, "2miles", null, null, null, 1, 10)
         assertEquals(request.toString(), '''{
   "from" : 0,
   "size" : 10,
@@ -134,7 +139,8 @@ public class LocationDAOTest {
   } ]
 }''')
 
-        request = dao.getESSearchQueryUsingAPI("building", "", "", null, null, null, Boolean.TRUE, null, 1, 10)
+        request = dao.prepareLocationSearch()
+        request = dao.buildSearchRequest(request, "building", "", "", null, null, null, Boolean.TRUE, weekday, null, 1, 10)
         assertEquals(request.toString(), '''{
   "from" : 0,
   "size" : 10,

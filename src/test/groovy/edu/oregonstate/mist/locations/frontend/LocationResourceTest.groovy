@@ -27,7 +27,7 @@ class LocationResourceTest {
         def mock = new MockFor(LocationDAO)
         mock.demand.search() {
             String q, String campus, String type, Double lat,
-            Double lon, String searchDistance, Boolean isOpen,
+            Double lon, String searchDistance, Boolean isOpen, Integer weekday,
             Boolean giRestroom, Integer pageNumber, Integer pageSize ->
                 '{"hits": {"total": 0, "hits": []}}'
         }
@@ -120,7 +120,7 @@ class LocationResourceTest {
         def mock = new MockFor(LocationDAO)
         mock.demand.search() {
             String q, String campus, String type, Double lat,
-            Double lon, String searchDistance, Boolean isOpen,
+            Double lon, String searchDistance, Boolean isOpen, Integer weekday,
             Boolean giRestroom, Integer pageNumber, Integer pageSize -> esStubData
         }
         def dao = mock.proxyInstance()

@@ -1,20 +1,15 @@
 package edu.oregonstate.mist.locations.frontend.db
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.elasticsearch.action.get.GetRequest
+import groovy.transform.PackageScope
 import org.elasticsearch.action.get.GetResponse
-import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.action.search.SearchRequestBuilder
-import org.elasticsearch.action.search.SearchType
 import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.geo.GeoDistance
 import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.elasticsearch.common.unit.DistanceUnit
 import org.elasticsearch.index.query.QueryBuilders
-import org.elasticsearch.search.sort.GeoDistanceSortBuilder
 import org.elasticsearch.search.sort.SortBuilders
 import org.elasticsearch.search.sort.SortOrder
-import org.joda.time.DateTime
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -61,12 +56,13 @@ class LocationDAO {
      *
      * @return json             JSON search results from ES
      */
-    String search(String q, String campus, String type, Double lat,
-                  Double lon, String searchDistance, Boolean isOpen,
-                  Boolean giRestroom, Integer pageNumber, Integer pageSize) {
+    String search(String q, String campus, String type,
+                  Double lat, Double lon, String searchDistance,
+                  Boolean isOpen, Integer weekday, Boolean giRestroom,
+                  Integer pageNumber, Integer pageSize) {
         def esQuery = prepareLocationSearch()
         esQuery = buildSearchRequest(esQuery, q, campus, type, lat, lon, searchDistance,
-                                     isOpen, giRestroom, pageNumber, pageSize)
+                                     isOpen, weekday, giRestroom, pageNumber, pageSize)
         LOGGER.debug("elastic search query: " + esQuery.toString())
 
         def resp = esQuery.get()
@@ -84,15 +80,16 @@ class LocationDAO {
      * @param pageSize
      * @return
      */
-    String searchService(String q, Boolean isOpen, Integer pageNumber,
-                         Integer pageSize) {
+    String searchService(String q, Boolean isOpen, Integer weekday,
+                         Integer pageNumber, Integer pageSize) {
 
         // generate ES query to search for locations
         // TODO: test
         def esQuery = prepareServiceSearch()
         esQuery = buildSearchRequest(esQuery, q, null, null,
                                      null, null, null,
-                                     isOpen, null, pageNumber, pageSize)
+                                     isOpen, weekday,
+                                     null, pageNumber, pageSize)
 
         LOGGER.debug("elastic search query: " + esQuery.toString())
 
@@ -110,20 +107,18 @@ class LocationDAO {
      * @return
      */
     String getRelatedServices(String locationId, Integer pageNumber, Integer pageSize) {
-        ObjectMapper mapper = new ObjectMapper()
 
         // generate ES query to search for locations
-        def esQuery = getESQueryRelatedServices(locationId, pageNumber, pageSize)
+        def req = prepareServiceSearch()
+        req = buildRelatedServicesRequest(req, locationId, pageNumber, pageSize)
 
-        LOGGER.debug("elastic search query: " + esQuery)
+        LOGGER.debug("elastic search query: " + esQuery.toString)
 
-        String esQueryJson = mapper.writeValueAsString(esQuery)
+        def resp = req.get()
 
-        // get data from ES
-        def url = new URL("${servicesESFullUrl}/_search")
-        URLConnection connection = postRequest(url, esQueryJson)
-        connection.content.text
+        resp.toString()
     }
+
 
     /**
      * Return a single location object with the matching id
@@ -149,49 +144,15 @@ class LocationDAO {
         response.sourceAsString
     }
 
-    /**
-     * Returns url of elastic search collection and type to search.
-     *
-     * @return
-     */
-    private GString getESFullUrl(String esIndex, String esType) {
-        "${esUrl}/${esIndex}/${esType}"
-    }
-
-    private GString getServicesESFullUrl() {
-        getESFullUrl(esIndexService, esTypeService)
-    }
-
-    /**
-     * Performs POST request.
-     *
-     * This groovy approach is used instead of jerseyClient because jersey client kept
-     * throwing no response errors.
-     *
-     * @param url
-     * @param esQueryJson
-     * @return
-     */
-    private URLConnection postRequest(URL url, String esQueryJson) {
-        def connection = url.openConnection()
-        connection.setRequestMethod("POST")
-        connection.doOutput = true
-
-        def writer = new OutputStreamWriter(connection.outputStream)
-        writer.write(esQueryJson)
-        writer.flush()
-        writer.close()
-        connection.connect()
-        connection
-    }
-
-    private SearchRequestBuilder prepareLocationSearch() {
+    @PackageScope
+    SearchRequestBuilder prepareLocationSearch() {
         def req = esClient.prepareSearch(esIndex)
         req.setTypes(esType)
         req
     }
 
-    private SearchRequestBuilder prepareServiceSearch() {
+    @PackageScope
+    SearchRequestBuilder prepareServiceSearch() {
         def req = esClient.prepareSearch(esIndexService)
         req.setTypes(esTypeService)
         req
@@ -206,19 +167,22 @@ class LocationDAO {
      * @param lon           longitude for geo search
      * @param searchDistance    restrict results to be at most this far from (lat,lon)
      * @param isOpen        only include dining locations which are open at the time of the search
+     * @param weekday       if isOpen is true, weekday gives the current day of the week
+     *                      (monday=1, sunday=7)
      * @param giRestroom    only include building with gender inclusive restrooms
      * @param pageNumber    page number (1..)
      * @param pageSize      page size
      * @return
      */
     @groovy.transform.TypeChecked
-    @groovy.transform.PackageScope // for testing
-    SearchRequestBuilder buildSearchRequest(SearchRequestBuilder req,
-                                            String q, String campus, String type,
-                                            Double lat, Double lon, String searchDistance,
-                                            Boolean isOpen,
-                                            Boolean giRestroom, int pageNumber, int pageSize) {
-
+    @PackageScope // for testing
+    static SearchRequestBuilder buildSearchRequest(
+            SearchRequestBuilder req,
+            String q, String campus, String type,
+            Double lat, Double lon, String searchDistance,
+            Boolean isOpen, Integer weekday,
+            Boolean giRestroom, int pageNumber, int pageSize
+    ) {
         req.setFrom((pageNumber - 1) * pageSize)
         req.setSize(pageSize)
 
@@ -254,9 +218,7 @@ class LocationDAO {
         }
 
         if (isOpen) {
-            // TODO: weekday should be a function argument
-            String weekday = Integer.toString(DateTime.now().getDayOfWeek())
-            String path = "attributes.openHours." + weekday
+            String path = "attributes.openHours." + weekday.toString()
 
             query.filter(
                     QueryBuilders.nestedQuery(path, QueryBuilders.boolQuery()
@@ -272,16 +234,32 @@ class LocationDAO {
         return req
     }
 
-    private static def getESQueryRelatedServices(String locationId, int pageNumber, int pageSize) {
-        [
-            "query": [
-                "bool": [
-                    "must": [ "match": [ "attributes.locationId": locationId ]]
-                ]
-            ],
-            "sort": [],
-            "from": (pageNumber - 1) * pageSize,
-            "size": pageSize
-        ]
+    @PackageScope
+    static SearchRequestBuilder buildRelatedServicesRequest(
+            SearchRequestBuilder req, String locationId,
+            Integer pageNumber, Integer pageSize
+    ) {
+        req.setFrom((pageNumber - 1) * pageSize)
+        req.setSize(pageSize)
+
+        def query = QueryBuilders.boolQuery()
+        query.must(QueryBuilders.matchQuery("attributes.locationId", locationId))
+        // TODO: it's not clear to me that the outer bool query is actually necessary
+
+        req.setQuery(query)
+
+//        def esQuery = getESQueryRelatedServices(locationId, pageNumber, pageSize)
+//        [
+//                "query": [
+//                        "bool": [
+//                                "must": [ "match": [ "attributes.locationId": locationId ]]
+//                        ]
+//                ],
+//                "sort": [],
+//                "from": (pageNumber - 1) * pageSize,
+//                "size": pageSize
+//        ]
+
+        req
     }
 }
