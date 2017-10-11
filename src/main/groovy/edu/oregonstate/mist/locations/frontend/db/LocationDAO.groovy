@@ -1,6 +1,8 @@
 package edu.oregonstate.mist.locations.frontend.db
 
+import groovy.transform.InheritConstructors
 import groovy.transform.PackageScope
+import groovy.transform.TypeChecked
 import org.elasticsearch.action.get.GetResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.client.transport.TransportClient
@@ -17,8 +19,8 @@ import org.slf4j.LoggerFactory
  * Handles HTTP requests against ElasticSearch. Operation supported are:
  * search and findById.
  */
-//@groovy.transform.TypeChecked
-@groovy.transform.InheritConstructors
+@TypeChecked
+@InheritConstructors
 class LocationDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationDAO.class)
 
@@ -109,12 +111,12 @@ class LocationDAO {
     String getRelatedServices(String locationId, Integer pageNumber, Integer pageSize) {
 
         // generate ES query to search for locations
-        def req = prepareServiceSearch()
-        req = buildRelatedServicesRequest(req, locationId, pageNumber, pageSize)
+        def esQuery = prepareServiceSearch()
+        esQuery = buildRelatedServicesRequest(esQuery, locationId, pageNumber, pageSize)
 
-        LOGGER.debug("elastic search query: " + esQuery.toString)
+        LOGGER.debug("elastic search query: " + esQuery.toString())
 
-        def resp = req.get()
+        def resp = esQuery.get()
 
         resp.toString()
     }
