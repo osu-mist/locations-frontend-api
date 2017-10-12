@@ -56,7 +56,8 @@ class ServiceResource extends Resource {
             isOpen = isOpen == null ? false : isOpen
 
             Integer weekday = DateTime.now().getDayOfWeek()
-            String result = locationDAO.searchService(trimmedQ, isOpen, weekday, pageNumber, pageSize)
+            String result =
+                    locationDAO.searchService(trimmedQ, isOpen, weekday, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []

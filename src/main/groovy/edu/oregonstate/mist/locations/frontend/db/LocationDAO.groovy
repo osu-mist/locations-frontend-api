@@ -117,7 +117,6 @@ class LocationDAO {
         resp.toString()
     }
 
-
     /**
      * Return a single location object with the matching id
      *
@@ -199,7 +198,8 @@ class LocationDAO {
 
         if (q) {
             // TODO: should this also search bldgID?
-            query.filter(QueryBuilders.multiMatchQuery(q, "attributes.name", "attributes.abbreviation"))
+            query.filter(QueryBuilders.multiMatchQuery(q,
+                    "attributes.name", "attributes.abbreviation"))
         }
 
         if (lat && lon) {
@@ -228,7 +228,7 @@ class LocationDAO {
         }
 
         req.setQuery(query)
-        return req
+        req
     }
 
     @PackageScope
@@ -244,7 +244,6 @@ class LocationDAO {
         // TODO: it's not clear that the outer bool query is actually necessary
 
         req.setQuery(query)
-
         req
     }
 }
