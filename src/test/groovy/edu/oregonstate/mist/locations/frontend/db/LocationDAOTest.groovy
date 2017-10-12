@@ -1,24 +1,46 @@
 package edu.oregonstate.mist.locations.frontend.db
 
 import groovy.transform.TypeChecked
+import org.elasticsearch.action.search.SearchRequestBuilder
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
 import static org.junit.Assert.*
 
+/**
+ * These tests check that the locationDAO constructs queries that look like
+ * what we expect - in particular, we want them to match the manual REST queries
+ * we had been using before.
+ */
 @TypeChecked
 public class LocationDAOTest {
-    @Test
-    void testSearch() {
+    Integer weekday = 1
+    private ElasticSearchManager esManager
+    private LocationDAO dao
+    private SearchRequestBuilder request
+
+    @Before
+    void setUp() {
         def configuration = [
                 esUrl  : "http://localhost:9300",
                 esIndex: "locations",
                 estype : "locations",
         ]
-        Integer weekday = 1
-        def manager = new ElasticSearchManager(configuration.get("esUrl"))
-        manager.start()
-        def dao = new LocationDAO(configuration, manager)
-        def request = dao.prepareLocationSearch()
+
+        esManager = new ElasticSearchManager(configuration.get("esUrl"))
+        esManager.start()
+        dao = new LocationDAO(configuration, esManager)
+        request = dao.prepareLocationSearch()
+    }
+
+    @After
+    void tearDown() {
+        esManager.stop()
+    }
+
+    @Test
+    void testSearchQuery() {
         request = dao.buildSearchRequest(request, "hello", null, null, null, null, null, null, null, null, 1, 10)
         assertEquals('''{
   "from" : 0,
@@ -34,8 +56,10 @@ public class LocationDAOTest {
     }
   }
 }''', request.toString())
+    }
 
-        request = dao.prepareLocationSearch()
+    @Test
+    void testSearchCampus() {
         request = dao.buildSearchRequest(request, "building", "corvallis", null, null, null, null, null, null, null, 1, 10)
         assertEquals('''{
   "from" : 0,
@@ -59,8 +83,10 @@ public class LocationDAOTest {
     }
   }
 }''', request.toString())
+    }
 
-        request = dao.prepareLocationSearch()
+    @Test
+    void testSearchTypeCulturalCenter() {
         request = dao.buildSearchRequest(request, "building", "", "cultural-center", null, null, null, null, null, null, 1, 10)
         assertEquals('''{
   "from" : 0,
@@ -84,7 +110,10 @@ public class LocationDAOTest {
     }
   }
 }''', request.toString())
+    }
 
+    @Test
+    void testSearchTypeDining() {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", "dining", null, null, null, null, null, null, 1, 10)
         assertEquals('''{
@@ -109,7 +138,10 @@ public class LocationDAOTest {
     }
   }
 }''', request.toString())
+    }
 
+    @Test
+    void testSearchGeoLocation() {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", "", (Double) 42.39561, (Double) -71.13051, "2miles", null, null, null, 1, 10)
         assertEquals(request.toString(), '''{
@@ -141,7 +173,10 @@ public class LocationDAOTest {
     }
   } ]
 }''')
+    }
 
+    @Test
+    void testSearchIsOpen() {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", "", null, null, null, Boolean.TRUE, weekday, null, 1, 10)
         assertEquals(request.toString(), '''{
