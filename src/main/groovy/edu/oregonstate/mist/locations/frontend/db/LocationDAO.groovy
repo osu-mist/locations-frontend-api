@@ -5,9 +5,8 @@ import groovy.transform.PackageScope
 import groovy.transform.TypeChecked
 import org.elasticsearch.action.get.GetResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
-import org.elasticsearch.client.transport.TransportClient
+import org.elasticsearch.client.Client
 import org.elasticsearch.common.geo.GeoDistance
-import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.elasticsearch.common.unit.DistanceUnit
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.sort.SortBuilders
@@ -17,33 +16,30 @@ import org.slf4j.LoggerFactory
 
 /**
  * Handles HTTP requests against ElasticSearch. Operation supported are:
- * search and findById.
+ * search, searchService, getRelatedService, getById, and getServiceById.
  */
 @TypeChecked
 @InheritConstructors
 class LocationDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocationDAO.class)
 
-    private final URL esUrl
     private final String esIndex
     private final String esType
     private final String esIndexService
     private final String esTypeService
 
-    private TransportClient esClient // TODO should be managed
+    private final ElasticSearchManager esManager
 
-    LocationDAO(Map<String, String> locationConfiguration) {
-        esUrl = new URL(locationConfiguration.get("esUrl"))
+    LocationDAO(Map<String, String> locationConfiguration, ElasticSearchManager esManager) {
+        this.esManager = esManager
         esIndex = locationConfiguration.get("esIndex")
         esType = locationConfiguration.get("estype")
         esIndexService = locationConfiguration.get("esIndexService")
         esTypeService = locationConfiguration.get("estypeService")
+    }
 
-        this.esClient = TransportClient.builder().build()
-        this.esClient.addTransportAddress(
-                new InetSocketTransportAddress(
-                        new InetSocketAddress(esUrl.host, 9300)))
-        // TODO: don't hardcode port
+    private Client getEsClient() {
+        esManager.getClient()
     }
 
     /**
@@ -70,7 +66,7 @@ class LocationDAO {
         def resp = esQuery.get()
         // TODO: think about error conditions
 
-        return resp.toString()
+        resp.toString()
     }
 
     /**
@@ -129,8 +125,7 @@ class LocationDAO {
      * @return
      */
     String getById(String id) {
-        GetResponse response = esClient.prepareGet(esIndex, esType, id.toLowerCase())
-                .execute().actionGet()
+        GetResponse response = esClient.prepareGet(esIndex, esType, id.toLowerCase()).get()
         response.sourceAsString
     }
 
@@ -141,8 +136,8 @@ class LocationDAO {
      * @return
      */
     String getServiceById(String id) {
-        GetResponse response = esClient.prepareGet(esIndexService, esTypeService, id.toLowerCase())
-                .execute().actionGet()
+        GetResponse response =
+                esClient.prepareGet(esIndexService, esTypeService, id.toLowerCase()).get()
         response.sourceAsString
     }
 
@@ -176,7 +171,7 @@ class LocationDAO {
      * @param pageSize      page size
      * @return
      */
-    @groovy.transform.TypeChecked
+    @TypeChecked
     @PackageScope // for testing
     static SearchRequestBuilder buildSearchRequest(
             SearchRequestBuilder req,
@@ -246,21 +241,9 @@ class LocationDAO {
 
         def query = QueryBuilders.boolQuery()
         query.must(QueryBuilders.matchQuery("attributes.locationId", locationId))
-        // TODO: it's not clear to me that the outer bool query is actually necessary
+        // TODO: it's not clear that the outer bool query is actually necessary
 
         req.setQuery(query)
-
-//        def esQuery = getESQueryRelatedServices(locationId, pageNumber, pageSize)
-//        [
-//                "query": [
-//                        "bool": [
-//                                "must": [ "match": [ "attributes.locationId": locationId ]]
-//                        ]
-//                ],
-//                "sort": [],
-//                "from": (pageNumber - 1) * pageSize,
-//                "size": pageSize
-//        ]
 
         req
     }

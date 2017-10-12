@@ -18,6 +18,9 @@ class ElasticSearchHealthCheck extends HealthCheck {
      *
      * @return result
      */
+
+    //TODO: convert to new thing
+
     @Override
     protected Result check() {
         try {

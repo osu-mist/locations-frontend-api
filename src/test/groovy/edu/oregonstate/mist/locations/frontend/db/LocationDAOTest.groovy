@@ -1,20 +1,23 @@
-package edu.oregonstate.mist.locations.frontend.db;
+package edu.oregonstate.mist.locations.frontend.db
 
-import org.junit.Test;
+import groovy.transform.TypeChecked
+import org.junit.Test
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.*
 
-@groovy.transform.TypeChecked
+@TypeChecked
 public class LocationDAOTest {
     @Test
     void testSearch() {
         def configuration = [
-                esUrl  : "http://localhost:9200",
+                esUrl  : "http://localhost:9300",
                 esIndex: "locations",
                 estype : "locations",
         ]
         Integer weekday = 1
-        def dao = new LocationDAO(configuration)
+        def manager = new ElasticSearchManager(configuration.get("esUrl"))
+        manager.start()
+        def dao = new LocationDAO(configuration, manager)
         def request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "hello", null, null, null, null, null, null, null, null, 1, 10)
         assertEquals('''{
