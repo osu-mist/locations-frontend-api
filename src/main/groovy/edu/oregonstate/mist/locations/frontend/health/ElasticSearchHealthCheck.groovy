@@ -2,14 +2,21 @@ package edu.oregonstate.mist.locations.frontend.health
 
 import com.codahale.metrics.health.HealthCheck
 import com.codahale.metrics.health.HealthCheck.Result
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
+import groovy.transform.TypeChecked
+import org.elasticsearch.client.Client
+import org.elasticsearch.cluster.health.ClusterHealthStatus
+import org.elasticsearch.indices.IndexClosedException
 
+@TypeChecked
 class ElasticSearchHealthCheck extends HealthCheck {
-    private final Map<String, String> locationConfiguration
+    private final Client esClient
+    private final String esIndex
+    private final String esIndexService
 
-    ElasticSearchHealthCheck(Map<String, String> locationConfiguration) {
-        this.locationConfiguration = locationConfiguration
+    ElasticSearchHealthCheck(Client esClient, Map<String,String> locationConfiguration) {
+        this.esClient = esClient
+        this.esIndex = locationConfiguration.get("esIndex")
+        this.esIndexService = locationConfiguration.get("esIndexService")
     }
 
     /**
@@ -18,36 +25,40 @@ class ElasticSearchHealthCheck extends HealthCheck {
      *
      * @return result
      */
-
-    //TODO: convert to new thing
-
     @Override
-    protected Result check() {
-        try {
-            String esUrl = locationConfiguration.get("esUrl")
-            String esIndex = locationConfiguration.get("esIndex")
-            String clusterHealth = new URL("${esUrl}/_cluster/health/${esIndex}").text
+    protected Result check() throws Exception {
+        def req = esClient.admin().cluster().prepareHealth(esIndex, esIndexService)
+        def resp = req.get()
+        def status = resp.getStatus()
 
-            ObjectMapper mapper = new ObjectMapper()
-            JsonNode rootNode = mapper.readTree(clusterHealth)
-            String status = rootNode.path("status").textValue()
+        //println(resp.toString())
 
-            if (status != "red") {
-                String indexHealth = new URL("${esUrl}/_cat/indices/${esIndex}").text
-
-                def indexPieces = indexHealth?.split(" ")
-                String indexStatus = indexPieces[1]
-                String indexDocCount = indexPieces[5]
-                if (indexHealth && indexStatus == "open" && indexDocCount) {
-                    return Result.healthy()
-                }
-
-                Result.unhealthy("index status: ${indexStatus}, docCount: ${indexDocCount}")
-            } else {
-                Result.unhealthy("cluster status: ${status}")
-            }
-        } catch(Exception e) {
-            Result.unhealthy(e.message)
+        if (status == ClusterHealthStatus.RED) {
+            return Result.unhealthy("cluster status: ${status.name()}")
         }
+
+        // It is surprisingly tricky to check the open/closed status of an index
+        // We can't use the _cat/indices/ endpoint because _cat seems to be limited to the REST API
+        // We could use _cluster/state/metadata and see if metadata.indices.foo.state is set
+        // But it's simpler just to try and get the index stats and catch the ClosedIndexException
+        // We want to get the doc count anyway, so this saves a request
+
+        // https://stackoverflow.com/questions/27780036/check-if-elasticsearch-index-is-open-or-closed
+
+        def statsReq = esClient.admin().indices().prepareStats(esIndex, esIndexService)
+        try {
+            def statsResp = statsReq.get()
+
+            for (index in [esIndex, esIndexService]) {
+                def docCount = statsResp.getIndex(index).total.docs.count
+                if (docCount <= 0) {
+                    return Result.unhealthy("index ${index}: doc count = ${docCount}")
+                }
+            }
+        } catch (IndexClosedException exc) {
+            return Result.unhealthy("index ${exc.index}: closed")
+        }
+
+        Result.healthy()
     }
 }

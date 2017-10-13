@@ -35,7 +35,7 @@ class LocationsFrontEndApplication extends Application<LocationsFrontendConfigur
         environment.jersey().register(new ServiceResource(locationDAO, endpointUri))
 
         ElasticSearchHealthCheck healthCheck =
-                new ElasticSearchHealthCheck(configuration.locationsConfiguration)
+                new ElasticSearchHealthCheck(esManager.client, configuration.locationsConfiguration)
         environment.healthChecks().register("elasticSearchCluster", healthCheck)
     }
 
