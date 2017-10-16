@@ -17,11 +17,15 @@ class ElasticSearchManager implements Managed {
      */
     ElasticSearchManager(String esUrl) {
         this.esUrl = new URL(esUrl)
+        def port = this.esUrl.port
+        if (port == -1) {
+            port = 9300
+        }
+
         this.esClient = TransportClient.builder().build()
         this.esClient.addTransportAddress(
                 new InetSocketTransportAddress(
-                        new InetSocketAddress(this.esUrl.host, 9300)))
-        // TODO: don't hardcode port
+                        new InetSocketAddress(this.esUrl.host, port)))
     }
 
     Client getClient() {
