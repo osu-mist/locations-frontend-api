@@ -49,8 +49,15 @@ class LocationDAO {
      * @param q                 Query text to use for full text search
      * @param campus            Campus to use to filter results
      * @param type              Type of location to filter results
-     * @param pageNumber
-     * @param pageSize
+     * @param lat               latitute for geo search
+     * @param lon               longitude for geo search
+     * @param searchDistance    restrict results to be at most this far from (lat,lon)
+     * @param isOpen        only include dining locations which are open at the time of the search
+     * @param weekday       if isOpen is true, weekday gives the current day of the week
+     *                      (monday=1, sunday=7)
+     * @param giRestroom    only include building with gender inclusive restrooms
+     * @param pageNumber    page number (1..)
+     * @param pageSize      page size
      *
      * @return json             JSON search results from ES
      */
@@ -65,6 +72,8 @@ class LocationDAO {
 
         def resp = esQuery.get()
         // TODO: think about error conditions
+
+        //LOGGER.debug("elastic search response: " + resp.toString())
 
         resp.toString()
     }
@@ -82,7 +91,6 @@ class LocationDAO {
                          Integer pageNumber, Integer pageSize) {
 
         // generate ES query to search for locations
-        // TODO: test
         def esQuery = prepareServiceSearch()
         esQuery = buildSearchRequest(esQuery, q, null, null,
                                      null, null, null,
