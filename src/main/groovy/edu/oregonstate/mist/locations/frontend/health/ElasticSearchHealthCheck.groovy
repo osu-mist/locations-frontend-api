@@ -26,6 +26,7 @@ class ElasticSearchHealthCheck extends HealthCheck {
      * @return result
      */
     @Override
+    @SuppressWarnings(['LineLength'])
     protected Result check() throws Exception {
         def req = esClient.admin().cluster().prepareHealth(esIndex, esIndexService)
         def resp = req.get()
