@@ -7,6 +7,7 @@ import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
+import org.joda.time.DateTime
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -83,7 +84,7 @@ class LocationResource extends Resource {
             isOpen = isOpen == null ? false : isOpen
             giRestroom = giRestroom == null ? false : giRestroom
 
-            String searchDistance
+            String searchDistance = null
             if(lat && lon) {
                 distance = getDistance(distance)
                 distanceUnit = getDistanceUnit(distanceUnit)
@@ -95,10 +96,11 @@ class LocationResource extends Resource {
                 return notFound().build()
             }
 
+            Integer weekday = DateTime.now().getDayOfWeek()
             String result = locationDAO.search(
                                 trimmedQ, trimmedCampus, trimmedType,
                                 lat, lon, searchDistance,
-                                isOpen, giRestroom, pageNumber, pageSize)
+                                isOpen, weekday, giRestroom, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []

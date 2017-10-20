@@ -1,4 +1,4 @@
-### Dropwizard skeleton configuration file
+### Locations frontend API configuration file
 ##
 ## Do not commit changes that contain credentials or sensitive data!
 
@@ -45,7 +45,7 @@ authentication:
     password: password
 
 locations:
-  esUrl: http://elastic-search-url.example.com
+  esUrl: http://elastic-search-url.example.com:9300
   esIndex: elastic-search-index
   estype: elastic-search-type
   esIndexService: elastic-search-services-index

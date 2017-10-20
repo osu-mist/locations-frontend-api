@@ -38,13 +38,16 @@ dependencies {
     testCompile "junit:junit:4.12"
     testCompile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     codenarc "org.codenarc:CodeNarc:${codenarcVersion}"
-    compile 'org.yaml:snakeyaml:1.16'
-    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
+    compile "com.spatial4j:spatial4j:0.5"
+    compile "com.vividsolutions:jts:1.13"
+    compile "de.thomaskrille:dropwizard-template-config:1.4.0"
     compile "io.dropwizard:dropwizard-auth:${dropwizardVersion}"
     compile "io.dropwizard:dropwizard-client:${dropwizardVersion}"
-    compile "de.thomaskrille:dropwizard-template-config:1.4.0"
+    compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
     // compile "io.dropwizard:dropwizard-jdbi:${dropwizardVersion}"
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    compile "org.elasticsearch:elasticsearch:2.4.4"
+    compile 'org.yaml:snakeyaml:1.16'
     // compile ':ojdbc6_g:'
 
 }
