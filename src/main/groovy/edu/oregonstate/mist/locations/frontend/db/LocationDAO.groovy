@@ -46,28 +46,31 @@ class LocationDAO {
      * Searches ES (elasticsearch) for locations matching "q" full text search within the given
      * campus and type.
      *
-     * @param q                 Query text to use for full text search
-     * @param campus            Campus to use to filter results
-     * @param type              Type of location to filter results
-     * @param lat               latitute for geo search
+     * @param q                 query text to use for full text search
+     * @param campus            campus to use to filter results
+     * @param type              type of location to filter results
+     * @param lat               latitude for geo search
      * @param lon               longitude for geo search
      * @param searchDistance    restrict results to be at most this far from (lat,lon)
-     * @param isOpen        only include dining locations which are open at the time of the search
-     * @param weekday       if isOpen is true, weekday gives the current day of the week
-     *                      (monday=1, sunday=7)
-     * @param giRestroom    only include building with gender inclusive restrooms
-     * @param pageNumber    page number (1..)
-     * @param pageSize      page size
+     * @param isOpen            only include dining locations which are
+     *                              open at the time of the search
+     * @param weekday           if isOpen is true, weekday gives the current day of the week
+     *                              (monday=1, sunday=7)
+     * @param giRestroom        only include building with gender inclusive restrooms
+     * @param parkingZoneGroup  parking zonegroup if type is parking
+     * @param pageNumber        page number (1..)
+     * @param pageSize          page size
      *
      * @return json             JSON search results from ES
      */
     String search(String q, String campus, String type,
                   Double lat, Double lon, String searchDistance,
-                  Boolean isOpen, Integer weekday, Boolean giRestroom,
+                  Boolean isOpen, Integer weekday, Boolean giRestroom, String parkingZoneGroup,
                   Integer pageNumber, Integer pageSize) {
         def esQuery = prepareLocationSearch()
         esQuery = buildSearchRequest(esQuery, q, campus, type, lat, lon, searchDistance,
-                                     isOpen, weekday, giRestroom, pageNumber, pageSize)
+                                     isOpen, weekday, giRestroom, parkingZoneGroup,
+                                     pageNumber, pageSize)
         LOGGER.debug("elastic search query: " + esQuery.toString())
 
         def resp = esQuery.get()
@@ -95,7 +98,7 @@ class LocationDAO {
         esQuery = buildSearchRequest(esQuery, q, null, null,
                                      null, null, null,
                                      isOpen, weekday,
-                                     null, pageNumber, pageSize)
+                                     null, null, pageNumber, pageSize)
 
         LOGGER.debug("elastic search query: " + esQuery.toString())
 
@@ -185,7 +188,8 @@ class LocationDAO {
             String q, String campus, String type,
             Double lat, Double lon, String searchDistance,
             Boolean isOpen, Integer weekday,
-            Boolean giRestroom, int pageNumber, int pageSize
+            Boolean giRestroom, String parkingZoneGroup,
+            int pageNumber, int pageSize
     ) {
         req.setFrom((pageNumber - 1) * pageSize)
         req.setSize(pageSize)
@@ -233,6 +237,10 @@ class LocationDAO {
 
         if (giRestroom) {
             query.must(QueryBuilders.rangeQuery("attributes.giRestroomCount").gt(0))
+        }
+
+        if (parkingZoneGroup) {
+            query.must(QueryBuilders.matchQuery("attributes.parkingZoneGroup", parkingZoneGroup))
         }
 
         req.setQuery(query)
