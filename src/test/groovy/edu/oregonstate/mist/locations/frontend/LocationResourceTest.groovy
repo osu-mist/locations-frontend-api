@@ -28,7 +28,7 @@ class LocationResourceTest {
         mock.demand.search() {
             String q, String campus, String type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
-            Boolean giRestroom, Integer pageNumber, Integer pageSize ->
+            Boolean giRestroom, String parkingZoneGroup, Integer pageNumber, Integer pageSize ->
                 '{"hits": {"total": 0, "hits": []}}'
         }
         def dao = mock.proxyInstance()
@@ -37,14 +37,14 @@ class LocationResourceTest {
 
         // Test: no result
         def noResultRsp = resource.list('dixon', null,
-                null, null, null, null, null, null, false)
+                null, null, null, null, null, null, false, null)
         assert noResultRsp.status == 200
         assert noResultRsp.entity.links == [:]
         assert noResultRsp.entity.data == []
 
         // Test: invalid campus
         def invalidCampRes = resource.list('dixon', 'invalid',
-                null, null, null, null, null, null, null)
+                null, null, null, null, null, null, null, null)
         assert invalidCampRes.status == 404
         assert invalidCampRes.entity.developerMessage.contains("Not Found")
         assert invalidCampRes.entity.userMessage.contains("Not Found")
@@ -121,7 +121,8 @@ class LocationResourceTest {
         mock.demand.search() {
             String q, String campus, String type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
-            Boolean giRestroom, Integer pageNumber, Integer pageSize -> esStubData
+            Boolean giRestroom, String parkingZoneGroup,
+            Integer pageNumber, Integer pageSize -> esStubData
         }
         def dao = mock.proxyInstance()
         def resource = new LocationResource(dao, endpointUri)
@@ -129,18 +130,20 @@ class LocationResourceTest {
         //This mocking is to ensure LocationsResource.groovy#L177 passes\
 
         def expectedParams = [
-                'q'             : 'dixon',
-                'campus'        : "corvallis",
-                'type'          : "building",
-                'lat'           : 44.55,
-                'lon'           : 77.77,
-                'distance'      : 2.0,
-                'distanceUnit'  : "mi",
-                'isOpen'        : true,
-                'giRestroom'    : true
+                'q'                 : 'dixon',
+                'campus'            : "corvallis",
+                'type'              : "building",
+                'lat'               : 44.55,
+                'lon'               : 77.77,
+                'distance'          : 2.0,
+                'distanceUnit'      : "mi",
+                'isOpen'            : true,
+                'giRestroom'        : true,
+                'parkingZoneGroup'  : 'A2'
         ]
 
-        Response res = resource.list((String) expectedParams['q'],
+        Response res = resource.list(
+                (String) expectedParams['q'],
                 (String) expectedParams['campus'],
                 (String) expectedParams['type'],
                 (Double) expectedParams['lat'],
@@ -148,7 +151,8 @@ class LocationResourceTest {
                 (Double) expectedParams['distance'],
                 (String) expectedParams['distanceUnit'],
                 (Boolean) expectedParams['isOpen'],
-                (Boolean) expectedParams['giRestroom'])
+                (Boolean) expectedParams['giRestroom'],
+                (String) expectedParams['parkingZoneGroup'])
 
         ResultObject resObj = res.entity
         String selfLinks = resObj.links["self"]

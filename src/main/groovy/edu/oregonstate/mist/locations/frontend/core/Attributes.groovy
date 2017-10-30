@@ -28,5 +28,6 @@ class Attributes {
     Integer giRestroomCount
     Boolean giRestroomLimit
     String giRestroomLocations
+    String parkingZoneGroup
     List<String> synonyms
 }

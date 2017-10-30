@@ -31,7 +31,8 @@ class LocationResource extends Resource {
                                                               "cascades", "hmsc", "other"]
 
     public static final ArrayList<String> ALLOWED_TYPES = ["building", "dining",
-                                                           "cultural-center", "other"]
+                                                           "cultural-center", "parking", "other"]
+
     public static final ArrayList<String> ALLOWED_UNITS = ["mi", "miles",
                                                            "yd", "yards",
                                                            "ft", "feet",
@@ -71,7 +72,8 @@ class LocationResource extends Resource {
                   @QueryParam('distance') Double distance,
                   @QueryParam('distanceUnit') String distanceUnit,
                   @QueryParam('isOpen') Boolean isOpen,
-                  @QueryParam('giRestroom') Boolean giRestroom) {
+                  @QueryParam('giRestroom') Boolean giRestroom,
+                  @QueryParam('parkingZoneGroup') String parkingZoneGroup) {
 
         try {
             if (maxPageSizeExceeded()) {
@@ -100,7 +102,8 @@ class LocationResource extends Resource {
             String result = locationDAO.search(
                                 trimmedQ, trimmedCampus, trimmedType,
                                 lat, lon, searchDistance,
-                                isOpen, weekday, giRestroom, pageNumber, pageSize)
+                                isOpen, weekday, giRestroom, parkingZoneGroup,
+                                pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []
@@ -116,7 +119,7 @@ class LocationResource extends Resource {
 
             setPaginationLinks(topLevelHits, q, type, campus,
                     lat, lon, distance, distanceUnit,
-                    isOpen, giRestroom, resultObject)
+                    isOpen, giRestroom, parkingZoneGroup, resultObject)
 
             ok(resultObject).build()
         } catch (Exception e) {
@@ -170,7 +173,8 @@ class LocationResource extends Resource {
      */
     private void setPaginationLinks(JsonNode topLevelHits, String q, String type, String campus,
                                     Double lat, Double lon, Double distance, String distanceUnit,
-                                    Boolean isOpen, Boolean giRestroom, ResultObject resultObject) {
+                                    Boolean isOpen, Boolean giRestroom, String parkingZoneGroup,
+                                    ResultObject resultObject) {
 
         def totalHits = topLevelHits.get("total").asInt()
         // If no results were found, no need to add links
@@ -182,17 +186,18 @@ class LocationResource extends Resource {
         Integer pageNumber = getPageNumber()
         Integer pageSize = getPageSize()
         def urlParams = [
-                "q"             : q,
-                "type"          : type,
-                "campus"        : campus,
-                "lat"           : lat,
-                "lon"           : lon,
-                "distance"      : distance,
-                "distanceUnit"  : distanceUnit,
-                "isOpen"        : isOpen,
-                "giRestroom"    : giRestroom,
-                "pageSize"      : pageSize,
-                "pageNumber"    : pageNumber
+                "q"                 : q,
+                "type"              : type,
+                "campus"            : campus,
+                "lat"               : lat,
+                "lon"               : lon,
+                "distance"          : distance,
+                "distanceUnit"      : distanceUnit,
+                "isOpen"            : isOpen,
+                "giRestroom"        : giRestroom,
+                "parkingZoneGroup"  : parkingZoneGroup,
+                "pageSize"          : pageSize,
+                "pageNumber"        : pageNumber
         ]
 
         int lastPage = Math.ceil(totalHits / pageSize)
