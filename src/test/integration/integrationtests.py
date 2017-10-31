@@ -53,7 +53,7 @@ class gateway_tests(unittest.TestCase):
     # Tests that certain parameters return expected number of results
     def test_results(self):
         all_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon'}).json()
-        self.assertEqual(len(all_dixon['data']), 2)
+        self.assertEqual(len(all_dixon['data']), 3)
 
         dining_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon', 'type': 'dining'}).json()
         self.assertEqual(len(dining_dixon['data']), 1)
@@ -62,7 +62,7 @@ class gateway_tests(unittest.TestCase):
         self.assertEqual(len(building_dixon['data']), 1)
 
         # test search only from name + abbr
-        building_library = query_request(locations_url, access_token, "get", {'q': 'library', 'campus': 'corvallis'}).json()
+        building_library = query_request(locations_url, access_token, "get", {'q': 'library', 'campus': 'corvallis', 'type': 'building'}).json()
         self.assertEqual(len(building_library['data']), 1)
 
         building_library = query_request(locations_url, access_token, "get", {'q': 'vlib'}).json()
