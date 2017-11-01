@@ -65,8 +65,8 @@ class LocationDAO {
      */
     String search(String q, String campus, String type,
                   Double lat, Double lon, String searchDistance,
-                  Boolean isOpen, Integer weekday, Boolean giRestroom, String parkingZoneGroup,
-                  Integer pageNumber, Integer pageSize) {
+                  Boolean isOpen, Integer weekday, Boolean giRestroom,
+                  List<String> parkingZoneGroup, Integer pageNumber, Integer pageSize) {
         def esQuery = prepareLocationSearch()
         esQuery = buildSearchRequest(esQuery, q, campus, type, lat, lon, searchDistance,
                                      isOpen, weekday, giRestroom, parkingZoneGroup,
@@ -188,7 +188,7 @@ class LocationDAO {
             String q, String campus, String type,
             Double lat, Double lon, String searchDistance,
             Boolean isOpen, Integer weekday,
-            Boolean giRestroom, String parkingZoneGroup,
+            Boolean giRestroom, List<String> parkingZoneGroup,
             int pageNumber, int pageSize
     ) {
         req.setFrom((pageNumber - 1) * pageSize)
@@ -240,7 +240,12 @@ class LocationDAO {
         }
 
         if (parkingZoneGroup) {
-            query.must(QueryBuilders.matchQuery("attributes.parkingZoneGroup", parkingZoneGroup))
+            def parkingZoneGroupQuery = QueryBuilders.boolQuery()
+            parkingZoneGroup.each {
+                parkingZoneGroupQuery.should(
+                        QueryBuilders.matchQuery("attributes.parkingZoneGroup", it))
+            }
+            query.must(parkingZoneGroupQuery)
         }
 
         req.setQuery(query)

@@ -146,7 +146,13 @@ abstract class Resource {
         nonNullParams["page[size]"] = params['pageSize']
 
         nonNullParams.findAll { it.value } .collect { k, v ->
-            uriBuilder.setParameter(k, v.toString())
+            if (v instanceof List<String>) {
+                v.each { multiParam ->
+                    uriBuilder.addParameter(k, multiParam)
+                }
+            } else {
+                uriBuilder.setParameter(k, v.toString())
+            }
         }
 
         uriBuilder.build().toString()
