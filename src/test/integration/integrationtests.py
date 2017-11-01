@@ -135,7 +135,7 @@ class gateway_tests(unittest.TestCase):
         # Test that only parking locations are returned when they should be
         # and each parking location has a related parkingZoneGroup
         all_parking = query_request(locations_url, access_token, "get",
-                {'type': 'parking', 'page[size]': 9999}).json()
+                {'type': 'parking', 'page[size]': max_page_size}).json()
 
         for parking_location in all_parking['data']:
             attributes = parking_location['attributes']
@@ -146,7 +146,7 @@ class gateway_tests(unittest.TestCase):
         # only returns parking locations that match one of the specified zones
         parking_zones = set(['A1', 'C', 'B2'])
         multi_zone_query = query_request(locations_url, access_token, "get",
-                {'parkingZoneGroup': parking_zones, 'campus': 'corvallis', 'page[size]': 9999}).json()
+                {'parkingZoneGroup': parking_zones, 'campus': 'corvallis', 'page[size]': max_page_size}).json()
 
         result_parking_zones = set([parking_location['attributes']['parkingZoneGroup']
             for parking_location in multi_zone_query['data']])
@@ -190,7 +190,7 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a request for all locations is successful
     def test_all_locations(self):
-        query_params = {'page[number]': 1, 'page[size]': 9999}
+        query_params = {'page[number]': 1, 'page[size]': max_page_size}
         self.assertEqual(query_request(locations_url, access_token, "get", query_params).status_code, 200)
 
     # Tests that API response time is less than a value
@@ -238,6 +238,8 @@ if __name__ == '__main__':
     url = get_url(config_path)
     access_token = get_access_token(config_path)
     single_resourse_id = get_single_resource_id(config_path)
+
+    max_page_size = 10000
 
     locations_url = url + "/locations"
     services_url = url + "/services"
