@@ -130,6 +130,29 @@ class gateway_tests(unittest.TestCase):
             self.assertGreater(attributes['giRestroomCount'], 0)
             self.assertIsNotNone(attributes['giRestroomLimit'])
 
+    # Test results for parking locations
+    def test_parking(self):
+        # Test that only parking locations are returned when they should be
+        # and each parking location has a related parkingZoneGroup
+        all_parking = query_request(locations_url, access_token, "get",
+                {'type': 'parking', 'page[size]': 9999}).json()
+
+        for parking_location in all_parking['data']:
+            attributes = parking_location['attributes']
+            self.assertIsNotNone(attributes['parkingZoneGroup'])
+            self.assertEqual(attributes['type'], 'parking')
+
+        # Test that a multi-query-parameter request for parkingZoneGroup
+        # only returns parking locations that match one of the specified zones
+        parking_zones = set(['A1', 'C', 'B2'])
+        multi_zone_query = query_request(locations_url, access_token, "get",
+                {'parkingZoneGroup': parking_zones, 'campus': 'corvallis', 'page[size]': 9999}).json()
+
+        result_parking_zones = set([parking_location['attributes']['parkingZoneGroup']
+            for parking_location in multi_zone_query['data']])
+
+        self.assertEqual(parking_zones, result_parking_zones)
+
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
         links = results_with_links(locations_url, access_token)
@@ -167,7 +190,7 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a request for all locations is successful
     def test_all_locations(self):
-        query_params = {'page[number]': 1, 'page[size]': 5000}
+        query_params = {'page[number]': 1, 'page[size]': 9999}
         self.assertEqual(query_request(locations_url, access_token, "get", query_params).status_code, 200)
 
     # Tests that API response time is less than a value
