@@ -121,7 +121,7 @@ class LocationResourceTest {
         mock.demand.search() {
             String q, String campus, String type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
-            Boolean giRestroom, String parkingZoneGroup,
+            Boolean giRestroom, List<String> parkingZoneGroup,
             Integer pageNumber, Integer pageSize -> esStubData
         }
         def dao = mock.proxyInstance()
@@ -139,7 +139,7 @@ class LocationResourceTest {
                 'distanceUnit'      : "mi",
                 'isOpen'            : true,
                 'giRestroom'        : true,
-                'parkingZoneGroup'  : 'A2'
+                'parkingZoneGroup'  : ['A2', 'C']
         ]
 
         Response res = resource.list(
@@ -152,8 +152,7 @@ class LocationResourceTest {
                 (String) expectedParams['distanceUnit'],
                 (Boolean) expectedParams['isOpen'],
                 (Boolean) expectedParams['giRestroom'],
-                (String) expectedParams['parkingZoneGroup'])
-
+                (List<String>) expectedParams['parkingZoneGroup'])
         ResultObject resObj = res.entity
         String selfLinks = resObj.links["self"]
 
@@ -167,7 +166,11 @@ class LocationResourceTest {
         }
 
         expectedParams.each { param, value ->
-            assert actualParams[param] == value.toString()
+            if (value instanceof List<String>) {
+                assert actualParams[param] == value[-1]
+            } else {
+                assert actualParams[param] == value.toString()
+            }
         }
     }
 }

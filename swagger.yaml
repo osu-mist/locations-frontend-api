@@ -65,12 +65,12 @@ paths:
           type: boolean
         - in: query
           name: campus
-          description: "Name of the campus. Valid options are: corvallis and extension"
+          description: "Name of the campus. Valid options are: corvallis, extension, cascades, hmsc, and other."
           required: false
           type: string
         - in: query
           name: type
-          description: "Type of location. Valid options are: building, dining and cultural-center"
+          description: "Type of location. Valid options are: building, dining, cultural-center, parking, and other."
           required: false
           type: string
         - in: query
@@ -79,6 +79,14 @@ paths:
             If true, locations without gender inclusive restrooms will be filtered out.
           required: false
           type: boolean
+        - in: query
+          name: parkingZoneGroup
+          description: >
+            Locations in results should match the parkingZoneGroup
+            in this query parameter.
+          required: false
+          collectionFormat: multi
+          type: string
         - in: query
           name: page[size]
           description: "Number of results to return. Used in pagination."
@@ -424,6 +432,9 @@ definitions:
         type: array
         items:
           type: string
+      parkingZoneGroup:
+        description: "Zonegroup of location if location is parking"
+        type: string
 
   ServicesAttributes:
     properties:

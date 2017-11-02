@@ -73,7 +73,7 @@ class LocationResource extends Resource {
                   @QueryParam('distanceUnit') String distanceUnit,
                   @QueryParam('isOpen') Boolean isOpen,
                   @QueryParam('giRestroom') Boolean giRestroom,
-                  @QueryParam('parkingZoneGroup') String parkingZoneGroup) {
+                  @QueryParam('parkingZoneGroup') List<String> parkingZoneGroup) {
 
         try {
             if (maxPageSizeExceeded()) {
@@ -173,8 +173,8 @@ class LocationResource extends Resource {
      */
     private void setPaginationLinks(JsonNode topLevelHits, String q, String type, String campus,
                                     Double lat, Double lon, Double distance, String distanceUnit,
-                                    Boolean isOpen, Boolean giRestroom, String parkingZoneGroup,
-                                    ResultObject resultObject) {
+                                    Boolean isOpen, Boolean giRestroom,
+                                    List<String> parkingZoneGroup, ResultObject resultObject) {
 
         def totalHits = topLevelHits.get("total").asInt()
         // If no results were found, no need to add links

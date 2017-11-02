@@ -53,7 +53,7 @@ class gateway_tests(unittest.TestCase):
     # Tests that certain parameters return expected number of results
     def test_results(self):
         all_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon'}).json()
-        self.assertEqual(len(all_dixon['data']), 2)
+        self.assertEqual(len(all_dixon['data']), 3)
 
         dining_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon', 'type': 'dining'}).json()
         self.assertEqual(len(dining_dixon['data']), 1)
@@ -62,7 +62,7 @@ class gateway_tests(unittest.TestCase):
         self.assertEqual(len(building_dixon['data']), 1)
 
         # test search only from name + abbr
-        building_library = query_request(locations_url, access_token, "get", {'q': 'library', 'campus': 'corvallis'}).json()
+        building_library = query_request(locations_url, access_token, "get", {'q': 'library', 'campus': 'corvallis', 'type': 'building'}).json()
         self.assertEqual(len(building_library['data']), 1)
 
         building_library = query_request(locations_url, access_token, "get", {'q': 'vlib'}).json()
@@ -130,6 +130,29 @@ class gateway_tests(unittest.TestCase):
             self.assertGreater(attributes['giRestroomCount'], 0)
             self.assertIsNotNone(attributes['giRestroomLimit'])
 
+    # Test results for parking locations
+    def test_parking(self):
+        # Test that only parking locations are returned when they should be
+        # and each parking location has a related parkingZoneGroup
+        all_parking = query_request(locations_url, access_token, "get",
+                {'type': 'parking', 'page[size]': max_page_size}).json()
+
+        for parking_location in all_parking['data']:
+            attributes = parking_location['attributes']
+            self.assertIsNotNone(attributes['parkingZoneGroup'])
+            self.assertEqual(attributes['type'], 'parking')
+
+        # Test that a multi-query-parameter request for parkingZoneGroup
+        # only returns parking locations that match one of the specified zones
+        parking_zones = set(['A1', 'C', 'B2'])
+        multi_zone_query = query_request(locations_url, access_token, "get",
+                {'parkingZoneGroup': parking_zones, 'campus': 'corvallis', 'page[size]': max_page_size}).json()
+
+        result_parking_zones = set([parking_location['attributes']['parkingZoneGroup']
+            for parking_location in multi_zone_query['data']])
+
+        self.assertEqual(parking_zones, result_parking_zones)
+
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
         links = results_with_links(locations_url, access_token)
@@ -167,7 +190,7 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a request for all locations is successful
     def test_all_locations(self):
-        query_params = {'page[number]': 1, 'page[size]': 5000}
+        query_params = {'page[number]': 1, 'page[size]': max_page_size}
         self.assertEqual(query_request(locations_url, access_token, "get", query_params).status_code, 200)
 
     # Tests that API response time is less than a value
@@ -215,6 +238,8 @@ if __name__ == '__main__':
     url = get_url(config_path)
     access_token = get_access_token(config_path)
     single_resourse_id = get_single_resource_id(config_path)
+
+    max_page_size = 10000
 
     locations_url = url + "/locations"
     services_url = url + "/services"
