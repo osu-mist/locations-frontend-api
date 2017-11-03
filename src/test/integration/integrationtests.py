@@ -1,8 +1,18 @@
-import unittest
+import ssl
 import sys
-import json
-from api_request import *
-from configuration_load import *
+import unittest
+
+from api_request import blank_result, \
+                        check_ssl, \
+                        get_buildings_with_services, \
+                        id_request, \
+                        not_found_request, \
+                        query_request, \
+                        response_time, \
+                        results_with_links, \
+                        unauth_request
+from configuration_load import get_access_token, get_single_resource_id, get_url
+
 
 class gateway_tests(unittest.TestCase):
 
@@ -72,36 +82,36 @@ class gateway_tests(unittest.TestCase):
         dining_library = query_request(locations_url, access_token, "get", {'q': 'library', 'type': 'dining'}).json()
         self.assertEqual(len(dining_library['data']), 0)
 
-        building_engineering = query_request(locations_url, access_token, "get",
-            {'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
+        building_engineering = query_request(locations_url, access_token, "get", {
+            'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
         self.assertEqual(len(building_engineering['data']), 2)
 
     def test_geo_location(self):
         # test geo query
-        building_library = query_request(locations_url, access_token, "get",
-            {'lat': 44.565066, 'lon': -123.276147}).json()
+        building_library = query_request(locations_url, access_token, "get", {
+            'lat': 44.565066, 'lon': -123.276147}).json()
         self.assertEqual(len(building_library['data']), 10)
         self.assertEqual(building_library['data'][0]['id'], "d409d908ecc6010a04a3b0387f063145")
         self.assertEqual(type(building_library['data'][0]['attributes']['latitude']), unicode)
         self.assertEqual(type(building_library['data'][0]['attributes']['longitude']), unicode)
 
-        building_library = query_request(locations_url, access_token, "get",
-            {'lat': 44.565066, 'lon': -123.276147, 'distance': 1, 'distanceUnit': 'yd'}).json()
+        building_library = query_request(locations_url, access_token, "get", {
+            'lat': 44.565066, 'lon': -123.276147, 'distance': 1, 'distanceUnit': 'yd'}).json()
         self.assertEqual(len(building_library['data']), 1)
 
-        extensions = query_request(locations_url, access_token, "get",
-            {'lat': 44.565066, 'lon': -123.276147, 'distance': 10, 'distanceUnit': 'mi',
-            'campus':'extension'}).json()
+        extensions = query_request(locations_url, access_token, "get", {
+            'lat': 44.565066, 'lon': -123.276147, 'distance': 10, 'distanceUnit': 'mi',
+            'campus': 'extension'}).json()
         self.assertEqual(len(extensions['data']), 3)
 
-        dining_java = query_request(locations_url, access_token, "get",
-                        {'lat': 44.565066, 'lon': -123.276147, 'isopen': True, 'distanceUnit': 'yd'}).json()
+        dining_java = query_request(locations_url, access_token, "get", {
+            'lat': 44.565066, 'lon': -123.276147, 'isopen': True, 'distanceUnit': 'yd'}).json()
         self.assertEqual(len(dining_java['data']), 1)
 
     def test_geometries(self):
         # MultiPolygon location
-        building_magruder = query_request(locations_url, access_token, "get",
-            {'q': 'magruder', 'type': 'building', 'campus': 'corvallis'}).json()
+        building_magruder = query_request(locations_url, access_token, "get", {
+            'q': 'magruder', 'type': 'building', 'campus': 'corvallis'}).json()
         magruder_geometry = building_magruder['data'][0]['attributes']['geometry']
         self.assertEqual(magruder_geometry['type'], "MultiPolygon")
         self.assertEqual(len(magruder_geometry['coordinates']), 4)
@@ -113,8 +123,8 @@ class gateway_tests(unittest.TestCase):
         self.assertEqual(magruder_geometry['coordinates'][-1][0][0], magruder_geometry['coordinates'][-1][0][-1])
 
         # Polygon location
-        building_mu = query_request(locations_url, access_token, "get",
-            {'q': 'memorial', 'type': 'building', 'campus': 'corvallis'}).json()
+        building_mu = query_request(locations_url, access_token, "get", {
+            'q': 'memorial', 'type': 'building', 'campus': 'corvallis'}).json()
         mu_geometry = building_mu['data'][0]['attributes']['geometry']
         self.assertEqual(mu_geometry['type'], "Polygon")
         self.assertEqual(len(mu_geometry['coordinates']), 1)
@@ -122,8 +132,8 @@ class gateway_tests(unittest.TestCase):
 
     # Tests results of a query that should return only locations with gender inclusive restrooms
     def test_gender_inclusive_rr(self):
-        gi_rr = query_request(locations_url, access_token, "get",
-              {'giRestroom': 'true', 'page[size]': 5000}).json()
+        gi_rr = query_request(locations_url, access_token, "get", {
+            'giRestroom': 'true', 'page[size]': 5000}).json()
 
         for location in gi_rr['data']:
             attributes = location['attributes']
@@ -134,8 +144,8 @@ class gateway_tests(unittest.TestCase):
     def test_parking(self):
         # Test that only parking locations are returned when they should be
         # and each parking location has a related parkingZoneGroup
-        all_parking = query_request(locations_url, access_token, "get",
-                {'type': 'parking', 'page[size]': max_page_size}).json()
+        all_parking = query_request(locations_url, access_token, "get", {
+            'type': 'parking', 'page[size]': max_page_size}).json()
 
         for parking_location in all_parking['data']:
             attributes = parking_location['attributes']
@@ -145,11 +155,10 @@ class gateway_tests(unittest.TestCase):
         # Test that a multi-query-parameter request for parkingZoneGroup
         # only returns parking locations that match one of the specified zones
         parking_zones = set(['A1', 'C', 'B2'])
-        multi_zone_query = query_request(locations_url, access_token, "get",
-                {'parkingZoneGroup': parking_zones, 'campus': 'corvallis', 'page[size]': max_page_size}).json()
+        multi_zone_query = query_request(locations_url, access_token, "get", {
+            'parkingZoneGroup': parking_zones, 'campus': 'corvallis', 'page[size]': max_page_size}).json()
 
-        result_parking_zones = set([parking_location['attributes']['parkingZoneGroup']
-            for parking_location in multi_zone_query['data']])
+        result_parking_zones = set([parking_location['attributes']['parkingZoneGroup'] for parking_location in multi_zone_query['data']])
 
         self.assertEqual(parking_zones, result_parking_zones)
 
@@ -168,12 +177,12 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a nonexistent campus returns a 404
     def test_not_found(self):
-        self.assertEqual(not_found_request(locations_url, access_token,
-            {'q': 'Hello world', 'campus': 'Pluto'}).status_code, 404)
-        self.assertEqual(not_found_request(locations_url, access_token,
-            {'q': 'Hello world', 'type': 'invalid-type'}).status_code, 404)
-        self.assertEqual(not_found_request(locations_url, access_token,
-            {'q': 'Hello world', 'campus': 'Pluto', 'type': 'invalid-type'}).status_code, 404)
+        self.assertEqual(not_found_request(locations_url, access_token, {
+            'q': 'Hello world', 'campus': 'Pluto'}).status_code, 404)
+        self.assertEqual(not_found_request(locations_url, access_token, {
+            'q': 'Hello world', 'type': 'invalid-type'}).status_code, 404)
+        self.assertEqual(not_found_request(locations_url, access_token, {
+            'q': 'Hello world', 'campus': 'Pluto', 'type': 'invalid-type'}).status_code, 404)
 
     # Tests that a 404 response contains correct JSON fields
     def test_not_found_results(self):
@@ -221,11 +230,12 @@ class gateway_tests(unittest.TestCase):
             self.skipTest('SSLv3 support not available')
         self.assertFalse(check_ssl(ssl.PROTOCOL_SSLv3, locations_url, access_token))
 
+
 if __name__ == '__main__':
     options_tpl = ('-i', 'config_path')
     del_list = []
 
-    for i,config_path in enumerate(sys.argv):
+    for i, config_path in enumerate(sys.argv):
         if config_path in options_tpl:
             del_list.append(i)
             del_list.append(i+1)
