@@ -1,6 +1,7 @@
 import ssl
 import sys
 import unittest
+from datetime import datetime
 
 from api_request import blank_result, \
                         check_ssl, \
@@ -161,6 +162,37 @@ class gateway_tests(unittest.TestCase):
         result_parking_zones = set([parking_location['attributes']['parkingZoneGroup'] for parking_location in multi_zone_query['data']])
 
         self.assertEqual(parking_zones, result_parking_zones)
+
+    # Test results returned with isOpen=true are actually open given what their openHours say
+    def test_isopen(self):
+        def test_resource(resource_url):
+            all_open_resources = query_request(
+                resource_url,
+                access_token,
+                'get',
+                {'page[size]': max_page_size, 'isOpen': 'true'}
+            ).json()
+
+            now = datetime.utcnow().replace(microsecond=0).isoformat()
+            weekday = str(datetime.today().weekday() + 1)
+
+            for open_resource in all_open_resources['data']:
+                # Test that only open resources are returned when they should be and each open resource has a related open hours
+                open_hours = open_resource['attributes']['openHours']
+                self.assertIsNotNone(open_hours)
+
+                # If there are not only one open hours, current time should be in one of these open hours intervals
+                if len(open_hours[weekday]) > 1:
+                    is_open = False
+                    for open_hour in open_hours[weekday]:
+                        if open_hour['start'][:-1] < now < open_hour['end'][:-1]:
+                            is_open = True
+                            self.assertTrue(is_open)
+                else:
+                    self.assertTrue(open_hours[weekday][0]['start'][:-1] < now < open_hours[weekday][0]['end'][:-1])
+
+        test_resource(locations_url)
+        test_resource(services_url)
 
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
