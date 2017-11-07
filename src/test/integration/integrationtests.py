@@ -183,13 +183,9 @@ class gateway_tests(unittest.TestCase):
 
                 # If there are not only one open hours, current time should be in one of these open hours intervals
                 if len(open_hours[weekday]) > 1:
-                    is_open = False
-                    for open_hour in open_hours[weekday]:
-                        if open_hour['start'][:-1] < now < open_hour['end'][:-1]:
-                            is_open = True
-                            self.assertTrue(is_open)
+                    self.assertTrue(any(open_hour['start'] <= now + 'Z' <= open_hour['end'] for open_hour in open_hours[weekday]))
                 else:
-                    self.assertTrue(open_hours[weekday][0]['start'][:-1] < now < open_hours[weekday][0]['end'][:-1])
+                    self.assertTrue(open_hours[weekday][0]['start'] <= now + 'Z' <= open_hours[weekday][0]['end'])
 
         test_resource(locations_url)
         test_resource(services_url)
