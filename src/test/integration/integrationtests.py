@@ -180,12 +180,7 @@ class gateway_tests(unittest.TestCase):
                 # Test that only open resources are returned when they should be and each open resource has a related open hours
                 open_hours = open_resource['attributes']['openHours']
                 self.assertIsNotNone(open_hours)
-
-                # If there are not only one open hours, current time should be in one of these open hours intervals
-                if len(open_hours[weekday]) > 1:
-                    self.assertTrue(any(open_hour['start'] <= now + 'Z' <= open_hour['end'] for open_hour in open_hours[weekday]))
-                else:
-                    self.assertTrue(open_hours[weekday][0]['start'] <= now + 'Z' <= open_hours[weekday][0]['end'])
+                self.assertTrue(any(open_hour['start'] <= now + 'Z' <= open_hour['end'] for open_hour in open_hours[weekday]))
 
         test_resource(locations_url)
         test_resource(services_url)
