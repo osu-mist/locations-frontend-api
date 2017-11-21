@@ -57,22 +57,18 @@ class LocationMapper {
         def now = DateTime.now(DateTimeZone.UTC)
         def weekday = DateTime.now().getDayOfWeek()
 
-        if (!ro?.attributes?.openHours) {
+        if (!ro?.attributes?.openHours || !ro?.attributes?.openHours[weekday.toString()]) {
             ro?.attributes?.isOpen = null
         } else {
             def openHours = ro?.attributes?.openHours[weekday.toString()]
-            if (openHours) {
-                def start, end
-                ro?.attributes?.isOpen = false
-                openHours.each {
-                    start = DateTime.parse(it.get('start'))
-                    end = DateTime.parse(it.get('end'))
-                    if (now.compareTo(start) >= 0 && now.compareTo(end) < 0) {
-                        ro?.attributes?.isOpen = true
-                    }
+            def start, end
+            ro?.attributes?.isOpen = false
+            openHours.each {
+                start = DateTime.parse(it.get('start'))
+                end = DateTime.parse(it.get('end'))
+                if (now.compareTo(start) >= 0 && now.compareTo(end) < 0) {
+                    ro?.attributes?.isOpen = true
                 }
-            } else {
-                ro?.attributes?.isOpen = null
             }
         }
     }
