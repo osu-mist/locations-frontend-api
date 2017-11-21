@@ -421,6 +421,8 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/DayHours"
+      isOpen:
+        type: boolean
       distance:
         description: "Distance from given location in given distance unit.
               This is only returned when the query parameters lat and lon are specified.
