@@ -30,4 +30,5 @@ class Attributes {
     String giRestroomLocations
     String parkingZoneGroup
     List<String> synonyms
+    Boolean isOpen
 }
