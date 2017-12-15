@@ -206,7 +206,7 @@ class LocationDAO {
 
         if (q) {
             // TODO: should this also search bldgID?
-            query.filter(QueryBuilders.multiMatchQuery(q,
+            query.must(QueryBuilders.multiMatchQuery(q,
                     "attributes.name", "attributes.abbreviation"))
         }
 
@@ -236,6 +236,7 @@ class LocationDAO {
         }
 
         req.setQuery(query)
+        req.addSort(SortBuilders.scoreSort())
         req
     }
 

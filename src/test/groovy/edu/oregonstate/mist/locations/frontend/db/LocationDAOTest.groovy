@@ -49,14 +49,17 @@ public class LocationDAOTest {
   "size" : 10,
   "query" : {
     "bool" : {
-      "filter" : {
+      "must" : {
         "multi_match" : {
           "query" : "hello",
           "fields" : [ "attributes.name", "attributes.abbreviation" ]
         }
       }
     }
-  }
+  },
+  "sort" : [ {
+    "_score" : { }
+  } ]
 }''', request.toString())
     }
 
@@ -70,22 +73,24 @@ public class LocationDAOTest {
   "size" : 10,
   "query" : {
     "bool" : {
-      "must" : {
+      "must" : [ {
         "match" : {
           "attributes.campus" : {
             "query" : "corvallis",
             "type" : "boolean"
           }
         }
-      },
-      "filter" : {
+      }, {
         "multi_match" : {
           "query" : "building",
           "fields" : [ "attributes.name", "attributes.abbreviation" ]
         }
-      }
+      } ]
     }
-  }
+  },
+  "sort" : [ {
+    "_score" : { }
+  } ]
 }''', request.toString())
     }
 
@@ -99,22 +104,24 @@ public class LocationDAOTest {
   "size" : 10,
   "query" : {
     "bool" : {
-      "must" : {
+      "must" : [ {
         "match" : {
           "attributes.tags" : {
             "query" : "cultural-center",
             "type" : "boolean"
           }
         }
-      },
-      "filter" : {
+      }, {
         "multi_match" : {
           "query" : "building",
           "fields" : [ "attributes.name", "attributes.abbreviation" ]
         }
-      }
+      } ]
     }
-  }
+  },
+  "sort" : [ {
+    "_score" : { }
+  } ]
 }''', request.toString())
     }
 
@@ -129,22 +136,24 @@ public class LocationDAOTest {
   "size" : 10,
   "query" : {
     "bool" : {
-      "must" : {
+      "must" : [ {
         "match" : {
           "attributes.type" : {
             "query" : "dining",
             "type" : "boolean"
           }
         }
-      },
-      "filter" : {
+      }, {
         "multi_match" : {
           "query" : "building",
           "fields" : [ "attributes.name", "attributes.abbreviation" ]
         }
-      }
+      } ]
     }
-  }
+  },
+  "sort" : [ {
+    "_score" : { }
+  } ]
 }''', request.toString())
     }
 
@@ -159,17 +168,18 @@ public class LocationDAOTest {
   "size" : 10,
   "query" : {
     "bool" : {
-      "filter" : [ {
+      "must" : {
         "multi_match" : {
           "query" : "building",
           "fields" : [ "attributes.name", "attributes.abbreviation" ]
         }
-      }, {
+      },
+      "filter" : {
         "geo_distance" : {
           "attributes.geoLocation" : [ -71.13051, 42.39561 ],
           "distance" : "2miles"
         }
-      } ]
+      }
     }
   },
   "sort" : [ {
@@ -181,6 +191,8 @@ public class LocationDAOTest {
       "unit" : "km",
       "distance_type" : "plane"
     }
+  }, {
+    "_score" : { }
   } ]
 }''')
     }
@@ -196,12 +208,13 @@ public class LocationDAOTest {
   "size" : 10,
   "query" : {
     "bool" : {
-      "filter" : [ {
+      "must" : {
         "multi_match" : {
           "query" : "building",
           "fields" : [ "attributes.name", "attributes.abbreviation" ]
         }
-      }, {
+      },
+      "filter" : {
         "nested" : {
           "query" : {
             "bool" : {
@@ -228,9 +241,12 @@ public class LocationDAOTest {
           },
           "path" : "attributes.openHours.1"
         }
-      } ]
+      }
     }
-  }
+  },
+  "sort" : [ {
+    "_score" : { }
+  } ]
 }''')
     }
 
