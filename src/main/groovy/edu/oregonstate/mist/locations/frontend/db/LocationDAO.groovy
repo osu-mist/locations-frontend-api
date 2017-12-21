@@ -206,6 +206,8 @@ class LocationDAO {
 
         if (q) {
             // TODO: should this also search bldgID?
+            // TODO: change to AND, but also add some fuzziness
+            // TODO: handle name and abbreviation differently
             query.must(QueryBuilders.multiMatchQuery(q,
                     "attributes.name", "attributes.abbreviation"))
         }
