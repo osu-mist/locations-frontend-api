@@ -9,7 +9,6 @@ import org.elasticsearch.client.Client
 import org.elasticsearch.common.geo.GeoDistance
 import org.elasticsearch.common.unit.DistanceUnit
 import org.elasticsearch.index.query.QueryBuilders
-import org.elasticsearch.index.query.MatchQueryBuilder
 import org.elasticsearch.search.sort.SortBuilders
 import org.elasticsearch.search.sort.SortOrder
 import org.slf4j.Logger
@@ -207,11 +206,8 @@ class LocationDAO {
 
         if (q) {
             // TODO: should this also search bldgID?
-            query.must(
-                QueryBuilders.multiMatchQuery(q,
-                    "attributes.name", "attributes.abbreviation")
-                .operator(MatchQueryBuilder.Operator.AND)
-            )
+            query.must(QueryBuilders.multiMatchQuery(q,
+                    "attributes.name", "attributes.abbreviation"))
         }
 
         if (lat && lon) {
