@@ -2,6 +2,8 @@ package edu.oregonstate.mist.locations.frontend.mapper
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import edu.oregonstate.mist.api.jsonapi.ResourceObject
 
 class LocationMapper {
@@ -50,5 +52,24 @@ class LocationMapper {
 
         // hashCode is used as metadata in ES. No need to expose it
         ro?.attributes?.remove("hashCode")
+
+        // expose isOpen field
+        def now = DateTime.now(DateTimeZone.UTC)
+        def weekday = DateTime.now().getDayOfWeek()
+
+        if (!ro?.attributes?.openHours || !ro?.attributes?.openHours[weekday.toString()]) {
+            ro?.attributes?.isOpen = null
+        } else {
+            def openHours = ro?.attributes?.openHours[weekday.toString()]
+            def start, end
+            ro?.attributes?.isOpen = false
+            openHours.each {
+                start = DateTime.parse(it.get('start'))
+                end = DateTime.parse(it.get('end'))
+                if (now.compareTo(start) >= 0 && now.compareTo(end) < 0) {
+                    ro?.attributes?.isOpen = true
+                }
+            }
+        }
     }
 }

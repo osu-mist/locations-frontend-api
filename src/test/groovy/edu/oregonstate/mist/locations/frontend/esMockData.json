@@ -20,7 +20,30 @@
                 "attributes": {
                     "name": "MF Building",
                     "tags": [],
-                    "openHours": {},
+                    "openHours": {
+                        "1": [
+                            {
+                                "start": "2017-11-20T15:00:00Z",
+                                "end": "2017-11-21T06:00:00Z"
+                            }
+                        ],
+                        "2": [
+                            {
+                                "start": "2017-11-21T15:00:00Z",
+                                "end": "2017-11-22T06:00:00Z"
+                            }
+                        ],
+                        "3": [
+                            {
+                                "start": "2017-11-22T15:00:00Z",
+                                "end": "2017-11-22T23:00:00Z"
+                            }
+                        ],
+                        "4": [],
+                        "5": [],
+                        "6": [],
+                        "7": []
+                    },
                     "type": "building",
                     "parent": null,
                     "locationId": null,
@@ -80,7 +103,61 @@
                 "attributes": {
                     "name": "FF Lab Feed",
                     "tags": [],
-                    "openHours": {},
+                    "openHours": {
+                        "1": [
+                            {
+                                "start": "2017-11-20T19:00:00Z",
+                                "end": "2017-11-20T22:00:00Z"
+                            },
+                            {
+                                "start": "2017-11-21T02:30:00Z",
+                                "end": "2017-11-21T06:00:00Z"
+                            }
+                        ],
+                        "2": [
+                            {
+                                "start": "2017-11-21T19:00:00Z",
+                                "end": "2017-11-21T22:00:00Z"
+                            },
+                            {
+                                "start": "2017-11-22T02:30:00Z",
+                                "end": "2017-11-22T06:00:00Z"
+                            }
+                        ],
+                        "3": [
+                            {
+                                "start": "2017-11-22T19:00:00Z",
+                                "end": "2017-11-22T22:00:00Z"
+                            },
+                            {
+                                "start": "2017-11-23T02:30:00Z",
+                                "end": "2017-11-23T06:00:00Z"
+                            }
+                        ],
+                        "4": [
+                            {
+                                "start": "2017-11-23T19:00:00Z",
+                                "end": "2017-11-23T22:00:00Z"
+                            },
+                            {
+                                "start": "2017-11-24T02:30:00Z",
+                                "end": "2017-11-24T06:00:00Z"
+                            }
+                        ],
+                        "5": [
+                            {
+                                "start": "2017-11-24T19:00:00Z",
+                                "end": "2017-11-24T22:00:00Z"
+                            }
+                        ],
+                        "6": [
+                            {
+                                "start": "2017-11-26T01:30:00Z",
+                                "end": "2017-11-26T04:30:00Z"
+                            }
+                        ],
+                        "7": []
+                    },
                     "type": "building",
                     "parent": null,
                     "locationId": null,
@@ -249,7 +326,7 @@
                     "county": null,
                     "telephone": null,
                     "fax": null,
-                    "thum                                                                bnails": [],
+                    "thumbnails": [],
                     "images": [],
                     "departments": [],
                     "website": null,
@@ -682,7 +759,7 @@
                     "giRestroomLimit": null,
                     "giRestroomLocations": null,
                     "synonyms": [],
-                    "h                                                                ashCode": 263034665
+                    "hashCode": 263034665
                 },
                 "links": {
                     "self": "https://api.oregonstate.edu/v1/locations/795cb5d2efcf328261e0c418fd9becf4"

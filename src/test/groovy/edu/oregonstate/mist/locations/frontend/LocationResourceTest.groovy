@@ -6,6 +6,9 @@ import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.resources.LocationResource
 import groovy.mock.interceptor.MockFor
 import io.dropwizard.testing.junit.DropwizardAppRule
+import org.joda.time.DateTimeUtils
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.junit.ClassRule
 import org.junit.Test
 
@@ -170,6 +173,43 @@ class LocationResourceTest {
                 assert actualParams[param] == value[-1]
             } else {
                 assert actualParams[param] == value.toString()
+            }
+        }
+    }
+    @Test
+    public void testIsOpen() {
+        String esStubData = new File(
+                "src/test/groovy/edu/oregonstate/mist/locations/frontend/esMockData.json").text
+
+        def mock = new MockFor(LocationDAO)
+        mock.demand.search() {
+            String q, String campus, String type, Double lat,
+            Double lon, String searchDistance, Boolean isOpen, Integer weekday,
+            Boolean giRestroom, List<String> parkingZoneGroup,
+            Integer pageNumber, Integer pageSize -> esStubData
+        }
+
+        def dao = mock.proxyInstance()
+        def resource = new LocationResource(dao, endpointUri)
+        resource.uriInfo = new MockUriInfo()
+
+        def noResultRsp = resource.list(null, null,
+                null, null, null, null, null, null, false, null)
+
+        noResultRsp.entity.data.attributes.each {
+
+            DateTimeUtils.setCurrentMillisFixed(new DateTime(2017, 11, 21, 14, 19).getMillis())
+            new DateTime(DateTimeZone.UTC)
+
+            // Test: no openHours
+            if (!it.openHours) {
+                assert it.isOpen == null
+            // Test: not open location
+            } else if (it.name == "FF Lab Feed") {
+                assert it.isOpen == false
+            // Test: open location
+            } else if (it.name == "MF Building") {
+                assert it.isOpen == true
             }
         }
     }
