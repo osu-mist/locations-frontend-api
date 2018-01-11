@@ -7,7 +7,6 @@ import edu.oregonstate.mist.api.Resource
 import edu.oregonstate.mist.api.jsonapi.CooridinateGeometry
 import edu.oregonstate.mist.api.jsonapi.GeoJsonResultObject
 import edu.oregonstate.mist.api.jsonapi.Geometries
-import edu.oregonstate.mist.api.jsonapi.Geometry
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
@@ -242,28 +241,7 @@ class LocationResource extends Resource {
             resultObject.data = LocationMapper.map(esResponse)
 
             if (geojson) {
-                def ro = resultObject.data
-                def geojsonResultObject = new GeoJsonResultObject()
-
-                def geoPolygon = ro.attributes.geometry
-                def geoPoint = new CooridinateGeometry(
-                    type: "Point",
-                    coordinates: [
-                        ro.attributes.longitude.toFloat(),
-                        ro.attributes.latitude.toFloat()]
-                )
-                def geometries = new Geometries(
-                    type: "GeometryCollection",
-                    geometries: [geoPolygon, geoPoint])
-
-                ro.attributes.remove("geometry")
-                ro.attributes.remove("longitude")
-                ro.attributes.remove("latitude")
-
-                geojsonResultObject.type = "Feature"
-                geojsonResultObject.geometry = geometries
-                geojsonResultObject.properties = ro.attributes
-
+                def geojsonResultObject = toGeoJson(resultObject)
                 return ok(geojsonResultObject).build()
             }
 
@@ -305,6 +283,32 @@ class LocationResource extends Resource {
             internalServerError("Woot you found a bug for us to fix!").build()
         }
 
+    }
+
+    private static toGeoJson(ResultObject resultObject) {
+        def ro = resultObject?.data
+        def geojsonResultObject = new GeoJsonResultObject()
+
+        def geoPolygon = ro?.attributes?.geometry
+        def geoPoint = new CooridinateGeometry(
+                type: "Point",
+                coordinates: [
+                        ro?.attributes?.longitude?.toFloat(),
+                        ro?.attributes?.latitude?.toFloat()]
+        )
+        def geometries = new Geometries(
+                type: "GeometryCollection",
+                geometries: [geoPolygon, geoPoint])
+
+        ["geometry", "longitude", "latitude"].each {
+            ro?.attributes?.remove(it)
+        }
+
+        geojsonResultObject?.type = "Feature"
+        geojsonResultObject?.geometry = geometries
+        geojsonResultObject?.properties = ro?.attributes
+
+        geojsonResultObject
     }
 
     /**
