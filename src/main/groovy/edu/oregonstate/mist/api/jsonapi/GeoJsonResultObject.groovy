@@ -9,10 +9,10 @@ class Geometry {
 
 class Geometries extends Geometry {
     @JsonProperty("geometries")
-    List<Geometry> geometries
+    def geometries
 }
 
-class CooridinateGeometry extends Geometry {
+class GeoCooridinate extends Geometry {
     @JsonProperty("coordinates")
     List<Object> coordinates
 }
@@ -20,8 +20,19 @@ class CooridinateGeometry extends Geometry {
 class GeoJsonResultObject {
     @JsonProperty("type")
     String type
+}
+
+class GeoFeature extends GeoJsonResultObject {
+    String type = "Feature"
     @JsonProperty("geometry")
     Geometry geometry
     @JsonProperty("properties")
-    Object properties
+    def properties
 }
+
+class GeoFeatureCollection extends GeoJsonResultObject {
+    String type = "FeatureCollection"
+    @JsonProperty("features")
+    List<GeoFeature> features = []
+}
+

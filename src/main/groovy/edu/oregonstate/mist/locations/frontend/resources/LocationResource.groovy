@@ -4,9 +4,12 @@ import com.codahale.metrics.annotation.Timed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.Resource
-import edu.oregonstate.mist.api.jsonapi.CooridinateGeometry
-import edu.oregonstate.mist.api.jsonapi.GeoJsonResultObject
+import edu.oregonstate.mist.api.jsonapi.GeoCooridinate
+import edu.oregonstate.mist.api.jsonapi.GeoFeature
+import edu.oregonstate.mist.api.jsonapi.GeoFeatureCollection
 import edu.oregonstate.mist.api.jsonapi.Geometries
+import edu.oregonstate.mist.api.jsonapi.Geometry
+import edu.oregonstate.mist.api.jsonapi.ResourceObject
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
@@ -124,6 +127,11 @@ class LocationResource extends Resource {
             setPaginationLinks(topLevelHits, q, type, campus,
                     lat, lon, distance, distanceUnit,
                     isOpen, giRestroom, parkingZoneGroup, resultObject)
+
+            if (geojson) {
+                def geojsonResultObject = toGeoJson(resultObject)
+                return ok(geojsonResultObject).build()
+            }
 
             ok(resultObject).build()
         } catch (Exception e) {
@@ -286,26 +294,50 @@ class LocationResource extends Resource {
     }
 
     private static toGeoJson(ResultObject resultObject) {
+        def geojsonResultObject
         def ro = resultObject?.data
-        def geojsonResultObject = new GeoJsonResultObject()
+
+        if (ro instanceof List) {
+            geojsonResultObject = new GeoFeatureCollection()
+            ro.each {
+                geojsonResultObject?.features += adjustGeoFeature(it)
+            }
+        } else {
+            geojsonResultObject = adjustGeoFeature(ro)
+        }
+
+        geojsonResultObject
+    }
+
+    private static GeoFeature adjustGeoFeature(ResourceObject ro) {
+        def geojsonResultObject = new GeoFeature()
 
         def geoPolygon = ro?.attributes?.geometry
-        def geoPoint = new CooridinateGeometry(
-                type: "Point",
-                coordinates: [
-                        ro?.attributes?.longitude?.toFloat(),
-                        ro?.attributes?.latitude?.toFloat()]
-        )
-        def geometries = new Geometries(
-                type: "GeometryCollection",
-                geometries: [geoPolygon, geoPoint])
+        def geoPoint
+        def geometry
+
+        if (!ro?.attributes?.longitude || !ro?.attributes?.latitude) {
+            geometry = new GeoCooridinate()
+            geometry?.type = geoPolygon.type
+            geometry?.coordinates = geoPolygon.coordinates
+        } else {
+            geoPoint = new GeoCooridinate(
+                    type: "Point",
+                    coordinates: [
+                            ro?.attributes?.longitude?.toFloat(),
+                            ro?.attributes?.latitude?.toFloat()]
+            )
+
+            geometry = new Geometries(
+                    type: "GeometryCollection",
+                    geometries: [geoPolygon, geoPoint])
+        }
 
         ["geometry", "longitude", "latitude"].each {
             ro?.attributes?.remove(it)
         }
 
-        geojsonResultObject?.type = "Feature"
-        geojsonResultObject?.geometry = geometries
+        geojsonResultObject?.geometry = geometry
         geojsonResultObject?.properties = ro
 
         geojsonResultObject
