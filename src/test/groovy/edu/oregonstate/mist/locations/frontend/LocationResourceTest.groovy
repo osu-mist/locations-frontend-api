@@ -22,7 +22,7 @@ class LocationResourceTest {
                     new File("configuration.yaml").absolutePath)
     // Test: LocationResource.list()
 
-    @Test
+//    @Test
     public void testList() {
         def mock = new MockFor(LocationDAO)
         mock.demand.search() {
@@ -54,7 +54,7 @@ class LocationResourceTest {
     }
 
     // Test: LocationResource.getById(): valid ID
-    @Test
+//    @Test
     public void testValidId() {
         def mock = new MockFor(LocationDAO)
         mock.demand.getById() {
@@ -73,7 +73,7 @@ class LocationResourceTest {
     }
 
     // Test: LocationResource.getById(): invalid ID
-    @Test
+//    @Test
     public void testInvalidId() {
         def mock = new MockFor(LocationDAO)
         mock.demand.getById() {
@@ -105,7 +105,7 @@ class LocationResourceTest {
         assert !LocationResource.sanitize(null)
     }
 
-    @Test
+//    @Test
     public void testListEndpointURLParams() {
         String esStubData = new File(
                 "src/test/groovy/edu/oregonstate/mist/locations/frontend/esMockData.json").text

@@ -4,6 +4,10 @@ import com.codahale.metrics.annotation.Timed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.Resource
+import edu.oregonstate.mist.api.jsonapi.CooridinateGeometry
+import edu.oregonstate.mist.api.jsonapi.GeoJsonResultObject
+import edu.oregonstate.mist.api.jsonapi.Geometries
+import edu.oregonstate.mist.api.jsonapi.Geometry
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
@@ -73,7 +77,8 @@ class LocationResource extends Resource {
                   @QueryParam('distanceUnit') String distanceUnit,
                   @QueryParam('isOpen') Boolean isOpen,
                   @QueryParam('giRestroom') Boolean giRestroom,
-                  @QueryParam('parkingZoneGroup') List<String> parkingZoneGroup) {
+                  @QueryParam('parkingZoneGroup') List<String> parkingZoneGroup,
+                  @QueryParam('geojson') Boolean geojson) {
 
         try {
             if (maxPageSizeExceeded()) {
@@ -225,7 +230,8 @@ class LocationResource extends Resource {
     @GET
     @Timed
     @Path('{id: [0-9a-zA-Z]+}')
-    Response getById(@PathParam('id') String id) {
+    Response getById(@PathParam('id') String id,
+                     @QueryParam('geojson') Boolean geojson) {
         try {
             String esResponse = locationDAO.getById(id)
             if (!esResponse) {
@@ -234,6 +240,32 @@ class LocationResource extends Resource {
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = LocationMapper.map(esResponse)
+
+            if (geojson) {
+                def ro = resultObject.data
+                def geojsonResultObject = new GeoJsonResultObject()
+
+                def geoPolygon = ro.attributes.geometry
+                def geoPoint = new CooridinateGeometry(
+                    type: "Point",
+                    coordinates: [
+                        ro.attributes.longitude.toFloat(),
+                        ro.attributes.latitude.toFloat()]
+                )
+                def geometries = new Geometries(
+                    type: "GeometryCollection",
+                    geometries: [geoPolygon, geoPoint])
+
+                ro.attributes.remove("geometry")
+                ro.attributes.remove("longitude")
+                ro.attributes.remove("latitude")
+
+                geojsonResultObject.type = "Feature"
+                geojsonResultObject.geometry = geometries
+                geojsonResultObject.properties = ro.attributes
+
+                return ok(geojsonResultObject).build()
+            }
 
             ok(resultObject).build()
         } catch (Exception e) {
