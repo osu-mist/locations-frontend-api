@@ -306,7 +306,7 @@ class LocationResource extends Resource {
 
         geojsonResultObject?.type = "Feature"
         geojsonResultObject?.geometry = geometries
-        geojsonResultObject?.properties = ro?.attributes
+        geojsonResultObject?.properties = ro
 
         geojsonResultObject
     }
