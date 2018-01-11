@@ -312,25 +312,40 @@ class LocationResource extends Resource {
     private static GeoFeature adjustGeoFeature(ResourceObject ro) {
         def geojsonResultObject = new GeoFeature()
 
-        def geoPolygon = ro?.attributes?.geometry
-        def geoPoint
+        def geoPolygon, geoPoint
         def geometry
 
+        // adjust geoPolygon
+        if (!ro?.attributes?.geometry?.type || !ro?.attributes?.geometry?.coordinates) {
+            geoPolygon = null
+        } else {
+            geoPolygon = ro?.attributes?.geometry
+        }
+
+        // adjust geoPoint
         if (!ro?.attributes?.longitude || !ro?.attributes?.latitude) {
-            geometry = new GeoCooridinate()
-            geometry?.type = geoPolygon.type
-            geometry?.coordinates = geoPolygon.coordinates
+            geoPoint = null
         } else {
             geoPoint = new GeoCooridinate(
-                    type: "Point",
-                    coordinates: [
-                            ro?.attributes?.longitude?.toFloat(),
-                            ro?.attributes?.latitude?.toFloat()]
+                type: "Point",
+                coordinates: [
+                    ro?.attributes?.longitude?.toFloat(),
+                    ro?.attributes?.latitude?.toFloat()]
             )
+        }
 
-            geometry = new Geometries(
-                    type: "GeometryCollection",
-                    geometries: [geoPolygon, geoPoint])
+        if (geoPolygon && geoPoint) {
+            geometry = new Geometries()
+            geometry?.type = "GeometryCollection"
+            geometry?.geometries = [geoPolygon, geoPoint]
+        } else if (geoPolygon && !geoPoint) {
+            geometry = new GeoCooridinate()
+            geometry?.type = geoPolygon?.type
+            geometry?.coordinates = geoPolygon?.coordinates
+        } else if (!geoPolygon && geoPoint) {
+            geometry = new GeoCooridinate()
+            geometry?.type = geoPoint?.type
+            geometry?.coordinates = geoPoint?.coordinates
         }
 
         ["geometry", "longitude", "latitude"].each {
