@@ -8,7 +8,6 @@ import edu.oregonstate.mist.api.jsonapi.GeoCooridinate
 import edu.oregonstate.mist.api.jsonapi.GeoFeature
 import edu.oregonstate.mist.api.jsonapi.GeoFeatureCollection
 import edu.oregonstate.mist.api.jsonapi.Geometries
-import edu.oregonstate.mist.api.jsonapi.Geometry
 import edu.oregonstate.mist.api.jsonapi.ResourceObject
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.api.jsonapi.ResultObject
@@ -298,7 +297,7 @@ class LocationResource extends Resource {
         def ro = resultObject?.data
 
         if (ro instanceof List) {
-            geojsonResultObject = new GeoFeatureCollection()
+            geojsonResultObject = new GeoFeatureCollection(type: "FeatureCollection")
             ro.each {
                 geojsonResultObject?.features += adjustGeoFeature(it)
             }
@@ -310,27 +309,25 @@ class LocationResource extends Resource {
     }
 
     private static GeoFeature adjustGeoFeature(ResourceObject ro) {
-        def geojsonResultObject = new GeoFeature()
+        def geojsonResultObject = new GeoFeature(type: "Feature")
 
-        def geoPolygon, geoPoint
+        def geoPolygon = null
+        def geoPoint = null
         def geometry
 
         // adjust geoPolygon
-        if (!ro?.attributes?.geometry?.type || !ro?.attributes?.geometry?.coordinates) {
-            geoPolygon = null
-        } else {
+        if (ro?.attributes?.geometry?.type && ro?.attributes?.geometry?.coordinates) {
             geoPolygon = ro?.attributes?.geometry
         }
 
         // adjust geoPoint
-        if (!ro?.attributes?.longitude || !ro?.attributes?.latitude) {
-            geoPoint = null
-        } else {
+        if (ro?.attributes?.longitude && ro?.attributes?.latitude) {
             geoPoint = new GeoCooridinate(
                 type: "Point",
                 coordinates: [
                     ro?.attributes?.longitude?.toFloat(),
-                    ro?.attributes?.latitude?.toFloat()]
+                    ro?.attributes?.latitude?.toFloat()
+                ]
             )
         }
 
@@ -338,14 +335,13 @@ class LocationResource extends Resource {
             geometry = new Geometries()
             geometry?.type = "GeometryCollection"
             geometry?.geometries = [geoPolygon, geoPoint]
-        } else if (geoPolygon && !geoPoint) {
+        } else if (!(geoPolygon || geoPoint)) {
+            geometry = null
+        } else {
+            def coordinates = [geoPolygon, geoPoint].find { it }
             geometry = new GeoCooridinate()
-            geometry?.type = geoPolygon?.type
-            geometry?.coordinates = geoPolygon?.coordinates
-        } else if (!geoPolygon && geoPoint) {
-            geometry = new GeoCooridinate()
-            geometry?.type = geoPoint?.type
-            geometry?.coordinates = geoPoint?.coordinates
+            geometry?.type = coordinates?.type
+            geometry?.coordinates = coordinates?.coordinates
         }
 
         ["geometry", "longitude", "latitude"].each {

@@ -23,7 +23,6 @@ class GeoJsonResultObject {
 }
 
 class GeoFeature extends GeoJsonResultObject {
-    String type = "Feature"
     @JsonProperty("geometry")
     Geometry geometry
     @JsonProperty("properties")
@@ -31,7 +30,6 @@ class GeoFeature extends GeoJsonResultObject {
 }
 
 class GeoFeatureCollection extends GeoJsonResultObject {
-    String type = "FeatureCollection"
     @JsonProperty("features")
     List<GeoFeature> features = []
 }
