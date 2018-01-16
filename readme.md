@@ -343,7 +343,7 @@ Locations API provides [GeoJSON](https://tools.ietf.org/html/rfc7946) format for
 
 ### /locations?geojson=true
 
-This resource returns a GeoJSON object with `"type": "FeatureCollection"` no matter how many locations are retrieved.
+This resource returns a GeoJSON object with `"type": "FeatureCollection"` no matter how many locations are retrieved:
 
 ```json
 {
@@ -369,308 +369,308 @@ Note that for each GeoJSON object with `"type": "Feature"` under the member `"fe
 
 This resource returns a GeoJSON object with `"type": "Feature"` since it will only return one single object. However, there are three different cases which might be happened:
 
-1. `Point && Polygon`
+1. **Point && Polygon**
 
-Most of locations contain both `Point` (latitude and longitude) and `Polygon` attributes. If both attributes exist, they will be wrapped as a `type: GeometryCollection` GeoJSON object as following:
+    Most of locations contain both `Point` (latitude and longitude) and `Polygon` attributes. If both attributes exist, they will be wrapped as a `type: GeometryCollection` GeoJSON object as following:
 
-```json
-{
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "GeometryCollection",
-                "geometries": [
-                    {
-                        "type": "Polygon",
-                        "coordinates": [...]
+    ```json
+    {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "GeometryCollection",
+                    "geometries": [
+                        {
+                            "type": "Polygon",
+                            "coordinates": [...]
+                        },
+                        {
+                            "type": "Point",
+                            "coordinates": [...]
+                        }
+                    ]
+                },
+                "properties": {
+                    "id": "b018683aa0e551280d1422301f8fb249",
+                    "type": "locations",
+                    "attributes": {
+                        "name": "Austin Hall",
+                        "tags": [],
+                        "openHours": {},
+                        "type": "building",
+                        "abbreviation": "Aust",
+                        "summary": null,
+                        "description": "",
+                        "address": "2751 SW Jefferson Way",
+                        "city": "CORVALLIS",
+                        "state": "OR",
+                        "zip": "97331",
+                        "county": null,
+                        "telephone": null,
+                        "fax": null,
+                        "thumbnails": [
+                            "http://map.dev.acquia.cws.oregonstate.edu/sites/map.oregonstate.edu/files/styles/thumbnail/public/locations/austin.jpg"
+                        ],
+                        "images": [
+                            "http://map.dev.acquia.cws.oregonstate.edu/sites/map.oregonstate.edu/files/locations/austin.jpg"
+                        ],
+                        "departments": [],
+                        "website": "http://map.dev.acquia.cws.oregonstate.edu/?id=b018683aa0e551280d1422301f8fb249",
+                        "sqft": null,
+                        "calendar": null,
+                        "campus": "Corvallis",
+                        "giRestroomCount": 2,
+                        "giRestroomLimit": false,
+                        "giRestroomLocations": "0191, 0193",
+                        "synonyms": [
+                            "College of Business"
+                        ],
+                        "bldgID": "0090",
+                        "parkingZoneGroup": null,
+                        "propID": null
                     },
-                    {
-                        "type": "Point",
-                        "coordinates": [...]
-                    }
-                ]
-            },
-            "properties": {
-                "id": "b018683aa0e551280d1422301f8fb249",
-                "type": "locations",
-                "attributes": {
-                    "name": "Austin Hall",
-                    "tags": [],
-                    "openHours": {},
-                    "type": "building",
-                    "abbreviation": "Aust",
-                    "summary": null,
-                    "description": "",
-                    "address": "2751 SW Jefferson Way",
-                    "city": "CORVALLIS",
-                    "state": "OR",
-                    "zip": "97331",
-                    "county": null,
-                    "telephone": null,
-                    "fax": null,
-                    "thumbnails": [
-                        "http://map.dev.acquia.cws.oregonstate.edu/sites/map.oregonstate.edu/files/styles/thumbnail/public/locations/austin.jpg"
-                    ],
-                    "images": [
-                        "http://map.dev.acquia.cws.oregonstate.edu/sites/map.oregonstate.edu/files/locations/austin.jpg"
-                    ],
-                    "departments": [],
-                    "website": "http://map.dev.acquia.cws.oregonstate.edu/?id=b018683aa0e551280d1422301f8fb249",
-                    "sqft": null,
-                    "calendar": null,
-                    "campus": "Corvallis",
-                    "giRestroomCount": 2,
-                    "giRestroomLimit": false,
-                    "giRestroomLocations": "0191, 0193",
-                    "synonyms": [
-                        "College of Business"
-                    ],
-                    "bldgID": "0090",
-                    "parkingZoneGroup": null,
-                    "propID": null
-                },
-                "links": {
-                    "self": "https://api.oregonstate.edu/v1/locations/b018683aa0e551280d1422301f8fb249"
-                },
-                "relationships": null
+                    "links": {
+                        "self": "https://api.oregonstate.edu/v1/locations/b018683aa0e551280d1422301f8fb249"
+                    },
+                    "relationships": null
+                }
             }
-        }
-    ]
-}
-```
+        ]
+    }
+    ```
 
 2. `Point || Polygon`
 
-If only one of those exist, then the `"geometry"` field will only have the existing one:
+    If only one of those exist, then the `"geometry"` field will only have the existing one:
 
-```json
-{
-    "type": "Feature",
-    "geometry": {
-        "type": "Polygon",
-        "coordinates": [...]
-    },
-    "properties": {
-        "id": "937eada7c23344d68d0d6fc5ce906cdf",
-        "type": "locations",
-        "attributes": {
-            "name": "KERR ADMINISTRATION WEST LOT",
-            "tags": [],
-            "openHours": {},
-            "type": "parking",
-            "abbreviation": null,
-            "summary": null,
-            "description": null,
-            "address": null,
-            "city": null,
-            "state": null,
-            "zip": null,
-            "county": null,
-            "telephone": null,
-            "fax": null,
-            "thumbnails": [],
-            "images": [],
-            "departments": [],
-            "website": null,
-            "sqft": null,
-            "calendar": null,
-            "campus": "corvallis",
-            "giRestroomCount": null,
-            "giRestroomLimit": null,
-            "giRestroomLocations": null,
-            "synonyms": [],
-            "bldgID": null,
-            "parkingZoneGroup": "Short-term Lot",
-            "propID": "3263"
+    ```json
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [...]
         },
-        "links": {
-            "self": "https://api.oregonstate.edu/v1/locations/937eada7c23344d68d0d6fc5ce906cdf"
-        },
-        "relationships": null
-    }
-}
-```
-
-or
-
-```json
-{
-    "type": "Feature",
-    "geometry": {
-        "type": "Point",
-        "coordinates": [...]
-    },
-    "properties": {
-        "id": "dd90d825dc2f8b5bb5b72b3d41a46d87",
-        "type": "locations",
-        "attributes": {
-            "name": "Boardwalk Cafe",
-            "tags": [],
-            "openHours": {
-                "1": [
-                    {
-                        "start": "2017-11-07T01:00:00Z",
-                        "end": "2017-11-07T04:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-06T19:00:00Z",
-                        "end": "2017-11-06T22:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-06T15:00:00Z",
-                        "end": "2017-11-06T18:00:00Z"
-                    }
-                ],
-                "2": [
-                    {
-                        "start": "2017-11-08T01:00:00Z",
-                        "end": "2017-11-08T04:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-07T19:00:00Z",
-                        "end": "2017-11-07T22:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-07T15:00:00Z",
-                        "end": "2017-11-07T18:00:00Z"
-                    }
-                ],
-                "3": [
-                    {
-                        "start": "2017-11-09T01:00:00Z",
-                        "end": "2017-11-09T04:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-08T19:00:00Z",
-                        "end": "2017-11-08T22:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-08T15:00:00Z",
-                        "end": "2017-11-08T18:00:00Z"
-                    }
-                ],
-                "4": [
-                    {
-                        "start": "2017-11-03T00:00:00Z",
-                        "end": "2017-11-03T03:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-02T18:00:00Z",
-                        "end": "2017-11-02T21:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-02T14:00:00Z",
-                        "end": "2017-11-02T17:00:00Z"
-                    }
-                ],
-                "5": [
-                    {
-                        "start": "2017-11-04T00:00:00Z",
-                        "end": "2017-11-04T03:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-03T18:00:00Z",
-                        "end": "2017-11-03T21:00:00Z"
-                    },
-                    {
-                        "start": "2017-11-03T14:00:00Z",
-                        "end": "2017-11-03T17:00:00Z"
-                    }
-                ],
-                "6": [
-                    {
-                        "start": "2017-11-04T16:00:00Z",
-                        "end": "2017-11-05T03:00:00Z"
-                    }
-                ],
-                "7": [
-                    {
-                        "start": "2017-11-05T17:00:00Z",
-                        "end": "2017-11-06T04:00:00Z"
-                    }
-                ]
+        "properties": {
+            "id": "937eada7c23344d68d0d6fc5ce906cdf",
+            "type": "locations",
+            "attributes": {
+                "name": "KERR ADMINISTRATION WEST LOT",
+                "tags": [],
+                "openHours": {},
+                "type": "parking",
+                "abbreviation": null,
+                "summary": null,
+                "description": null,
+                "address": null,
+                "city": null,
+                "state": null,
+                "zip": null,
+                "county": null,
+                "telephone": null,
+                "fax": null,
+                "thumbnails": [],
+                "images": [],
+                "departments": [],
+                "website": null,
+                "sqft": null,
+                "calendar": null,
+                "campus": "corvallis",
+                "giRestroomCount": null,
+                "giRestroomLimit": null,
+                "giRestroomLocations": null,
+                "synonyms": [],
+                "bldgID": null,
+                "parkingZoneGroup": "Short-term Lot",
+                "propID": "3263"
             },
-            "type": "dining",
-            "abbreviation": null,
-            "summary": "Zone: McNary Dining",
-            "description": "",
-            "address": "1300 SW Jefferson Avenue (McNary Dining)",
-            "city": null,
-            "state": null,
-            "zip": null,
-            "county": null,
-            "telephone": null,
-            "fax": null,
-            "thumbnails": [],
-            "images": [],
-            "departments": [],
-            "website": "http://map.dev.acquia.cws.oregonstate.edu/?id=dd90d825dc2f8b5bb5b72b3d41a46d87",
-            "sqft": null,
-            "calendar": null,
-            "campus": "corvallis",
-            "giRestroomCount": null,
-            "giRestroomLimit": null,
-            "giRestroomLocations": null,
-            "synonyms": [],
-            "bldgID": null,
-            "parkingZoneGroup": null,
-            "propID": null
-        },
-        "links": {
-            "self": "https://api.oregonstate.edu/v1/locations/dd90d825dc2f8b5bb5b72b3d41a46d87"
-        },
-        "relationships": null
+            "links": {
+                "self": "https://api.oregonstate.edu/v1/locations/937eada7c23344d68d0d6fc5ce906cdf"
+            },
+            "relationships": null
+        }
     }
-}
-```
+    ```
+
+    or
+
+    ```json
+    {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [...]
+        },
+        "properties": {
+            "id": "dd90d825dc2f8b5bb5b72b3d41a46d87",
+            "type": "locations",
+            "attributes": {
+                "name": "Boardwalk Cafe",
+                "tags": [],
+                "openHours": {
+                    "1": [
+                        {
+                            "start": "2017-11-07T01:00:00Z",
+                            "end": "2017-11-07T04:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-06T19:00:00Z",
+                            "end": "2017-11-06T22:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-06T15:00:00Z",
+                            "end": "2017-11-06T18:00:00Z"
+                        }
+                    ],
+                    "2": [
+                        {
+                            "start": "2017-11-08T01:00:00Z",
+                            "end": "2017-11-08T04:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-07T19:00:00Z",
+                            "end": "2017-11-07T22:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-07T15:00:00Z",
+                            "end": "2017-11-07T18:00:00Z"
+                        }
+                    ],
+                    "3": [
+                        {
+                            "start": "2017-11-09T01:00:00Z",
+                            "end": "2017-11-09T04:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-08T19:00:00Z",
+                            "end": "2017-11-08T22:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-08T15:00:00Z",
+                            "end": "2017-11-08T18:00:00Z"
+                        }
+                    ],
+                    "4": [
+                        {
+                            "start": "2017-11-03T00:00:00Z",
+                            "end": "2017-11-03T03:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-02T18:00:00Z",
+                            "end": "2017-11-02T21:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-02T14:00:00Z",
+                            "end": "2017-11-02T17:00:00Z"
+                        }
+                    ],
+                    "5": [
+                        {
+                            "start": "2017-11-04T00:00:00Z",
+                            "end": "2017-11-04T03:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-03T18:00:00Z",
+                            "end": "2017-11-03T21:00:00Z"
+                        },
+                        {
+                            "start": "2017-11-03T14:00:00Z",
+                            "end": "2017-11-03T17:00:00Z"
+                        }
+                    ],
+                    "6": [
+                        {
+                            "start": "2017-11-04T16:00:00Z",
+                            "end": "2017-11-05T03:00:00Z"
+                        }
+                    ],
+                    "7": [
+                        {
+                            "start": "2017-11-05T17:00:00Z",
+                            "end": "2017-11-06T04:00:00Z"
+                        }
+                    ]
+                },
+                "type": "dining",
+                "abbreviation": null,
+                "summary": "Zone: McNary Dining",
+                "description": "",
+                "address": "1300 SW Jefferson Avenue (McNary Dining)",
+                "city": null,
+                "state": null,
+                "zip": null,
+                "county": null,
+                "telephone": null,
+                "fax": null,
+                "thumbnails": [],
+                "images": [],
+                "departments": [],
+                "website": "http://map.dev.acquia.cws.oregonstate.edu/?id=dd90d825dc2f8b5bb5b72b3d41a46d87",
+                "sqft": null,
+                "calendar": null,
+                "campus": "corvallis",
+                "giRestroomCount": null,
+                "giRestroomLimit": null,
+                "giRestroomLocations": null,
+                "synonyms": [],
+                "bldgID": null,
+                "parkingZoneGroup": null,
+                "propID": null
+            },
+            "links": {
+                "self": "https://api.oregonstate.edu/v1/locations/dd90d825dc2f8b5bb5b72b3d41a46d87"
+            },
+            "relationships": null
+        }
+    }
+    ```
 
 3. `!Point && !Polygon`
 
-If none of them exists, then the `"geometry"` field will be `null` object:
+    If none of them exists, then the `"geometry"` field will be `null` object:
 
-```json
-{
-    "type": "Feature",
-    "geometry": null,
-    "properties": {
-        "id": "5d3231555780488ab8d22e764bae5805",
-        "type": "locations",
-        "attributes": {
-            "name": "Sinnhuber Aquatic Research Lab",
-            "tags": [],
-            "openHours": {},
-            "type": "building",
-            "abbreviation": null,
-            "summary": null,
-            "description": null,
-            "address": "28645 E. HWY 34",
-            "city": "CORVALLIS",
-            "state": "OR",
-            "zip": "97333",
-            "county": null,
-            "telephone": null,
-            "fax": null,
-            "thumbnails": [],
-            "images": [],
-            "departments": [],
-            "website": null,
-            "sqft": null,
-            "calendar": null,
-            "campus": "Corvallis",
-            "giRestroomCount": 0,
-            "giRestroomLimit": null,
-            "giRestroomLocations": null,
-            "synonyms": [],
-            "bldgID": "0491",
-            "parkingZoneGroup": null,
-            "propID": null
-        },
-        "links": {
-            "self": "https://api.oregonstate.edu/v1/locations/5d3231555780488ab8d22e764bae5805"
-        },
-        "relationships": null
+    ```json
+    {
+        "type": "Feature",
+        "geometry": null,
+        "properties": {
+            "id": "5d3231555780488ab8d22e764bae5805",
+            "type": "locations",
+            "attributes": {
+                "name": "Sinnhuber Aquatic Research Lab",
+                "tags": [],
+                "openHours": {},
+                "type": "building",
+                "abbreviation": null,
+                "summary": null,
+                "description": null,
+                "address": "28645 E. HWY 34",
+                "city": "CORVALLIS",
+                "state": "OR",
+                "zip": "97333",
+                "county": null,
+                "telephone": null,
+                "fax": null,
+                "thumbnails": [],
+                "images": [],
+                "departments": [],
+                "website": null,
+                "sqft": null,
+                "calendar": null,
+                "campus": "Corvallis",
+                "giRestroomCount": 0,
+                "giRestroomLimit": null,
+                "giRestroomLocations": null,
+                "synonyms": [],
+                "bldgID": "0491",
+                "parkingZoneGroup": null,
+                "propID": null
+            },
+            "links": {
+                "self": "https://api.oregonstate.edu/v1/locations/5d3231555780488ab8d22e764bae5805"
+            },
+            "relationships": null
+        }
     }
-}
-```
+    ```
