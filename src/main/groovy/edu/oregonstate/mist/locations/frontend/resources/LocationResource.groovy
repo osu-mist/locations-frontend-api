@@ -292,6 +292,12 @@ class LocationResource extends Resource {
 
     }
 
+    /**
+     * Turn resultObject to GeoJSON format.
+     *
+     * @param resultObject
+     * @return
+     */
     private static toGeoJson(ResultObject resultObject) {
         def geojsonResultObject
         def ro = resultObject?.data
@@ -308,6 +314,12 @@ class LocationResource extends Resource {
         geojsonResultObject
     }
 
+    /**
+     * Adjust single resultObject to a Feature object.
+     *
+     * @param ro
+     * @return
+     */
     private static GeoFeature adjustGeoFeature(ResourceObject ro) {
         def geojsonResultObject = new GeoFeature(type: "Feature")
 
