@@ -441,7 +441,7 @@ This resource returns a GeoJSON object with `"type": "Feature"` since it will on
     }
     ```
 
-2. `Point || Polygon`
+2. **Point || Polygon**
 
     If only one of those exist, then the `"geometry"` field will only have the existing one:
 
@@ -626,7 +626,7 @@ This resource returns a GeoJSON object with `"type": "Feature"` since it will on
     }
     ```
 
-3. `!Point && !Polygon`
+3. **!Point && !Polygon**
 
     If none of them exists, then the `"geometry"` field will be `null` object:
 
