@@ -339,7 +339,7 @@ This resource returns the information for a given building:
 
 ## GeoJSON
 
-Locations API now provides [GeoJSON](https://tools.ietf.org/html/rfc7946) format for `/locations` and `/locations/{id}` endpoints with the parameter `geojson=true`.
+Locations API provides [GeoJSON](https://tools.ietf.org/html/rfc7946) format for `/locations` and `/locations/{id}` endpoints with the parameter `geojson=true`.
 
 ### /locations?geojson=true
 
