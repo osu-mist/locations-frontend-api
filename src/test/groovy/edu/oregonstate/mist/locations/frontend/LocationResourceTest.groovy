@@ -37,14 +37,14 @@ class LocationResourceTest {
 
         // Test: no result
         def noResultRsp = resource.list('dixon', null,
-                null, null, null, null, null, null, false, null)
+                null, null, null, null, null, null, false, null, null)
         assert noResultRsp.status == 200
         assert noResultRsp.entity.links == [:]
         assert noResultRsp.entity.data == []
 
         // Test: invalid campus
         def invalidCampRes = resource.list('dixon', 'invalid',
-                null, null, null, null, null, null, null, null)
+                null, null, null, null, null, null, null, null, null)
         assert invalidCampRes.status == 404
         assert invalidCampRes.entity.developerMessage.contains("Not Found")
         assert invalidCampRes.entity.userMessage.contains("Not Found")
@@ -64,7 +64,7 @@ class LocationResourceTest {
         def resource = new LocationResource(dao, endpointUri)
         resource.uriInfo = new MockUriInfo()
 
-        def validIdRes = resource.getById('valid-id')
+        def validIdRes = resource.getById('valid-id', null)
         assert validIdRes.status == 200
         validIdRes.entity.links == [:]
         validIdRes.entity.data == '{"id":"","type":"locations","attributes":{}}'
@@ -83,7 +83,7 @@ class LocationResourceTest {
         def resource = new LocationResource(dao, endpointUri)
         resource.uriInfo = new MockUriInfo()
 
-        def invalidIdRes = resource.getById(null)
+        def invalidIdRes = resource.getById(null, null)
         assert invalidIdRes.status == 404
         assert invalidIdRes.entity.developerMessage.contains("Not Found")
         assert invalidIdRes.entity.userMessage.contains("Not Found")
@@ -152,7 +152,8 @@ class LocationResourceTest {
                 (String) expectedParams['distanceUnit'],
                 (Boolean) expectedParams['isOpen'],
                 (Boolean) expectedParams['giRestroom'],
-                (List<String>) expectedParams['parkingZoneGroup'])
+                (List<String>) expectedParams['parkingZoneGroup'],
+                (Boolean) expectedParams['geojson'])
         ResultObject resObj = res.entity
         String selfLinks = resObj.links["self"]
 

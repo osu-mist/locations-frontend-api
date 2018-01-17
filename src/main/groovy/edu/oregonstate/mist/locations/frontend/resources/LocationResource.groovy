@@ -4,6 +4,11 @@ import com.codahale.metrics.annotation.Timed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.Resource
+import edu.oregonstate.mist.api.geojson.GeoCooridinate
+import edu.oregonstate.mist.api.geojson.GeoFeature
+import edu.oregonstate.mist.api.geojson.GeoFeatureCollection
+import edu.oregonstate.mist.api.geojson.Geometries
+import edu.oregonstate.mist.api.jsonapi.ResourceObject
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.mapper.LocationMapper
@@ -73,7 +78,8 @@ class LocationResource extends Resource {
                   @QueryParam('distanceUnit') String distanceUnit,
                   @QueryParam('isOpen') Boolean isOpen,
                   @QueryParam('giRestroom') Boolean giRestroom,
-                  @QueryParam('parkingZoneGroup') List<String> parkingZoneGroup) {
+                  @QueryParam('parkingZoneGroup') List<String> parkingZoneGroup,
+                  @QueryParam('geojson') Boolean geojson) {
 
         try {
             if (maxPageSizeExceeded()) {
@@ -120,6 +126,11 @@ class LocationResource extends Resource {
             setPaginationLinks(topLevelHits, q, type, campus,
                     lat, lon, distance, distanceUnit,
                     isOpen, giRestroom, parkingZoneGroup, resultObject)
+
+            if (geojson) {
+                def geojsonResultObject = toGeoJson(resultObject)
+                return ok(geojsonResultObject).build()
+            }
 
             ok(resultObject).build()
         } catch (Exception e) {
@@ -225,7 +236,8 @@ class LocationResource extends Resource {
     @GET
     @Timed
     @Path('{id: [0-9a-zA-Z]+}')
-    Response getById(@PathParam('id') String id) {
+    Response getById(@PathParam('id') String id,
+                     @QueryParam('geojson') Boolean geojson) {
         try {
             String esResponse = locationDAO.getById(id)
             if (!esResponse) {
@@ -234,6 +246,11 @@ class LocationResource extends Resource {
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = LocationMapper.map(esResponse)
+
+            if (geojson) {
+                def geojsonResultObject = toGeoJson(resultObject)
+                return ok(geojsonResultObject).build()
+            }
 
             ok(resultObject).build()
         } catch (Exception e) {
@@ -273,6 +290,74 @@ class LocationResource extends Resource {
             internalServerError("Woot you found a bug for us to fix!").build()
         }
 
+    }
+
+    /**
+     * Turn resultObject to GeoJSON format.
+     *
+     * @param resultObject
+     * @return
+     */
+    private static toGeoJson(ResultObject resultObject) {
+        def geojsonResultObject
+        def ro = resultObject?.data
+
+        if (ro instanceof List) {
+            geojsonResultObject = new GeoFeatureCollection(type: "FeatureCollection")
+            geojsonResultObject.features = ro.collect { adjustGeoFeature(it) }
+        } else {
+            geojsonResultObject = adjustGeoFeature(ro)
+        }
+
+        geojsonResultObject
+    }
+
+    /**
+     * Adjust single resultObject to a Feature object.
+     *
+     * @param ro
+     * @return
+     */
+    private static GeoFeature adjustGeoFeature(ResourceObject ro) {
+        def geojsonResultObject = new GeoFeature(type: "Feature")
+
+        def geoPolygon, geoPoint, geometry
+
+        // adjust geoPolygon
+        if (ro?.attributes?.geometry?.type && ro?.attributes?.geometry?.coordinates) {
+            geoPolygon = ro?.attributes?.geometry
+        }
+
+        // adjust geoPoint
+        if (ro?.attributes?.longitude && ro?.attributes?.latitude) {
+            geoPoint = new GeoCooridinate(
+                type: "Point",
+                coordinates: [
+                    ro?.attributes?.longitude?.toFloat(),
+                    ro?.attributes?.latitude?.toFloat()
+                ]
+            )
+        }
+
+        if (geoPolygon && geoPoint) {
+            geometry = new Geometries()
+            geometry?.type = "GeometryCollection"
+            geometry?.geometries = [geoPolygon, geoPoint]
+        } else if ( geoPolygon || geoPoint) {
+            def coordinates = geoPolygon ?: geoPoint
+            geometry = new GeoCooridinate()
+            geometry?.type = coordinates?.type
+            geometry?.coordinates = coordinates?.coordinates
+        }
+
+        ["geometry", "longitude", "latitude"].each {
+            ro?.attributes?.remove(it)
+        }
+
+        geojsonResultObject?.geometry = geometry
+        geojsonResultObject?.properties = ro
+
+        geojsonResultObject
     }
 
     /**
