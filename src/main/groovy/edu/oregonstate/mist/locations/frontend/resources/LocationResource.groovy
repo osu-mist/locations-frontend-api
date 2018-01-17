@@ -304,9 +304,7 @@ class LocationResource extends Resource {
 
         if (ro instanceof List) {
             geojsonResultObject = new GeoFeatureCollection(type: "FeatureCollection")
-            ro.each {
-                geojsonResultObject?.features += adjustGeoFeature(it)
-            }
+            geojsonResultObject.features = ro.collect { adjustGeoFeature(it) }
         } else {
             geojsonResultObject = adjustGeoFeature(ro)
         }
@@ -323,9 +321,7 @@ class LocationResource extends Resource {
     private static GeoFeature adjustGeoFeature(ResourceObject ro) {
         def geojsonResultObject = new GeoFeature(type: "Feature")
 
-        def geoPolygon = null
-        def geoPoint = null
-        def geometry
+        def geoPolygon, geoPoint, geometry
 
         // adjust geoPolygon
         if (ro?.attributes?.geometry?.type && ro?.attributes?.geometry?.coordinates) {
@@ -347,10 +343,8 @@ class LocationResource extends Resource {
             geometry = new Geometries()
             geometry?.type = "GeometryCollection"
             geometry?.geometries = [geoPolygon, geoPoint]
-        } else if (!(geoPolygon || geoPoint)) {
-            geometry = null
-        } else {
-            def coordinates = [geoPolygon, geoPoint].find { it }
+        } else if ( geoPolygon || geoPoint) {
+            def coordinates = geoPolygon ?: geoPoint
             geometry = new GeoCooridinate()
             geometry?.type = coordinates?.type
             geometry?.coordinates = coordinates?.coordinates
