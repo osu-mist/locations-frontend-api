@@ -4,10 +4,10 @@ import com.codahale.metrics.annotation.Timed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import edu.oregonstate.mist.api.Resource
-import edu.oregonstate.mist.api.jsonapi.GeoCooridinate
-import edu.oregonstate.mist.api.jsonapi.GeoFeature
-import edu.oregonstate.mist.api.jsonapi.GeoFeatureCollection
-import edu.oregonstate.mist.api.jsonapi.Geometries
+import edu.oregonstate.mist.api.geojson.GeoCooridinate
+import edu.oregonstate.mist.api.geojson.GeoFeature
+import edu.oregonstate.mist.api.geojson.GeoFeatureCollection
+import edu.oregonstate.mist.api.geojson.Geometries
 import edu.oregonstate.mist.api.jsonapi.ResourceObject
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.api.jsonapi.ResultObject

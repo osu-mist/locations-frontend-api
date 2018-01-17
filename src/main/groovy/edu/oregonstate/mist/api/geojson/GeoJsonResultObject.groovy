@@ -1,4 +1,4 @@
-package edu.oregonstate.mist.api.jsonapi
+package edu.oregonstate.mist.api.geojson
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
