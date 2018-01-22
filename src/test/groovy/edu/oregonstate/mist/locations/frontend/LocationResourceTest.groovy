@@ -17,15 +17,15 @@ class LocationResourceTest {
 
     @ClassRule
     public static final DropwizardAppRule<LocationsFrontendConfiguration> APPLICATION =
-            new DropwizardAppRule<LocationsFrontendConfiguration>(
-                    LocationsFrontEndApplication.class,
-                    new File("configuration.yaml").absolutePath)
+        new DropwizardAppRule<LocationsFrontendConfiguration>(
+            LocationsFrontEndApplication.class,
+            new File("configuration.yaml").absolutePath)
     // Test: LocationResource.list()
 
     @Test
     public void testList() {
         def mock = new MockFor(LocationDAO)
-        mock.demand.search() {
+        mock.demand.search( 0..3 ) {
             String q, String campus, String type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
             Boolean giRestroom, String parkingZoneGroup, Integer pageNumber, Integer pageSize ->
@@ -37,18 +37,25 @@ class LocationResourceTest {
 
         // Test: no result
         def noResultRsp = resource.list('dixon', null,
-                null, null, null, null, null, null, false, null, null)
+            null, null, null, null, null, null, false, null, null)
         assert noResultRsp.status == 200
         assert noResultRsp.entity.links == [:]
         assert noResultRsp.entity.data == []
 
         // Test: invalid campus
         def invalidCampRes = resource.list('dixon', 'invalid',
-                null, null, null, null, null, null, null, null, null)
+            null, null, null, null, null, null, null, null, null)
         assert invalidCampRes.status == 404
         assert invalidCampRes.entity.developerMessage.contains("Not Found")
         assert invalidCampRes.entity.userMessage.contains("Not Found")
         assert invalidCampRes.entity.code == 1404
+
+        // Test: geoJson
+        def geoJsonRes = resource.list(null, null,
+            null, null, null, null, null, null, null, null, true)
+        assert geoJsonRes.status == 200
+        assert geoJsonRes.entity.type == 'FeatureCollection'
+        assert geoJsonRes.entity.hasProperty('features')
 
         mock.verify(dao)
     }
@@ -57,7 +64,7 @@ class LocationResourceTest {
     @Test
     public void testValidId() {
         def mock = new MockFor(LocationDAO)
-        mock.demand.getById() {
+        mock.demand.getById( 0..2 ) {
             String id -> '{"id":"","type":"locations","attributes":{}}'
         }
         def dao = mock.proxyInstance()
@@ -68,6 +75,12 @@ class LocationResourceTest {
         assert validIdRes.status == 200
         validIdRes.entity.links == [:]
         validIdRes.entity.data == '{"id":"","type":"locations","attributes":{}}'
+
+        // Test: geoJson
+        def geoJsonRes = resource.getById('valid-id', true)
+        assert geoJsonRes.status == 200
+        assert geoJsonRes.entity.type == "Feature"
+        assert geoJsonRes.entity.hasProperty("geometry")
 
         mock.verify(dao)
     }
@@ -108,14 +121,14 @@ class LocationResourceTest {
     @Test
     public void testListEndpointURLParams() {
         String esStubData = new File(
-                "src/test/groovy/edu/oregonstate/mist/locations/frontend/esMockData.json").text
+            "src/test/groovy/edu/oregonstate/mist/locations/frontend/esMockData.json").text
 
         def jsonNodeMock = new MockFor(JsonNode)
         jsonNodeMock.demand.get() {
             1
         }
         def usable = jsonNodeMock.proxyInstance()
-        assert(usable.get("total") == 1)
+        assert (usable.get("total") == 1)
 
         def mock = new MockFor(LocationDAO)
         mock.demand.search() {
@@ -130,30 +143,30 @@ class LocationResourceTest {
         //This mocking is to ensure LocationsResource.groovy#L177 passes\
 
         def expectedParams = [
-                'q'                 : 'dixon',
-                'campus'            : "corvallis",
-                'type'              : "building",
-                'lat'               : 44.55,
-                'lon'               : 77.77,
-                'distance'          : 2.0,
-                'distanceUnit'      : "mi",
-                'isOpen'            : true,
-                'giRestroom'        : true,
-                'parkingZoneGroup'  : ['A2', 'C']
+            'q'               : 'dixon',
+            'campus'          : "corvallis",
+            'type'            : "building",
+            'lat'             : 44.55,
+            'lon'             : 77.77,
+            'distance'        : 2.0,
+            'distanceUnit'    : "mi",
+            'isOpen'          : true,
+            'giRestroom'      : true,
+            'parkingZoneGroup': ['A2', 'C']
         ]
 
         Response res = resource.list(
-                (String) expectedParams['q'],
-                (String) expectedParams['campus'],
-                (String) expectedParams['type'],
-                (Double) expectedParams['lat'],
-                (Double) expectedParams['lon'],
-                (Double) expectedParams['distance'],
-                (String) expectedParams['distanceUnit'],
-                (Boolean) expectedParams['isOpen'],
-                (Boolean) expectedParams['giRestroom'],
-                (List<String>) expectedParams['parkingZoneGroup'],
-                (Boolean) expectedParams['geojson'])
+            (String) expectedParams['q'],
+            (String) expectedParams['campus'],
+            (String) expectedParams['type'],
+            (Double) expectedParams['lat'],
+            (Double) expectedParams['lon'],
+            (Double) expectedParams['distance'],
+            (String) expectedParams['distanceUnit'],
+            (Boolean) expectedParams['isOpen'],
+            (Boolean) expectedParams['giRestroom'],
+            (List<String>) expectedParams['parkingZoneGroup'],
+            (Boolean) expectedParams['geojson'])
         ResultObject resObj = res.entity
         String selfLinks = resObj.links["self"]
 
