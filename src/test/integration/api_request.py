@@ -15,10 +15,10 @@ def get_buildings_with_services(url, access_token):
     return building_ids
 
 
-def id_request(url, access_token, id):
-    url += "/%s" % id
+def id_request(url, access_token, id, query_params=None):
+    url += '/{}'.format(id)
     headers = {'Authorization': access_token}
-    request = requests.get(url, headers=headers)
+    request = requests.get(url, params=query_params, headers=headers)
     return request.json()
 
 

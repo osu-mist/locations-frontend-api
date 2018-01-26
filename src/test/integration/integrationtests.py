@@ -1,3 +1,5 @@
+import json
+import geojson
 import ssl
 import sys
 import unittest
@@ -184,6 +186,67 @@ class gateway_tests(unittest.TestCase):
 
         test_resource(locations_url)
         test_resource(services_url)
+
+    # private function: convert result to GeoJSON object
+    def __to_geojson(self, json_res):
+        encoded_json = json.dumps(json_res)
+        geo_object = geojson.loads(encoded_json)
+        return geo_object
+
+    # Test GeoJSON result contains multiple GeoJSON objects
+    def test_geojson_feature_collection(self):
+        geo_object = self.__to_geojson(query_request(
+            locations_url, access_token, "get", {'geojson': 'true'}).json())
+        self.assertTrue(geo_object.is_valid)
+        self.assertIsInstance(geo_object, type(geojson.FeatureCollection([])))
+
+    # Test GeoJSON result contains Polygon / MultiPolygon and Point
+    def test_geojson_geometry_collection(self):
+        resource_ids = [
+            '81b24334a8fe31fbcf2c56de923c1523',  # Polygon and Point
+            '52691ff2fca1a0c6a73230fd7241131d'   # MultiPolygon and Point
+        ]
+        for resource_id in resource_ids:
+            geo_object = self.__to_geojson(id_request(
+                locations_url, access_token, resource_id, {'geojson': 'true'}))
+            geo_collection = geo_object.geometry
+            self.assertTrue(geo_object.is_valid)
+            self.assertIsInstance(geo_object, type(geojson.Feature()))
+            self.assertIsInstance(geo_collection, type(geojson.GeometryCollection()))
+
+            geo_types = [
+                type(geojson.Polygon()),
+                type(geojson.MultiPolygon()),
+                type(geojson.Point())
+            ]
+
+            for geo in geo_collection.geometries:
+                self.assertTrue(type(geo) in geo_types)
+
+    # Test GeoJSON result only contains Polygon or Point
+    def test_geojson_geometry(self):
+        geometry_list = {
+            'dd90d825dc2f8b5bb5b72b3d41a46d87': type(geojson.Point()),   # Point
+            '937eada7c23344d68d0d6fc5ce906cdf': type(geojson.Polygon())  # Polygon
+        }
+
+        for resource_id in geometry_list.keys():
+            geo_object = self.__to_geojson(id_request(
+                locations_url, access_token, resource_id, {'geojson': 'true'}))
+            geometry = geo_object.geometry
+            self.assertTrue(geo_object.is_valid)
+            self.assertIsInstance(geo_object, type(geojson.Feature()))
+            self.assertIsInstance(geometry, geometry_list[resource_id])
+
+    # Test GeoJson result neither contains Points nor Polygon
+    def test_geojson_none(self):
+        resource_id = '5d3231555780488ab8d22e764bae5805'
+        geo_object = self.__to_geojson(id_request(
+            locations_url, access_token, resource_id, {'geojson': 'true'}))
+        geometry = geo_object.geometry
+        self.assertTrue(geo_object.is_valid)
+        self.assertIsInstance(geo_object, type(geojson.Feature()))
+        self.assertIsNone(geometry)
 
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
