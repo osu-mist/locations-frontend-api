@@ -194,7 +194,7 @@ class gateway_tests(unittest.TestCase):
         return geo_object
 
     # Test GeoJSON result contains multiple GeoJSON objects
-    def test_geojson_combined(self):
+    def test_geojson_feature_collection(self):
         geo_object = self.__to_geojson(query_request(
             locations_url, access_token, "get", {'geojson': 'true'}).json())
         self.assertTrue(geo_object.is_valid)
