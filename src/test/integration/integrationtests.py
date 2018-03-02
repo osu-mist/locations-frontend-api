@@ -226,8 +226,7 @@ class gateway_tests(unittest.TestCase):
     # Test GeoJSON result only contains Polygon or Point
     def test_geojson_geometry(self):
         geometry_list = {
-            'dd90d825dc2f8b5bb5b72b3d41a46d87': type(geojson.Point()),   # Point
-            '937eada7c23344d68d0d6fc5ce906cdf': type(geojson.Polygon())  # Polygon
+            'dd90d825dc2f8b5bb5b72b3d41a46d87': type(geojson.Point()),  # Point
         }
 
         for resource_id in geometry_list.keys():
