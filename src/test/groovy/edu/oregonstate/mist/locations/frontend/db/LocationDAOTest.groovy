@@ -52,7 +52,7 @@ public class LocationDAOTest {
       "must" : {
         "multi_match" : {
           "query" : "hello",
-          "fields" : [ "attributes.name", "attributes.abbreviation" ]
+          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
         }
       }
     }
@@ -83,7 +83,7 @@ public class LocationDAOTest {
       }, {
         "multi_match" : {
           "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation" ]
+          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
         }
       } ]
     }
@@ -114,7 +114,7 @@ public class LocationDAOTest {
       }, {
         "multi_match" : {
           "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation" ]
+          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
         }
       } ]
     }
@@ -146,7 +146,7 @@ public class LocationDAOTest {
       }, {
         "multi_match" : {
           "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation" ]
+          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
         }
       } ]
     }
@@ -171,7 +171,7 @@ public class LocationDAOTest {
       "must" : {
         "multi_match" : {
           "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation" ]
+          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
         }
       },
       "filter" : {
@@ -211,7 +211,7 @@ public class LocationDAOTest {
       "must" : {
         "multi_match" : {
           "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation" ]
+          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
         }
       },
       "filter" : {

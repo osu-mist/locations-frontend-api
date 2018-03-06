@@ -213,7 +213,7 @@ class LocationDAO {
             // TODO: change to AND, but also add some fuzziness
             // TODO: handle name and abbreviation differently
             query.must(QueryBuilders.multiMatchQuery(q,
-                    "attributes.name", "attributes.abbreviation"))
+                    "attributes.name", "attributes.abbreviation", "attributes.synonyms"))
         }
 
         if (lat && lon) {
