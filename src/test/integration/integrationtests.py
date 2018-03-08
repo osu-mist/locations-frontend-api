@@ -247,6 +247,27 @@ class gateway_tests(unittest.TestCase):
         self.assertIsInstance(geo_object, type(geojson.Feature()))
         self.assertIsNone(geometry)
 
+    # Test that synonym searching returns expected results
+    def test_synonyms(self):
+        gill_coliseum = query_request(locations_url, access_token, "get", {
+            'q': 'basketball'}).json()
+        self.assertEqual(len(gill_coliseum["data"]), 1)
+        self.assertEqual(gill_coliseum["data"][0]["id"],
+                         "cf6e802927cc01ec45f5f77b2f85a18a")
+        self.assertEqual(gill_coliseum["data"][0]["attributes"]["name"],
+                         "Gill Coliseum")
+
+        austin_hall_result = query_request(
+                locations_url,
+                access_token,
+                "get",
+                {'q': 'College of Business'}
+            ).json()
+        self.assertEqual(austin_hall_result["data"][0]["id"],
+                         "b018683aa0e551280d1422301f8fb249")
+        self.assertEqual(austin_hall_result["data"][0]["attributes"]["name"],
+                         "Austin Hall")
+
     # Tests that a query with more than 10 results contains correct links
     def test_links(self):
         links = results_with_links(locations_url, access_token)
