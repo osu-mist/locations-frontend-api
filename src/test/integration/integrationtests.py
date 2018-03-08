@@ -87,7 +87,7 @@ class gateway_tests(unittest.TestCase):
 
         building_engineering = query_request(locations_url, access_token, "get", {
             'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
-        self.assertEqual(len(building_engineering['data']), 2)
+        self.assertEqual(len(building_engineering['data']), 3)
 
     def test_geo_location(self):
         # test geo query
