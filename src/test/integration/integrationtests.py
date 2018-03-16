@@ -308,6 +308,73 @@ class gateway_tests(unittest.TestCase):
         query_params = {'page[number]': 1, 'page[size]': max_page_size}
         self.assertEqual(query_request(locations_url, access_token, "get", query_params).status_code, 200)
 
+    # Test that all extension locations are valid
+    def test_extension(self):
+        query_params = {'campus': 'extension', 'page[size]': max_page_size}
+        offices = query_request(locations_url, access_token, "get", query_params).json()
+
+        # check that we have extension locations
+        self.assertGreater(len(offices["data"]), 10)
+
+        for office in offices["data"]:
+            self.assertIsNotNone(office["id"])
+            self.assertEqual(office["type"], "locations")
+            self.assertIsNotNone(office["attributes"]["name"])
+            self.assertEqual(office["attributes"]["type"], "building")
+            self.assertIsNotNone(office["attributes"]["county"])
+            self.assertIsNotNone(office["attributes"]["zip"])
+            self.assertIsNotNone(office["attributes"]["fax"])
+            self.assertIsNotNone(office["attributes"]["website"])
+            self.assertIsNotNone(office["attributes"]["website"])
+            self.assertIsNotNone(office["attributes"]["latitude"])
+            self.assertIsNotNone(office["attributes"]["longitude"])
+
+    def test_dining(self):
+        query_params = {'type': 'dining', 'page[size]': max_page_size}
+        restaurants = query_request(locations_url, access_token, "get", query_params).json()
+
+        test_slot = None
+        test_diners = [diner for diner in restaurants["data"] if self.has_valid_open_hours(diner)]
+        open_hours = test_diners[0]["attributes"]["openHours"]
+
+        for day, open_hour_list in open_hours.iteritems():
+            valid_slots = [i for i in open_hour_list if self.is_valid_open_slot(i)]
+            if len(valid_slots) > 0:
+                test_slot = valid_slots[0]
+                break
+
+        regex = "[0-9]{4}-[0-9]{2}-[0-9]{2}[T][0-9]{2}:[0-9]{2}:[0-9]{2}[Z]"
+        if test_slot is not None:
+            self.assertRegexpMatches(test_slot["start"], regex)
+            self.assertRegexpMatches(test_slot["end"], regex)
+
+        self.assertGreater(len(restaurants["data"]), 10)
+
+        invalid_dining_count = len([diner for diner in restaurants["data"] if
+                                    diner["attributes"]["name"] is None or
+                                    diner["attributes"]["summary"] is None or
+                                    diner["attributes"]["latitude"] is None or
+                                    diner["attributes"]["longitude"] is None])
+        self.assertLessEqual(invalid_dining_count, 3)
+
+    def has_valid_open_hours(self, location):
+        valid_day_range = range(1, 7)
+        invalid_days = 0
+
+        if "openHours" not in location["attributes"]:
+            return False
+
+        for day, open_hour_list in location["attributes"]["openHours"].iteritems():
+            valid_day_index = int(day) in valid_day_range
+            invalid_time_slot_count = len([i for i in open_hour_list if not self.is_valid_open_slot(i)])
+            if invalid_time_slot_count > 1 or not valid_day_index:
+                invalid_days += 1
+
+        return (7 - invalid_days) >= 3
+
+    def is_valid_open_slot(self, open_slot):
+        return open_slot is not None and open_slot["start"] is not None and open_slot["end"] is not None
+
     # Tests that API response time is less than a value
     def test_response_time(self):
         self.assertLess(response_time(locations_url, access_token), 1)
