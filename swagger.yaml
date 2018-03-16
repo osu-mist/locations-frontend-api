@@ -435,6 +435,14 @@ definitions:
       parkingZoneGroup:
         description: "Zonegroup of location if location is parking"
         type: string
+      #TODO: Change the name of the fields based on what Takumi is naming them.
+      evSpaceCount:
+        description: "Count of electric vehicle parking spaces if the location is parking"
+        type: integer
+      adaSpaceCount:
+        description: "Count of ADA parking spaces if the location is parking"
+      motorcycleSpaceCount:
+        description: "Count of motorcycle parking spaces if the location is parking."
 
   ServicesAttributes:
     properties:
