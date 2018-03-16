@@ -435,6 +435,15 @@ definitions:
       parkingZoneGroup:
         description: "Zonegroup of location if location is parking"
         type: string
+      evParkingSpaceCount:
+        description: "Count of electric vehicle parking spaces if the location is parking"
+        type: integer
+      adaParkingSpaceCount:
+        description: "Count of ADA parking spaces if the location is parking"
+        type: integer
+      motorcycleParkingSpaceCount:
+        description: "Count of motorcycle parking spaces if the location is parking."
+        type: integer
 
   ServicesAttributes:
     properties:
