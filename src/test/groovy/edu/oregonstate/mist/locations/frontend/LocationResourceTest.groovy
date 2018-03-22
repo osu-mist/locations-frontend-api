@@ -26,7 +26,7 @@ class LocationResourceTest {
     public void testList() {
         def mock = new MockFor(LocationDAO)
         mock.demand.search( 0..3 ) {
-            String q, String campus, String type, Double lat,
+            String q, String campus, List<String> type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
             Boolean giRestroom, String parkingZoneGroup, Integer pageNumber, Integer pageSize ->
                 '{"hits": {"total": 0, "hits": []}}'
@@ -132,7 +132,7 @@ class LocationResourceTest {
 
         def mock = new MockFor(LocationDAO)
         mock.demand.search() {
-            String q, String campus, String type, Double lat,
+            String q, String campus, List<String> type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
             Boolean giRestroom, List<String> parkingZoneGroup,
             Integer pageNumber, Integer pageSize -> esStubData
@@ -145,7 +145,7 @@ class LocationResourceTest {
         def expectedParams = [
             'q'               : 'dixon',
             'campus'          : "corvallis",
-            'type'            : "building",
+            'type'            : ["building"],
             'lat'             : 44.55,
             'lon'             : 77.77,
             'distance'        : 2.0,
@@ -158,7 +158,7 @@ class LocationResourceTest {
         Response res = resource.list(
             (String) expectedParams['q'],
             (String) expectedParams['campus'],
-            (String) expectedParams['type'],
+            (List<String>) expectedParams['type'],
             (Double) expectedParams['lat'],
             (Double) expectedParams['lon'],
             (Double) expectedParams['distance'],
