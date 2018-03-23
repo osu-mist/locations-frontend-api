@@ -72,6 +72,7 @@ paths:
           name: type
           description: "Type of location. Valid options are: building, dining, cultural-center, parking, and other."
           required: false
+          collectionFormat: multi
           type: string
         - in: query
           name: giRestroom
