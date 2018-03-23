@@ -15,13 +15,7 @@ import javax.ws.rs.core.UriBuilder
 class LocationResourceTest {
     static URI endpointUri = UriBuilder.fromPath('https://api.unit.test.edu/v1/').build()
 
-    @ClassRule
-    public static final DropwizardAppRule<LocationsFrontendConfiguration> APPLICATION =
-        new DropwizardAppRule<LocationsFrontendConfiguration>(
-            LocationsFrontEndApplication.class,
-            new File("configuration.yaml").absolutePath)
     // Test: LocationResource.list()
-
     @Test
     public void testList() {
         def mock = new MockFor(LocationDAO)
