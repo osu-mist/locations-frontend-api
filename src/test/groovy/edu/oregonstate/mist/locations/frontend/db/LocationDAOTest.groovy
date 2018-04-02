@@ -96,7 +96,7 @@ public class LocationDAOTest {
 
     @Test
     void testSearchTypeCulturalCenter() {
-        request = dao.buildSearchRequest(request, "building", "", "cultural-center",
+        request = dao.buildSearchRequest(request, "building", "", ["cultural-center"],
                 null, null, null,
                 null, null, null, null, 1, 10)
         assertEquals('''{
@@ -105,10 +105,14 @@ public class LocationDAOTest {
   "query" : {
     "bool" : {
       "must" : [ {
-        "match" : {
-          "attributes.tags" : {
-            "query" : "cultural-center",
-            "type" : "boolean"
+        "bool" : {
+          "should" : {
+            "match" : {
+              "attributes.tags" : {
+                "query" : "cultural-center",
+                "type" : "boolean"
+              }
+            }
           }
         }
       }, {
@@ -128,7 +132,7 @@ public class LocationDAOTest {
     @Test
     void testSearchTypeDining() {
         request = dao.prepareLocationSearch()
-        request = dao.buildSearchRequest(request, "building", "", "dining",
+        request = dao.buildSearchRequest(request, "building", "", ["dining"],
                 null, null, null,
                 null, null, null, null, 1, 10)
         assertEquals('''{
@@ -137,11 +141,58 @@ public class LocationDAOTest {
   "query" : {
     "bool" : {
       "must" : [ {
-        "match" : {
-          "attributes.type" : {
-            "query" : "dining",
-            "type" : "boolean"
+        "bool" : {
+          "should" : {
+            "match" : {
+              "attributes.type" : {
+                "query" : "dining",
+                "type" : "boolean"
+              }
+            }
           }
+        }
+      }, {
+        "multi_match" : {
+          "query" : "building",
+          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
+        }
+      } ]
+    }
+  },
+  "sort" : [ {
+    "_score" : { }
+  } ]
+}''', request.toString())
+    }
+
+    @Test
+    void testSearchMultitype() {
+        request = dao.prepareLocationSearch()
+        request = dao.buildSearchRequest(request, "building", "", ["dining", "cultural-center"],
+                null, null, null,
+                null, null, null, null, 1, 10)
+        assertEquals('''{
+  "from" : 0,
+  "size" : 10,
+  "query" : {
+    "bool" : {
+      "must" : [ {
+        "bool" : {
+          "should" : [ {
+            "match" : {
+              "attributes.type" : {
+                "query" : "dining",
+                "type" : "boolean"
+              }
+            }
+          }, {
+            "match" : {
+              "attributes.tags" : {
+                "query" : "cultural-center",
+                "type" : "boolean"
+              }
+            }
+          } ]
         }
       }, {
         "multi_match" : {
@@ -160,7 +211,7 @@ public class LocationDAOTest {
     @Test
     void testSearchGeoLocation() {
         request = dao.prepareLocationSearch()
-        request = dao.buildSearchRequest(request, "building", "", "",
+        request = dao.buildSearchRequest(request, "building", "", [],
                 (Double) 42.39561, (Double) -71.13051, "2miles",
                 null, null, null, null, 1, 10)
         assertEquals(request.toString(), '''{
@@ -200,7 +251,7 @@ public class LocationDAOTest {
     @Test
     void testSearchIsOpen() {
         request = dao.prepareLocationSearch()
-        request = dao.buildSearchRequest(request, "building", "", "",
+        request = dao.buildSearchRequest(request, "building", "", [],
                 null, null, null,
                 Boolean.TRUE, weekday, null, null, 1, 10)
         assertEquals(request.toString(), '''{

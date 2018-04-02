@@ -89,6 +89,41 @@ class gateway_tests(unittest.TestCase):
             'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
         self.assertEqual(len(building_engineering['data']), 3)
 
+    def test_multi_type(self):
+        # test search using multiple type= parameters
+        results = query_request(locations_url, access_token, "get", {'type': ['building', 'dining'], 'lat': '44.5602', 'lon': '-123.2761', 'distance': 100, 'distanceUnit': 'ft'}).json()
+        self.assertEqual(len(results['data']), 2)
+        returned_types = [x['attributes']['type'] for x in results['data']]
+        returned_types.sort()
+        self.assertEqual(returned_types, ['building', 'dining'])
+
+        # expected results:
+        # ILLC (building)
+        # Peet's Coffee (dining)
+
+        # and of course sending only one type gets only one result
+
+        results = query_request(locations_url, access_token, "get", {'type': 'building', 'lat': '44.5602', 'lon': '-123.2761', 'distance': 100, 'distanceUnit': 'ft'}).json()
+        self.assertEqual(len(results['data']), 1)
+        self.assertEqual(results['data'][0]['attributes']['type'], 'building')
+
+        results = query_request(locations_url, access_token, "get", {'type': 'dining', 'lat': '44.5602', 'lon': '-123.2761', 'distance': 100, 'distanceUnit': 'ft'}).json()
+        self.assertEqual(len(results['data']), 1)
+        self.assertEqual(results['data'][0]['attributes']['type'], 'dining')
+
+    def test_result_order(self):
+        # Check that Milam Hall is the first result for "milam hall"
+
+        # We previously had a bug where searching for "milam hall"
+        # would not return Milam Hall as the first result,
+        # since the results also included matches for just "hall"
+        # and we weren't ordering the results by relevance.
+        # See CO-813
+
+        results = query_request(locations_url, access_token, "get", {'q': 'Milam Hall'}).json()
+        self.assertEqual(len(results['data']), 10)
+        self.assertEqual(results['data'][0]['attributes']['name'], 'Milam Hall')
+
     def test_geo_location(self):
         # test geo query
         building_library = query_request(locations_url, access_token, "get", {

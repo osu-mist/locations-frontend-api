@@ -72,7 +72,8 @@ class LocationResource extends Resource {
     @GET
     @Timed
     Response list(@QueryParam('q') String q,
-                  @QueryParam('campus') String campus, @QueryParam('type') String type,
+                  @QueryParam('campus') String campus,
+                  @QueryParam('type') List<String> type,
                   @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
                   @QueryParam('distance') Double distance,
                   @QueryParam('distanceUnit') String distanceUnit,
@@ -88,7 +89,7 @@ class LocationResource extends Resource {
 
             def trimmedQ = sanitize(q?.trim())
             def trimmedCampus = sanitize(campus?.trim()?.toLowerCase())
-            def trimmedType = sanitize(type?.trim()?.toLowerCase())
+            def trimmedType = type.collect { sanitize(it.trim().toLowerCase()) }
             isOpen = isOpen == null ? false : isOpen
             giRestroom = giRestroom == null ? false : giRestroom
 
@@ -164,10 +165,12 @@ class LocationResource extends Resource {
      * @param trimmedUnit
      * @return
      */
-    private static boolean validateParameters(String trimmedCampus, String trimmedType, Double lat,
-                                       Double lon, String trimmedUnit) {
+    private static boolean validateParameters(
+            String trimmedCampus, List<String> trimmedTypes,
+            Double lat, Double lon, String trimmedUnit
+    ) {
         def invalidCampus = trimmedCampus && !ALLOWED_CAMPUSES.contains(trimmedCampus)
-        def invalidType = trimmedType && !ALLOWED_TYPES.contains(trimmedType)
+        def invalidType = trimmedTypes && !ALLOWED_TYPES.containsAll(trimmedTypes)
         def invalidLocation = (lat == null && lon != null) || (lat != null && lon == null)
         def invalidUnit = trimmedUnit && !ALLOWED_UNITS.contains(trimmedUnit)
         invalidCampus || invalidType || invalidLocation || invalidUnit
@@ -182,10 +185,12 @@ class LocationResource extends Resource {
      * @param campus
      * @param resultObject
      */
-    private void setPaginationLinks(JsonNode topLevelHits, String q, String type, String campus,
-                                    Double lat, Double lon, Double distance, String distanceUnit,
-                                    Boolean isOpen, Boolean giRestroom,
-                                    List<String> parkingZoneGroup, ResultObject resultObject) {
+    private void setPaginationLinks(
+            JsonNode topLevelHits, String q, List<String> type, String campus,
+            Double lat, Double lon, Double distance, String distanceUnit,
+            Boolean isOpen, Boolean giRestroom,
+            List<String> parkingZoneGroup, ResultObject resultObject
+    ) {
 
         def totalHits = topLevelHits.get("total").asInt()
         // If no results were found, no need to add links

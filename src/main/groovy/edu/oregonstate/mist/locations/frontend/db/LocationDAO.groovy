@@ -63,7 +63,7 @@ class LocationDAO {
      *
      * @return json             JSON search results from ES
      */
-    String search(String q, String campus, String type,
+    String search(String q, String campus, List<String> type,
                   Double lat, Double lon, String searchDistance,
                   Boolean isOpen, Integer weekday, Boolean giRestroom,
                   List<String> parkingZoneGroup, Integer pageNumber, Integer pageSize) {
@@ -185,7 +185,7 @@ class LocationDAO {
     @PackageScope // for testing
     static SearchRequestBuilder buildSearchRequest(
             SearchRequestBuilder req,
-            String q, String campus, String type,
+            String q, String campus, List<String> type,
             Double lat, Double lon, String searchDistance,
             Boolean isOpen, Integer weekday,
             Boolean giRestroom, List<String> parkingZoneGroup,
@@ -201,11 +201,15 @@ class LocationDAO {
         }
 
         if (type) {
-            if (type == "cultural-center") {
-                query.must(QueryBuilders.matchQuery("attributes.tags", type))
-            } else {
-                query.must(QueryBuilders.matchQuery("attributes.type", type))
+            def typeQuery = QueryBuilders.boolQuery()
+            type.each {
+                if (it == "cultural-center") {
+                    typeQuery.should(QueryBuilders.matchQuery("attributes.tags", it))
+                } else {
+                    typeQuery.should(QueryBuilders.matchQuery("attributes.type", it))
+                }
             }
+            query.must(typeQuery)
         }
 
         if (q) {
