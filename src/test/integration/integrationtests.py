@@ -111,7 +111,18 @@ class gateway_tests(unittest.TestCase):
         self.assertEqual(len(results['data']), 1)
         self.assertEqual(results['data'][0]['attributes']['type'], 'dining')
 
+    def test_result_order(self):
+        # Check that Milam Hall is the first result for "milam hall"
 
+        # We previously had a bug where searching for "milam hall"
+        # would not return Milam Hall as the first result,
+        # since the results also included matches for just "hall"
+        # and we weren't ordering the results by relevance.
+        # See CO-813
+
+        results = query_request(locations_url, access_token, "get", {'q': 'Milam Hall'}).json()
+        self.assertEqual(len(results['data']), 10)
+        self.assertEqual(results['data'][0]['attributes']['name'], 'Milam Hall')
 
     def test_geo_location(self):
         # test geo query
