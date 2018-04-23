@@ -66,11 +66,12 @@ class LocationDAO {
     String search(String q, String campus, List<String> type,
                   Double lat, Double lon, String searchDistance,
                   Boolean isOpen, Integer weekday, Boolean giRestroom,
-                  List<String> parkingZoneGroup, Integer pageNumber, Integer pageSize) {
+                  List<String> parkingZoneGroup, Integer ada, Integer moto,
+                  Integer ev, Integer pageNumber, Integer pageSize) {
         def esQuery = prepareLocationSearch()
         esQuery = buildSearchRequest(esQuery, q, campus, type, lat, lon, searchDistance,
-                                     isOpen, weekday, giRestroom, parkingZoneGroup,
-                                     pageNumber, pageSize)
+                                     isOpen, weekday, giRestroom, parkingZoneGroup, ada,
+                                     moto, ev, pageNumber, pageSize)
         LOGGER.debug("elastic search query: " + esQuery.toString())
 
         def resp = esQuery.get()
@@ -98,7 +99,7 @@ class LocationDAO {
         esQuery = buildSearchRequest(esQuery, q, null, null,
                                      null, null, null,
                                      isOpen, weekday,
-                                     null, null, pageNumber, pageSize)
+                                     null, null, null, null, null, pageNumber, pageSize)
 
         LOGGER.debug("elastic search query: " + esQuery.toString())
 
@@ -189,6 +190,7 @@ class LocationDAO {
             Double lat, Double lon, String searchDistance,
             Boolean isOpen, Integer weekday,
             Boolean giRestroom, List<String> parkingZoneGroup,
+            Integer ada, Integer moto, Integer ev,
             int pageNumber, int pageSize
     ) {
         req.setFrom((pageNumber - 1) * pageSize)
@@ -252,6 +254,18 @@ class LocationDAO {
                         QueryBuilders.matchQuery("attributes.parkingZoneGroup", it))
             }
             query.must(parkingZoneGroupQuery)
+        }
+
+        if (ada) {
+            query.must(QueryBuilders.rangeQuery("attributes.adaParkingSpaceCount").gt(ada))
+        }
+
+        if (moto) {
+            query.must(QueryBuilders.rangeQuery("attributes.motorcycleParkingSpaceCount").gt(moto))
+        }
+
+        if (ev) {
+            query.must(QueryBuilders.rangeQuery("attributes.evParkingSpaceCount").gt(ev))
         }
 
         req.setQuery(query)

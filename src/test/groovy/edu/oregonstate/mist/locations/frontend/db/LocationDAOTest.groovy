@@ -43,7 +43,7 @@ public class LocationDAOTest {
     void testSearchQuery() {
         request = dao.buildSearchRequest(request, "hello", null, null,
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null, 1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -67,7 +67,7 @@ public class LocationDAOTest {
     void testSearchCampus() {
         request = dao.buildSearchRequest(request, "building", "corvallis", null,
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null,null, 1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -98,7 +98,7 @@ public class LocationDAOTest {
     void testSearchTypeCulturalCenter() {
         request = dao.buildSearchRequest(request, "building", "", ["cultural-center"],
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null,1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -134,7 +134,7 @@ public class LocationDAOTest {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", ["dining"],
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null,1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -170,7 +170,7 @@ public class LocationDAOTest {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", ["dining", "cultural-center"],
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null,1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -213,7 +213,7 @@ public class LocationDAOTest {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", [],
                 (Double) 42.39561, (Double) -71.13051, "2miles",
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null,1, 10)
         assertEquals(request.toString(), '''{
   "from" : 0,
   "size" : 10,
@@ -253,7 +253,7 @@ public class LocationDAOTest {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", [],
                 null, null, null,
-                Boolean.TRUE, weekday, null, null, 1, 10)
+                Boolean.TRUE, weekday, null, null, null, null, null,1, 10)
         assertEquals(request.toString(), '''{
   "from" : 0,
   "size" : 10,

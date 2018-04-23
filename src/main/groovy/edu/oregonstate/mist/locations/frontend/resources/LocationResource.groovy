@@ -74,12 +74,16 @@ class LocationResource extends Resource {
     Response list(@QueryParam('q') String q,
                   @QueryParam('campus') String campus,
                   @QueryParam('type') List<String> type,
-                  @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
+                  @QueryParam('lat') Double lat,
+                  @QueryParam('lon') Double lon,
                   @QueryParam('distance') Double distance,
                   @QueryParam('distanceUnit') String distanceUnit,
                   @QueryParam('isOpen') Boolean isOpen,
                   @QueryParam('giRestroom') Boolean giRestroom,
                   @QueryParam('parkingZoneGroup') List<String> parkingZoneGroup,
+                  @QueryParam('ada') Integer ada,
+                  @QueryParam('moto') Integer moto,
+                  @QueryParam('ev') Integer ev,
                   @QueryParam('geojson') Boolean geojson) {
 
         try {
@@ -110,6 +114,7 @@ class LocationResource extends Resource {
                                 trimmedQ, trimmedCampus, trimmedType,
                                 lat, lon, searchDistance,
                                 isOpen, weekday, giRestroom, parkingZoneGroup,
+                                ada, moto, ev,
                                 pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
@@ -126,7 +131,7 @@ class LocationResource extends Resource {
 
             setPaginationLinks(topLevelHits, q, type, campus,
                     lat, lon, distance, distanceUnit,
-                    isOpen, giRestroom, parkingZoneGroup, resultObject)
+                    isOpen, giRestroom, parkingZoneGroup, ada, moto, ev, resultObject)
 
             if (geojson) {
                 def geojsonResultObject = toGeoJson(resultObject)
@@ -189,7 +194,8 @@ class LocationResource extends Resource {
             JsonNode topLevelHits, String q, List<String> type, String campus,
             Double lat, Double lon, Double distance, String distanceUnit,
             Boolean isOpen, Boolean giRestroom,
-            List<String> parkingZoneGroup, ResultObject resultObject
+            List<String> parkingZoneGroup,
+            Integer ada, Integer moto, Integer ev, ResultObject resultObject
     ) {
 
         def totalHits = topLevelHits.get("total").asInt()
@@ -212,6 +218,9 @@ class LocationResource extends Resource {
                 "isOpen"            : isOpen,
                 "giRestroom"        : giRestroom,
                 "parkingZoneGroup"  : parkingZoneGroup,
+                "ada"               : ada,
+                "moto"              : moto,
+                "ev"                : ev,
                 "pageSize"          : pageSize,
                 "pageNumber"        : pageNumber
         ]
@@ -348,7 +357,7 @@ class LocationResource extends Resource {
             geometry = new Geometries()
             geometry?.type = "GeometryCollection"
             geometry?.geometries = [geoPolygon, geoPoint]
-        } else if ( geoPolygon || geoPoint) {
+        } else if (geoPolygon || geoPoint) {
             def coordinates = geoPolygon ?: geoPoint
             geometry = new GeoCooridinate()
             geometry?.type = coordinates?.type
