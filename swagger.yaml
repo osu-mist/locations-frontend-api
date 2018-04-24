@@ -89,6 +89,24 @@ paths:
           collectionFormat: multi
           type: string
         - in: query
+          name: ada
+          description: "The filter for ADA parking space"
+          required: false
+          type: number
+          format: integer
+        - in: query
+          name: moto
+          description: "The filter for motorcycle parking space"
+          required: false
+          type: number
+          format: integer
+        - in: query
+          name: ev
+          description: "The filter for electric vehicle parking space"
+          required: false
+          type: number
+          format: integer
+        - in: query
           name: page[size]
           description: "Number of results to return. Used in pagination."
           required: false
