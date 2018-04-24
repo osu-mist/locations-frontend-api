@@ -111,11 +111,9 @@ class LocationResource extends Resource {
 
             Integer weekday = DateTime.now().getDayOfWeek()
             String result = locationDAO.search(
-                                trimmedQ, trimmedCampus, trimmedType,
-                                lat, lon, searchDistance,
-                                isOpen, weekday, giRestroom, parkingZoneGroup,
-                                ada, moto, ev,
-                                pageNumber, pageSize)
+                trimmedQ, trimmedCampus, trimmedType, lat, lon,
+                searchDistance, isOpen, weekday, giRestroom,
+                parkingZoneGroup, ada, moto, ev, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []
@@ -130,8 +128,8 @@ class LocationResource extends Resource {
             }
 
             setPaginationLinks(topLevelHits, q, type, campus,
-                    lat, lon, distance, distanceUnit,
-                    isOpen, giRestroom, parkingZoneGroup, ada, moto, ev, resultObject)
+                lat, lon, distance, distanceUnit, isOpen, giRestroom,
+                parkingZoneGroup, ada, moto, ev, resultObject)
 
             if (geojson) {
                 def geojsonResultObject = toGeoJson(resultObject)
@@ -191,12 +189,10 @@ class LocationResource extends Resource {
      * @param resultObject
      */
     private void setPaginationLinks(
-            JsonNode topLevelHits, String q, List<String> type, String campus,
-            Double lat, Double lon, Double distance, String distanceUnit,
-            Boolean isOpen, Boolean giRestroom,
-            List<String> parkingZoneGroup,
-            Integer ada, Integer moto, Integer ev, ResultObject resultObject
-    ) {
+        JsonNode topLevelHits, String q, List<String> type, String campus,
+        Double lat, Double lon, Double distance, String distanceUnit,
+        Boolean isOpen, Boolean giRestroom, List<String> parkingZoneGroup,
+        Integer ada, Integer moto, Integer ev, ResultObject resultObject) {
 
         def totalHits = topLevelHits.get("total").asInt()
         // If no results were found, no need to add links

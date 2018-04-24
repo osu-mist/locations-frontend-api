@@ -5,8 +5,6 @@ import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.resources.LocationResource
 import groovy.mock.interceptor.MockFor
-import io.dropwizard.testing.junit.DropwizardAppRule
-import org.junit.ClassRule
 import org.junit.Test
 
 import javax.ws.rs.core.Response

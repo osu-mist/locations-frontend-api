@@ -178,6 +178,9 @@ class LocationDAO {
      * @param weekday       if isOpen is true, weekday gives the current day of the week
      *                      (monday=1, sunday=7)
      * @param giRestroom    only include building with gender inclusive restrooms
+     * @param ada           search for locations with ADA parking space more than this amount
+     * @param moto          search for locations with moto parking space more than this amount
+     * @param ev            search for locations with ev parking space more than this amount
      * @param pageNumber    page number (1..)
      * @param pageSize      page size
      * @return
@@ -185,13 +188,10 @@ class LocationDAO {
     @TypeChecked
     @PackageScope // for testing
     static SearchRequestBuilder buildSearchRequest(
-            SearchRequestBuilder req,
-            String q, String campus, List<String> type,
-            Double lat, Double lon, String searchDistance,
-            Boolean isOpen, Integer weekday,
-            Boolean giRestroom, List<String> parkingZoneGroup,
-            Integer ada, Integer moto, Integer ev,
-            int pageNumber, int pageSize
+            SearchRequestBuilder req, String q, String campus, List<String> type,
+            Double lat, Double lon, String searchDistance, Boolean isOpen,
+            Integer weekday, Boolean giRestroom, List<String> parkingZoneGroup,
+            Integer ada, Integer moto, Integer ev, Integer pageNumber, Integer pageSize
     ) {
         req.setFrom((pageNumber - 1) * pageSize)
         req.setSize(pageSize)
