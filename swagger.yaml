@@ -89,20 +89,20 @@ paths:
           collectionFormat: multi
           type: string
         - in: query
-          name: ada
-          description: "The filter for ADA parking space"
+          name: adaParkingSpaceCount
+          description: "The filter for locations with ADA parking space greater than or equal to this amount"
           required: false
           type: number
           format: integer
         - in: query
-          name: moto
-          description: "The filter for motorcycle parking space"
+          name: motorcycleParkingSpaceCount
+          description: "The filter for locations with motorcycle parking space greater than or equal to this amount"
           required: false
           type: number
           format: integer
         - in: query
-          name: ev
-          description: "The filter for electric vehicle parking space"
+          name: evParkingSpaceCount
+          description: "The filter for locations with electric vehicle parking space greater than or equal to this amount"
           required: false
           type: number
           format: integer

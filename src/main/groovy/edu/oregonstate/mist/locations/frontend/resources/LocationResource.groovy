@@ -81,9 +81,9 @@ class LocationResource extends Resource {
                   @QueryParam('isOpen') Boolean isOpen,
                   @QueryParam('giRestroom') Boolean giRestroom,
                   @QueryParam('parkingZoneGroup') List<String> parkingZoneGroup,
-                  @QueryParam('ada') Integer ada,
-                  @QueryParam('moto') Integer moto,
-                  @QueryParam('ev') Integer ev,
+                  @QueryParam('adaParkingSpaceCount') Integer adaParkingSpaceCount,
+                  @QueryParam('motorcycleParkingSpaceCount') Integer motorcycleParkingSpaceCount,
+                  @QueryParam('evParkingSpaceCount') Integer evParkingSpaceCount,
                   @QueryParam('geojson') Boolean geojson) {
 
         try {
@@ -113,7 +113,8 @@ class LocationResource extends Resource {
             String result = locationDAO.search(
                 trimmedQ, trimmedCampus, trimmedType, lat, lon,
                 searchDistance, isOpen, weekday, giRestroom,
-                parkingZoneGroup, ada, moto, ev, pageNumber, pageSize)
+                parkingZoneGroup, adaParkingSpaceCount, motorcycleParkingSpaceCount,
+                evParkingSpaceCount, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []
@@ -129,7 +130,8 @@ class LocationResource extends Resource {
 
             setPaginationLinks(topLevelHits, q, type, campus,
                 lat, lon, distance, distanceUnit, isOpen, giRestroom,
-                parkingZoneGroup, ada, moto, ev, resultObject)
+                parkingZoneGroup, adaParkingSpaceCount, motorcycleParkingSpaceCount,
+                evParkingSpaceCount, resultObject)
 
             if (geojson) {
                 def geojsonResultObject = toGeoJson(resultObject)
@@ -192,7 +194,8 @@ class LocationResource extends Resource {
         JsonNode topLevelHits, String q, List<String> type, String campus,
         Double lat, Double lon, Double distance, String distanceUnit,
         Boolean isOpen, Boolean giRestroom, List<String> parkingZoneGroup,
-        Integer ada, Integer moto, Integer ev, ResultObject resultObject) {
+        Integer adaParkingSpaceCount, Integer motorcycleParkingSpaceCount,
+        Integer evParkingSpaceCount, ResultObject resultObject) {
 
         def totalHits = topLevelHits.get("total").asInt()
         // If no results were found, no need to add links
@@ -204,21 +207,21 @@ class LocationResource extends Resource {
         Integer pageNumber = getPageNumber()
         Integer pageSize = getPageSize()
         def urlParams = [
-                "q"                 : q,
-                "type"              : type,
-                "campus"            : campus,
-                "lat"               : lat,
-                "lon"               : lon,
-                "distance"          : distance,
-                "distanceUnit"      : distanceUnit,
-                "isOpen"            : isOpen,
-                "giRestroom"        : giRestroom,
-                "parkingZoneGroup"  : parkingZoneGroup,
-                "ada"               : ada,
-                "moto"              : moto,
-                "ev"                : ev,
-                "pageSize"          : pageSize,
-                "pageNumber"        : pageNumber
+                "q"                          : q,
+                "type"                       : type,
+                "campus"                     : campus,
+                "lat"                        : lat,
+                "lon"                        : lon,
+                "distance"                   : distance,
+                "distanceUnit"               : distanceUnit,
+                "isOpen"                     : isOpen,
+                "giRestroom"                 : giRestroom,
+                "parkingZoneGroup"           : parkingZoneGroup,
+                "adaParkingSpaceCount"       : adaParkingSpaceCount,
+                "motorcycleParkingSpaceCount": motorcycleParkingSpaceCount,
+                "evParkingSpaceCount"        : evParkingSpaceCount,
+                "pageSize"                   : pageSize,
+                "pageNumber"                 : pageNumber
         ]
 
         int lastPage = Math.ceil(totalHits / pageSize)

@@ -46,32 +46,39 @@ class LocationDAO {
      * Searches ES (elasticsearch) for locations matching "q" full text search within the given
      * campus and type.
      *
-     * @param q                 query text to use for full text search
-     * @param campus            campus to use to filter results
-     * @param type              type of location to filter results
-     * @param lat               latitude for geo search
-     * @param lon               longitude for geo search
-     * @param searchDistance    restrict results to be at most this far from (lat,lon)
-     * @param isOpen            only include dining locations which are
-     *                              open at the time of the search
-     * @param weekday           if isOpen is true, weekday gives the current day of the week
-     *                              (monday=1, sunday=7)
-     * @param giRestroom        only include building with gender inclusive restrooms
-     * @param parkingZoneGroup  parking zonegroup if type is parking
-     * @param pageNumber        page number (1..)
-     * @param pageSize          page size
-     *
-     * @return json             JSON search results from ES
+     * @param q                            query text to use for full text search
+     * @param campus                       campus to use to filter results
+     * @param type                         type of location to filter results
+     * @param lat                          latitude for geo search
+     * @param lon                          longitude for geo search
+     * @param searchDistance               restrict results to be at most this far from (lat,lon)
+     * @param isOpen                       only include dining locations which are open at the time
+     *                                     of the search
+     * @param weekday                      if isOpen is true, weekday gives the current day of the
+     *                                     week (monday=1, sunday=7)
+     * @param giRestroom                   only include building with gender inclusive restrooms
+     * @param parkingZoneGroup             parking zonegroup if type is parking
+     * @param adaParkingSpaceCount         search for locations with ADA parking space greater than
+     *                                     and equal to this amount
+     * @param motorcycleParkingSpaceCount  search for locations with motorcycle parking space
+     *                                     greater than and equal to this amount
+     * @param evParkingSpaceCount          search for locations with electric vehicle parking space
+     *                                     greater than and equal to this amount
+     * @param pageNumber                   page number (1..)
+     * @param pageSize                     page size
+     * @return json                        JSON search results from ES
      */
     String search(String q, String campus, List<String> type,
                   Double lat, Double lon, String searchDistance,
                   Boolean isOpen, Integer weekday, Boolean giRestroom,
-                  List<String> parkingZoneGroup, Integer ada, Integer moto,
-                  Integer ev, Integer pageNumber, Integer pageSize) {
+                  List<String> parkingZoneGroup, Integer adaParkingSpaceCount,
+                  Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount,
+                  Integer pageNumber, Integer pageSize) {
         def esQuery = prepareLocationSearch()
         esQuery = buildSearchRequest(esQuery, q, campus, type, lat, lon, searchDistance,
-                                     isOpen, weekday, giRestroom, parkingZoneGroup, ada,
-                                     moto, ev, pageNumber, pageSize)
+                                     isOpen, weekday, giRestroom, parkingZoneGroup,
+                                     adaParkingSpaceCount, motorcycleParkingSpaceCount,
+                                     evParkingSpaceCount, pageNumber, pageSize)
         LOGGER.debug("elastic search query: " + esQuery.toString())
 
         def resp = esQuery.get()
@@ -168,21 +175,25 @@ class LocationDAO {
 
     /**
      * Generate ElasticSearch query to list locations by campus, type and full text search.
-     * @param q             search for locations with this name
-     * @param campus        restrict results to this campus (corvallis, cascade)
-     * @param type          restrict results to this type (building, dining, cultural-center...)
-     * @param lat           latitute for geo search
-     * @param lon           longitude for geo search
-     * @param searchDistance    restrict results to be at most this far from (lat,lon)
-     * @param isOpen        only include dining locations which are open at the time of the search
-     * @param weekday       if isOpen is true, weekday gives the current day of the week
-     *                      (monday=1, sunday=7)
-     * @param giRestroom    only include building with gender inclusive restrooms
-     * @param ada           search for locations with ADA parking space more than this amount
-     * @param moto          search for locations with moto parking space more than this amount
-     * @param ev            search for locations with ev parking space more than this amount
-     * @param pageNumber    page number (1..)
-     * @param pageSize      page size
+     * @param q                            search for locations with this name
+     * @param campus                       restrict results to this campus (corvallis, cascade)
+     * @param type                         restrict results to this type (building, dining...)
+     * @param lat                          latitute for geo search
+     * @param lon                          longitude for geo search
+     * @param searchDistance               restrict results to be at most this far from (lat,lon)
+     * @param isOpen                       only include dining locations which are open at the time
+     *                                     of the search
+     * @param weekday                      if isOpen is true, weekday gives the current day of the
+     *                                     week (monday=1, sunday=7)
+     * @param giRestroom                   only include building with gender inclusive restrooms
+     * @param adaParkingSpaceCount         search for locations with ADA parking space greater than
+     *                                     and equal to this amount
+     * @param motorcycleParkingSpaceCount  search for locations with motorcycle parking space
+     *                                     greater than and equal to this amount
+     * @param evParkingSpaceCount          search for locations with electric vehicle parking space
+     *                                     greater than and equal to this amount
+     * @param pageNumber                   page number (1..)
+     * @param pageSize                     page size
      * @return
      */
     @TypeChecked
@@ -191,7 +202,8 @@ class LocationDAO {
             SearchRequestBuilder req, String q, String campus, List<String> type,
             Double lat, Double lon, String searchDistance, Boolean isOpen,
             Integer weekday, Boolean giRestroom, List<String> parkingZoneGroup,
-            Integer ada, Integer moto, Integer ev, Integer pageNumber, Integer pageSize
+            Integer adaParkingSpaceCount, Integer motorcycleParkingSpaceCount,
+            Integer evParkingSpaceCount, Integer pageNumber, Integer pageSize
     ) {
         req.setFrom((pageNumber - 1) * pageSize)
         req.setSize(pageSize)
@@ -256,16 +268,22 @@ class LocationDAO {
             query.must(parkingZoneGroupQuery)
         }
 
-        if (ada) {
-            query.must(QueryBuilders.rangeQuery("attributes.adaParkingSpaceCount").gt(ada))
+        if (adaParkingSpaceCount) {
+            query.must(QueryBuilders
+                .rangeQuery("attributes.adaParkingSpaceCount")
+                .gte(adaParkingSpaceCount))
         }
 
-        if (moto) {
-            query.must(QueryBuilders.rangeQuery("attributes.motorcycleParkingSpaceCount").gt(moto))
+        if (motorcycleParkingSpaceCount) {
+            query.must(QueryBuilders
+                .rangeQuery("attributes.motorcycleParkingSpaceCount")
+                .gte(motorcycleParkingSpaceCount))
         }
 
-        if (ev) {
-            query.must(QueryBuilders.rangeQuery("attributes.evParkingSpaceCount").gt(ev))
+        if (evParkingSpaceCount) {
+            query.must(QueryBuilders
+                .rangeQuery("attributes.evParkingSpaceCount")
+                .gte(evParkingSpaceCount))
         }
 
         req.setQuery(query)

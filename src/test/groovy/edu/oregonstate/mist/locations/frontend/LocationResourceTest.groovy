@@ -20,8 +20,8 @@ class LocationResourceTest {
         mock.demand.search( 0..3 ) {
             String q, String campus, List<String> type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
-            Boolean giRestroom, String parkingZoneGroup,
-            Integer ada, Integer moto, Integer ev,
+            Boolean giRestroom, String parkingZoneGroup, Integer adaParkingSpaceCount,
+            Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount,
             Integer pageNumber, Integer pageSize ->
                 '{"hits": {"total": 0, "hits": []}}'
         }
@@ -128,8 +128,8 @@ class LocationResourceTest {
         mock.demand.search() {
             String q, String campus, List<String> type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
-            Boolean giRestroom, List<String> parkingZoneGroup,
-            Integer ada, Integer moto, Integer ev,
+            Boolean giRestroom, List<String> parkingZoneGroup, Integer adaParkingSpaceCount,
+            Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount,
             Integer pageNumber, Integer pageSize -> esStubData
         }
         def dao = mock.proxyInstance()
@@ -138,19 +138,19 @@ class LocationResourceTest {
         //This mocking is to ensure LocationsResource.groovy#L177 passes\
 
         def expectedParams = [
-            'q'               : 'dixon',
-            'campus'          : "corvallis",
-            'type'            : ["building"],
-            'lat'             : 44.55,
-            'lon'             : 77.77,
-            'distance'        : 2.0,
-            'distanceUnit'    : "mi",
-            'isOpen'          : true,
-            'giRestroom'      : true,
-            'ada'             : 1,
-            'moto'            : 1,
-            'ev'              : 1,
-            'parkingZoneGroup': ['A2', 'C']
+            'q'                          : 'dixon',
+            'campus'                     : "corvallis",
+            'type'                       : ["building"],
+            'lat'                        : 44.55,
+            'lon'                        : 77.77,
+            'distance'                   : 2.0,
+            'distanceUnit'               : "mi",
+            'isOpen'                     : true,
+            'giRestroom'                 : true,
+            'adaParkingSpaceCount'       : 1,
+            'motorcycleParkingSpaceCount': 1,
+            'evParkingSpaceCount'        : 1,
+            'parkingZoneGroup'           : ['A2', 'C']
         ]
 
         Response res = resource.list(
@@ -164,9 +164,9 @@ class LocationResourceTest {
             (Boolean) expectedParams['isOpen'],
             (Boolean) expectedParams['giRestroom'],
             (List<String>) expectedParams['parkingZoneGroup'],
-            (Integer) expectedParams['ada'],
-            (Integer) expectedParams['moto'],
-            (Integer) expectedParams['ev'],
+            (Integer) expectedParams['adaParkingSpaceCount'],
+            (Integer) expectedParams['motorcycleParkingSpaceCount'],
+            (Integer) expectedParams['evParkingSpaceCount'],
             (Boolean) expectedParams['geojson'])
         ResultObject resObj = res.entity
         String selfLinks = resObj.links["self"]

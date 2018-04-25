@@ -307,7 +307,6 @@ public class LocationDAOTest {
         request = dao.buildSearchRequest(request, null, null, [],
             null, null, null,
             Boolean.TRUE, weekday, null, null, 1, 1, 1,1, 10)
-
         assertEquals(request.toString(), '''{
   "from" : 0,
   "size" : 10,
@@ -318,7 +317,7 @@ public class LocationDAOTest {
           "attributes.adaParkingSpaceCount" : {
             "from" : 1,
             "to" : null,
-            "include_lower" : false,
+            "include_lower" : true,
             "include_upper" : true
           }
         }
@@ -327,7 +326,7 @@ public class LocationDAOTest {
           "attributes.motorcycleParkingSpaceCount" : {
             "from" : 1,
             "to" : null,
-            "include_lower" : false,
+            "include_lower" : true,
             "include_upper" : true
           }
         }
@@ -336,7 +335,7 @@ public class LocationDAOTest {
           "attributes.evParkingSpaceCount" : {
             "from" : 1,
             "to" : null,
-            "include_lower" : false,
+            "include_lower" : true,
             "include_upper" : true
           }
         }
