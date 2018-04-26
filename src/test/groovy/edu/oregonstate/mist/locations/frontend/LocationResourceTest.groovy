@@ -5,8 +5,6 @@ import edu.oregonstate.mist.api.jsonapi.ResultObject
 import edu.oregonstate.mist.locations.frontend.db.LocationDAO
 import edu.oregonstate.mist.locations.frontend.resources.LocationResource
 import groovy.mock.interceptor.MockFor
-import io.dropwizard.testing.junit.DropwizardAppRule
-import org.junit.ClassRule
 import org.junit.Test
 
 import javax.ws.rs.core.Response
@@ -22,7 +20,9 @@ class LocationResourceTest {
         mock.demand.search( 0..3 ) {
             String q, String campus, List<String> type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
-            Boolean giRestroom, String parkingZoneGroup, Integer pageNumber, Integer pageSize ->
+            Boolean giRestroom, String parkingZoneGroup, Integer adaParkingSpaceCount,
+            Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount,
+            Integer pageNumber, Integer pageSize ->
                 '{"hits": {"total": 0, "hits": []}}'
         }
         def dao = mock.proxyInstance()
@@ -31,14 +31,14 @@ class LocationResourceTest {
 
         // Test: no result
         def noResultRsp = resource.list('dixon', null,
-            null, null, null, null, null, null, false, null, null)
+            null, null, null, null, null, null, false, null, null, null, null, null)
         assert noResultRsp.status == 200
         assert noResultRsp.entity.links == [:]
         assert noResultRsp.entity.data == []
 
         // Test: invalid campus
         def invalidCampRes = resource.list('dixon', 'invalid',
-            null, null, null, null, null, null, null, null, null)
+            null, null, null, null, null, null, null, null, null, null,null, null)
         assert invalidCampRes.status == 404
         assert invalidCampRes.entity.developerMessage.contains("Not Found")
         assert invalidCampRes.entity.userMessage.contains("Not Found")
@@ -46,7 +46,7 @@ class LocationResourceTest {
 
         // Test: geoJson
         def geoJsonRes = resource.list(null, null,
-            null, null, null, null, null, null, null, null, true)
+            null, null, null, null, null, null, null, null, null, null, null, true)
         assert geoJsonRes.status == 200
         assert geoJsonRes.entity.type == 'FeatureCollection'
         assert geoJsonRes.entity.hasProperty('features')
@@ -128,7 +128,8 @@ class LocationResourceTest {
         mock.demand.search() {
             String q, String campus, List<String> type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
-            Boolean giRestroom, List<String> parkingZoneGroup,
+            Boolean giRestroom, List<String> parkingZoneGroup, Integer adaParkingSpaceCount,
+            Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount,
             Integer pageNumber, Integer pageSize -> esStubData
         }
         def dao = mock.proxyInstance()
@@ -137,16 +138,19 @@ class LocationResourceTest {
         //This mocking is to ensure LocationsResource.groovy#L177 passes\
 
         def expectedParams = [
-            'q'               : 'dixon',
-            'campus'          : "corvallis",
-            'type'            : ["building"],
-            'lat'             : 44.55,
-            'lon'             : 77.77,
-            'distance'        : 2.0,
-            'distanceUnit'    : "mi",
-            'isOpen'          : true,
-            'giRestroom'      : true,
-            'parkingZoneGroup': ['A2', 'C']
+            'q'                          : 'dixon',
+            'campus'                     : "corvallis",
+            'type'                       : ["building"],
+            'lat'                        : 44.55,
+            'lon'                        : 77.77,
+            'distance'                   : 2.0,
+            'distanceUnit'               : "mi",
+            'isOpen'                     : true,
+            'giRestroom'                 : true,
+            'adaParkingSpaceCount'       : 1,
+            'motorcycleParkingSpaceCount': 1,
+            'evParkingSpaceCount'        : 1,
+            'parkingZoneGroup'           : ['A2', 'C']
         ]
 
         Response res = resource.list(
@@ -160,6 +164,9 @@ class LocationResourceTest {
             (Boolean) expectedParams['isOpen'],
             (Boolean) expectedParams['giRestroom'],
             (List<String>) expectedParams['parkingZoneGroup'],
+            (Integer) expectedParams['adaParkingSpaceCount'],
+            (Integer) expectedParams['motorcycleParkingSpaceCount'],
+            (Integer) expectedParams['evParkingSpaceCount'],
             (Boolean) expectedParams['geojson'])
         ResultObject resObj = res.entity
         String selfLinks = resObj.links["self"]

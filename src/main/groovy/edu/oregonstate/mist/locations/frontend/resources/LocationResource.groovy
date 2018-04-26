@@ -74,12 +74,16 @@ class LocationResource extends Resource {
     Response list(@QueryParam('q') String q,
                   @QueryParam('campus') String campus,
                   @QueryParam('type') List<String> type,
-                  @QueryParam('lat') Double lat, @QueryParam('lon') Double lon,
+                  @QueryParam('lat') Double lat,
+                  @QueryParam('lon') Double lon,
                   @QueryParam('distance') Double distance,
                   @QueryParam('distanceUnit') String distanceUnit,
                   @QueryParam('isOpen') Boolean isOpen,
                   @QueryParam('giRestroom') Boolean giRestroom,
                   @QueryParam('parkingZoneGroup') List<String> parkingZoneGroup,
+                  @QueryParam('adaParkingSpaceCount') Integer adaParkingSpaceCount,
+                  @QueryParam('motorcycleParkingSpaceCount') Integer motorcycleParkingSpaceCount,
+                  @QueryParam('evParkingSpaceCount') Integer evParkingSpaceCount,
                   @QueryParam('geojson') Boolean geojson) {
 
         try {
@@ -107,10 +111,10 @@ class LocationResource extends Resource {
 
             Integer weekday = DateTime.now().getDayOfWeek()
             String result = locationDAO.search(
-                                trimmedQ, trimmedCampus, trimmedType,
-                                lat, lon, searchDistance,
-                                isOpen, weekday, giRestroom, parkingZoneGroup,
-                                pageNumber, pageSize)
+                trimmedQ, trimmedCampus, trimmedType, lat, lon,
+                searchDistance, isOpen, weekday, giRestroom,
+                parkingZoneGroup, adaParkingSpaceCount, motorcycleParkingSpaceCount,
+                evParkingSpaceCount, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []
@@ -125,8 +129,9 @@ class LocationResource extends Resource {
             }
 
             setPaginationLinks(topLevelHits, q, type, campus,
-                    lat, lon, distance, distanceUnit,
-                    isOpen, giRestroom, parkingZoneGroup, resultObject)
+                lat, lon, distance, distanceUnit, isOpen, giRestroom,
+                parkingZoneGroup, adaParkingSpaceCount, motorcycleParkingSpaceCount,
+                evParkingSpaceCount, resultObject)
 
             if (geojson) {
                 def geojsonResultObject = toGeoJson(resultObject)
@@ -186,11 +191,11 @@ class LocationResource extends Resource {
      * @param resultObject
      */
     private void setPaginationLinks(
-            JsonNode topLevelHits, String q, List<String> type, String campus,
-            Double lat, Double lon, Double distance, String distanceUnit,
-            Boolean isOpen, Boolean giRestroom,
-            List<String> parkingZoneGroup, ResultObject resultObject
-    ) {
+        JsonNode topLevelHits, String q, List<String> type, String campus,
+        Double lat, Double lon, Double distance, String distanceUnit,
+        Boolean isOpen, Boolean giRestroom, List<String> parkingZoneGroup,
+        Integer adaParkingSpaceCount, Integer motorcycleParkingSpaceCount,
+        Integer evParkingSpaceCount, ResultObject resultObject) {
 
         def totalHits = topLevelHits.get("total").asInt()
         // If no results were found, no need to add links
@@ -202,18 +207,21 @@ class LocationResource extends Resource {
         Integer pageNumber = getPageNumber()
         Integer pageSize = getPageSize()
         def urlParams = [
-                "q"                 : q,
-                "type"              : type,
-                "campus"            : campus,
-                "lat"               : lat,
-                "lon"               : lon,
-                "distance"          : distance,
-                "distanceUnit"      : distanceUnit,
-                "isOpen"            : isOpen,
-                "giRestroom"        : giRestroom,
-                "parkingZoneGroup"  : parkingZoneGroup,
-                "pageSize"          : pageSize,
-                "pageNumber"        : pageNumber
+                "q"                          : q,
+                "type"                       : type,
+                "campus"                     : campus,
+                "lat"                        : lat,
+                "lon"                        : lon,
+                "distance"                   : distance,
+                "distanceUnit"               : distanceUnit,
+                "isOpen"                     : isOpen,
+                "giRestroom"                 : giRestroom,
+                "parkingZoneGroup"           : parkingZoneGroup,
+                "adaParkingSpaceCount"       : adaParkingSpaceCount,
+                "motorcycleParkingSpaceCount": motorcycleParkingSpaceCount,
+                "evParkingSpaceCount"        : evParkingSpaceCount,
+                "pageSize"                   : pageSize,
+                "pageNumber"                 : pageNumber
         ]
 
         int lastPage = Math.ceil(totalHits / pageSize)
@@ -348,7 +356,7 @@ class LocationResource extends Resource {
             geometry = new Geometries()
             geometry?.type = "GeometryCollection"
             geometry?.geometries = [geoPolygon, geoPoint]
-        } else if ( geoPolygon || geoPoint) {
+        } else if (geoPolygon || geoPoint) {
             def coordinates = geoPolygon ?: geoPoint
             geometry = new GeoCooridinate()
             geometry?.type = coordinates?.type

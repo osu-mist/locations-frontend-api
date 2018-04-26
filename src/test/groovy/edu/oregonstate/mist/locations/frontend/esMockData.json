@@ -682,7 +682,7 @@
                     "giRestroomLimit": null,
                     "giRestroomLocations": null,
                     "synonyms": [],
-                    "h                                                                ashCode": 263034665
+                    "hashCode": 263034665
                 },
                 "links": {
                     "self": "https://api.oregonstate.edu/v1/locations/795cb5d2efcf328261e0c418fd9becf4"

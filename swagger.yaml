@@ -89,6 +89,24 @@ paths:
           collectionFormat: multi
           type: string
         - in: query
+          name: adaParkingSpaceCount
+          description: "The filter for locations with ADA parking space greater than or equal to this amount"
+          required: false
+          type: number
+          format: integer
+        - in: query
+          name: motorcycleParkingSpaceCount
+          description: "The filter for locations with motorcycle parking space greater than or equal to this amount"
+          required: false
+          type: number
+          format: integer
+        - in: query
+          name: evParkingSpaceCount
+          description: "The filter for locations with electric vehicle parking space greater than or equal to this amount"
+          required: false
+          type: number
+          format: integer
+        - in: query
           name: page[size]
           description: "Number of results to return. Used in pagination."
           required: false

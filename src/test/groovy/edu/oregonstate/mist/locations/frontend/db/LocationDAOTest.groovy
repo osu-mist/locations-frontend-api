@@ -43,7 +43,7 @@ public class LocationDAOTest {
     void testSearchQuery() {
         request = dao.buildSearchRequest(request, "hello", null, null,
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null, 1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -67,7 +67,7 @@ public class LocationDAOTest {
     void testSearchCampus() {
         request = dao.buildSearchRequest(request, "building", "corvallis", null,
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null,null, 1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -98,7 +98,7 @@ public class LocationDAOTest {
     void testSearchTypeCulturalCenter() {
         request = dao.buildSearchRequest(request, "building", "", ["cultural-center"],
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null,1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -134,7 +134,7 @@ public class LocationDAOTest {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", ["dining"],
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null,1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -170,7 +170,7 @@ public class LocationDAOTest {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", ["dining", "cultural-center"],
                 null, null, null,
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null,1, 10)
         assertEquals('''{
   "from" : 0,
   "size" : 10,
@@ -213,7 +213,7 @@ public class LocationDAOTest {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", [],
                 (Double) 42.39561, (Double) -71.13051, "2miles",
-                null, null, null, null, 1, 10)
+                null, null, null, null, null, null, null,1, 10)
         assertEquals(request.toString(), '''{
   "from" : 0,
   "size" : 10,
@@ -253,7 +253,7 @@ public class LocationDAOTest {
         request = dao.prepareLocationSearch()
         request = dao.buildSearchRequest(request, "building", "", [],
                 null, null, null,
-                Boolean.TRUE, weekday, null, null, 1, 10)
+                Boolean.TRUE, weekday, null, null, null, null, null,1, 10)
         assertEquals(request.toString(), '''{
   "from" : 0,
   "size" : 10,
@@ -301,4 +301,78 @@ public class LocationDAOTest {
 }''')
     }
 
+    @Test
+    void testSearchParkingSpaces() {
+        request = dao.prepareLocationSearch()
+        request = dao.buildSearchRequest(request, null, null, [],
+            null, null, null,
+            Boolean.TRUE, weekday, null, null, 1, 1, 1,1, 10)
+        assertEquals(request.toString(), '''{
+  "from" : 0,
+  "size" : 10,
+  "query" : {
+    "bool" : {
+      "must" : [ {
+        "range" : {
+          "attributes.adaParkingSpaceCount" : {
+            "from" : 1,
+            "to" : null,
+            "include_lower" : true,
+            "include_upper" : true
+          }
+        }
+      }, {
+        "range" : {
+          "attributes.motorcycleParkingSpaceCount" : {
+            "from" : 1,
+            "to" : null,
+            "include_lower" : true,
+            "include_upper" : true
+          }
+        }
+      }, {
+        "range" : {
+          "attributes.evParkingSpaceCount" : {
+            "from" : 1,
+            "to" : null,
+            "include_lower" : true,
+            "include_upper" : true
+          }
+        }
+      } ],
+      "filter" : {
+        "nested" : {
+          "query" : {
+            "bool" : {
+              "filter" : [ {
+                "range" : {
+                  "attributes.openHours.1.start" : {
+                    "from" : null,
+                    "to" : "now",
+                    "include_lower" : true,
+                    "include_upper" : true
+                  }
+                }
+              }, {
+                "range" : {
+                  "attributes.openHours.1.end" : {
+                    "from" : "now",
+                    "to" : null,
+                    "include_lower" : false,
+                    "include_upper" : true
+                  }
+                }
+              } ]
+            }
+          },
+          "path" : "attributes.openHours.1"
+        }
+      }
+    }
+  },
+  "sort" : [ {
+    "_score" : { }
+  } ]
+}''')
+    }
 }
