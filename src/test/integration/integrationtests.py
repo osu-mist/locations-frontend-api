@@ -4,6 +4,7 @@ import ssl
 import sys
 import unittest
 from datetime import datetime
+from random import randint
 
 from api_request import blank_result, \
                         check_ssl, \
@@ -221,6 +222,21 @@ class gateway_tests(unittest.TestCase):
 
         test_resource(locations_url)
         test_resource(services_url)
+
+    # test the query parameters of adaParkingSpaceCount, motorcycleParkingSpaceCount, evParkingSpaceCount
+    def test_parking_spaces_filters(self):
+        payload = {
+            'adaParkingSpaceCount': randint(0, 5),
+            'motorcycleParkingSpaceCount': randint(0, 5),
+            'evParkingSpaceCount': randint(0, 5)
+        }
+
+        all_parkings = query_request(locations_url, access_token, 'get', payload).json()
+
+        for parking in all_parkings['data']:
+            self.assertGreaterEqual(parking['attributes']['adaParkingSpaceCount'], payload['adaParkingSpaceCount'])
+            self.assertGreaterEqual(parking['attributes']['motorcycleParkingSpaceCount'], payload['motorcycleParkingSpaceCount'])
+            self.assertGreaterEqual(parking['attributes']['evParkingSpaceCount'], payload['evParkingSpaceCount'])
 
     # private function: convert result to GeoJSON object
     def __to_geojson(self, json_res):
