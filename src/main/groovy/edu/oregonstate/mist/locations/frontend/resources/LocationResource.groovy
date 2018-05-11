@@ -84,7 +84,8 @@ class LocationResource extends Resource {
                   @QueryParam('adaParkingSpaceCount') Integer adaParkingSpaceCount,
                   @QueryParam('motorcycleParkingSpaceCount') Integer motorcycleParkingSpaceCount,
                   @QueryParam('evParkingSpaceCount') Integer evParkingSpaceCount,
-                  @QueryParam('geojson') Boolean geojson) {
+                  @QueryParam('geojson') Boolean geojson,
+                  @QueryParam('abbreviation') String abbreviation) {
 
         try {
             if (maxPageSizeExceeded()) {
@@ -114,7 +115,7 @@ class LocationResource extends Resource {
                 trimmedQ, trimmedCampus, trimmedType, lat, lon,
                 searchDistance, isOpen, weekday, giRestroom,
                 parkingZoneGroup, adaParkingSpaceCount, motorcycleParkingSpaceCount,
-                evParkingSpaceCount, pageNumber, pageSize)
+                evParkingSpaceCount, abbreviation, pageNumber, pageSize)
 
             ResultObject resultObject = new ResultObject()
             resultObject.data = []
@@ -131,7 +132,7 @@ class LocationResource extends Resource {
             setPaginationLinks(topLevelHits, q, type, campus,
                 lat, lon, distance, distanceUnit, isOpen, giRestroom,
                 parkingZoneGroup, adaParkingSpaceCount, motorcycleParkingSpaceCount,
-                evParkingSpaceCount, resultObject)
+                evParkingSpaceCount, abbreviation, resultObject)
 
             if (geojson) {
                 def geojsonResultObject = toGeoJson(resultObject)
@@ -195,7 +196,7 @@ class LocationResource extends Resource {
         Double lat, Double lon, Double distance, String distanceUnit,
         Boolean isOpen, Boolean giRestroom, List<String> parkingZoneGroup,
         Integer adaParkingSpaceCount, Integer motorcycleParkingSpaceCount,
-        Integer evParkingSpaceCount, ResultObject resultObject) {
+        Integer evParkingSpaceCount, String abbreviation, ResultObject resultObject) {
 
         def totalHits = topLevelHits.get("total").asInt()
         // If no results were found, no need to add links
@@ -220,6 +221,7 @@ class LocationResource extends Resource {
                 "adaParkingSpaceCount"       : adaParkingSpaceCount,
                 "motorcycleParkingSpaceCount": motorcycleParkingSpaceCount,
                 "evParkingSpaceCount"        : evParkingSpaceCount,
+                "abbreviation"               : abbreviation,
                 "pageSize"                   : pageSize,
                 "pageNumber"                 : pageNumber
         ]

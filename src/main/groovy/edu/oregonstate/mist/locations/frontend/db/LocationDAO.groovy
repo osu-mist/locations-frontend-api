@@ -73,12 +73,12 @@ class LocationDAO {
                   Boolean isOpen, Integer weekday, Boolean giRestroom,
                   List<String> parkingZoneGroup, Integer adaParkingSpaceCount,
                   Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount,
-                  Integer pageNumber, Integer pageSize) {
+                  String abbreviation, Integer pageNumber, Integer pageSize) {
         def esQuery = prepareLocationSearch()
         esQuery = buildSearchRequest(esQuery, q, campus, type, lat, lon, searchDistance,
                                      isOpen, weekday, giRestroom, parkingZoneGroup,
                                      adaParkingSpaceCount, motorcycleParkingSpaceCount,
-                                     evParkingSpaceCount, pageNumber, pageSize)
+                                     evParkingSpaceCount, abbreviation, pageNumber, pageSize)
         LOGGER.debug("elastic search query: " + esQuery.toString())
 
         def resp = esQuery.get()
@@ -106,7 +106,7 @@ class LocationDAO {
         esQuery = buildSearchRequest(esQuery, q, null, null,
                                      null, null, null,
                                      isOpen, weekday,
-                                     null, null, null, null, null, pageNumber, pageSize)
+                                     null, null, null, null, null, null, pageNumber, pageSize)
 
         LOGGER.debug("elastic search query: " + esQuery.toString())
 
@@ -192,6 +192,7 @@ class LocationDAO {
      *                                     greater than and equal to this amount
      * @param evParkingSpaceCount          search for locations with electric vehicle parking space
      *                                     greater than and equal to this amount
+     * @param abbreviation                 return locations that match abbreviation
      * @param pageNumber                   page number (1..)
      * @param pageSize                     page size
      * @return
@@ -203,7 +204,8 @@ class LocationDAO {
             Double lat, Double lon, String searchDistance, Boolean isOpen,
             Integer weekday, Boolean giRestroom, List<String> parkingZoneGroup,
             Integer adaParkingSpaceCount, Integer motorcycleParkingSpaceCount,
-            Integer evParkingSpaceCount, Integer pageNumber, Integer pageSize
+            Integer evParkingSpaceCount, String abbreviation,
+            Integer pageNumber, Integer pageSize
     ) {
         req.setFrom((pageNumber - 1) * pageSize)
         req.setSize(pageSize)
@@ -284,6 +286,10 @@ class LocationDAO {
             query.must(QueryBuilders
                 .rangeQuery("attributes.evParkingSpaceCount")
                 .gte(evParkingSpaceCount))
+        }
+
+        if (abbreviation) {
+            query.must(QueryBuilders.matchQuery("attributes.abbreviation", abbreviation))
         }
 
         req.setQuery(query)
