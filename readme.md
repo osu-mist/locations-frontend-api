@@ -25,7 +25,11 @@ This API is based on the web-api-skeleton. For more documentation on the skeleto
   elasticsearch:2.4.4
   ```
 
-* Use [location-api](https://github.com/osu-mist/locations-api) to fetch `locations-combined.json` and `services.json` by calling `/locations/combined` and `/locations/services`
+* Use [location-api](https://github.com/osu-mist/locations-api) to fetch `locations-combined.json` and `services.json` by calling `/locations/combined` and `/locations/services`. You can also get these files from the workspaces of the following Jenkins jobs:
+
+  * [Locations API Backend ES Update (api-dev)](http://act-jenkins.ucsadm.oregonstate.edu:8080/view/APIs/job/apis%20Locations%20API%20Backend%20ES%20Update%20%28api-dev%29)
+  * [Locations API Backend ES Update (api-prod)](http://act-jenkins.ucsadm.oregonstate.edu:8080/view/APIs/job/apis%20Locations%20API%20Backend%20ES%20Update%20%28api-prod%29)
+
 * Post binary data to elasticsearch
 
   ```bash
