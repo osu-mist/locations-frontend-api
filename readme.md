@@ -30,11 +30,11 @@ This API is based on the web-api-skeleton. For more documentation on the skeleto
   * [Locations API Backend ES Update (api-dev)](http://act-jenkins.ucsadm.oregonstate.edu:8080/view/APIs/job/apis%20Locations%20API%20Backend%20ES%20Update%20%28api-dev%29)
   * [Locations API Backend ES Update (api-prod)](http://act-jenkins.ucsadm.oregonstate.edu:8080/view/APIs/job/apis%20Locations%20API%20Backend%20ES%20Update%20%28api-prod%29)
 
-* Post binary data to elasticsearch
+* Post binary data to elasticsearch by using [ES Manager](https://github.com/osu-mist/es-manager):
 
   ```bash
-  $ curl -s -XPOST localhost:9200/locations/locations/_bulk --data-binary "@locations-combined.json"; echo
-  $ curl -s -XPOST localhost:9200/services/services/_bulk --data-binary "@services.json"; echo
+  $ python3 esmanager.py -i locations -t locations locations.json
+  $ python3 esmanager.py -i services -t services services.json
   ```
 
 ## Generate Keys
