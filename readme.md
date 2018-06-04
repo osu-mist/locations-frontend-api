@@ -16,7 +16,7 @@ This API is based on the web-api-skeleton. For more documentation on the skeleto
 * Install [elasticsearch](https://www.elastic.co/)
 * Run elasticsearch
 
-  ```bash
+  ```
   $ docker run \
   -p 9200:9200 \
   -p 9300:9300 \
@@ -32,7 +32,7 @@ This API is based on the web-api-skeleton. For more documentation on the skeleto
 
 * Post binary data to elasticsearch by using [ES Manager](https://github.com/osu-mist/es-manager):
 
-  ```bash
+  ```
   $ python3 esmanager.py -i locations -t locations locations.json
   $ python3 esmanager.py -i services -t services services.json
   ```
@@ -43,7 +43,7 @@ HTTPS is required for Web APIs in development and production. Use keytool(1) to 
 
 Generate key pair and keystore:
 
-```bash
+```
 $ keytool \
   -genkeypair \
   -dname "CN=Jane Doe, OU=Enterprise Computing Services, O=Oregon State University, L=Corvallis, S=Oregon, C=US" \
@@ -58,7 +58,7 @@ $ keytool \
 
 Export certificate to file:
 
-```bash
+```
 $ keytool \
   -exportcert \
   -rfc \
@@ -69,25 +69,25 @@ $ keytool \
 
 Import certificate into truststore:
 
-```bash
+```
 $ keytool \
--importcert \
--alias "doej" \
--file doej.pem \
--keystore doej.truststore
+  -importcert \
+  -alias "doej" \
+  -file doej.pem \
+  -keystore doej.truststore
 ```
 
 ## Gradle
 
 This project uses the build automation tool Gradle. Use the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) to download and install it automatically:
 
-```bash
+```
 $ ./gradlew
 ```
 
 The Gradle wrapper installs Gradle in the directory `~/.gradle`. To add it to your `$PATH`, add the following line to `~/.bashrc`:
 
-```bash
+```
 $ export PATH=$PATH:/home/user/.gradle/wrapper/dists/gradle-2.4-all/WRAPPER_GENERATED_HASH/gradle-2.4/bin
 ```
 
@@ -97,7 +97,7 @@ The changes will take effect once you restart the terminal or `source ~/.bashrc`
 
 List all tasks runnable from root project:
 
-```bash
+```
 $ gradle tasks
 ```
 
@@ -105,7 +105,7 @@ $ gradle tasks
 
 Generate IntelliJ IDEA project:
 
-```bash
+```
 $ gradle idea
 ```
 
@@ -119,7 +119,7 @@ Please refer to [Location Frontend API](https://wiki.library.oregonstate.edu/con
 
 Build the project:
 
-```bash
+```
 $ gradle build
 ```
 
@@ -129,7 +129,7 @@ JARs [will be saved](https://github.com/johnrengelman/shadow#using-the-default-p
 
 Run the project:
 
-```bash
+```
 $ gradle run
 ```
 
@@ -169,14 +169,14 @@ Contrib files are copied to:
 
 Clone the skeleton:
 
-```bash
+```
 $ git clone --origin skeleton git@github.com:osu-mist/web-api-skeleton.git my-api
 $ cd my-api
 ```
 
 Rename the webapiskeleton package and SkeletonApplication class:
 
-```bash
+```
 $ git mv src/main/groovy/edu/oregonstate/mist/webapiskeleton src/main/groovy/edu/oregonstate/mist/myapi
 $ vim src/main/groovy/edu/oregonstate/mist/myapi/SkeletonApplication.class
 ```
@@ -193,14 +193,14 @@ Update the resource examples at the end of this readme.
 
 Add the skeleton as a remote:
 
-```bash
+```
 $ git remote add skeleton git@github.com:osu-mist/web-api-skeleton.git
 $ git fetch skeleton
 ```
 
 Merge the skeleton into your codebase:
 
-```bash
+```
 $ git checkout feature/abc-123-branch
 $ git merge skeleton/master
 ...
@@ -211,14 +211,14 @@ $ git commit -v
 
 Fetch updates from the skeleton:
 
-```bash
+```
 $ git fetch skeleton
 ```
 
 Merge the updates into your codebase as before.
 Note that changes to CodeNarc configuration may introduce build failures.
 
-```bash
+```
 $ git checkout feature/abc-124-branch
 $ git merge skeleton/master
 ...
