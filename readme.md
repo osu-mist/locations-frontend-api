@@ -13,8 +13,7 @@ This API is based on the web-api-skeleton. For more documentation on the skeleto
 
 ## Prerequisites
 
-* Install [elasticsearch](https://www.elastic.co/)
-* Run elasticsearch
+* Install [elasticsearch](https://www.elastic.co/) or run elasticsearch in a docker container:
 
   ```
   $ docker run \
