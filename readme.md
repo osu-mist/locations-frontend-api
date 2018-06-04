@@ -1,4 +1,4 @@
-# Locations API.
+# Locations API
 
 ### Dropwizard and JDK
 
