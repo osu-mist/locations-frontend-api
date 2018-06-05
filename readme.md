@@ -1,6 +1,6 @@
 # Locations API
 
-### Dropwizard and JDK
+## Dropwizard and JDK
 
 Current implementations of the Dropwizard and JDK.
 
@@ -100,7 +100,7 @@ List all tasks runnable from root project:
 $ gradle tasks
 ```
 
-### IntelliJ IDEA
+## IntelliJ IDEA
 
 Generate IntelliJ IDEA project:
 
@@ -110,11 +110,13 @@ $ gradle idea
 
 Open with `File` -> `Open Project`.
 
-### Configure
+## Configure
 
 Copy [configuration-example.yaml](configuration-example.yaml) to `configuration.yaml`. Modify as necessary, being careful to avoid committing sensitive data.
 
 Please refer to [Location Frontend API](https://wiki.library.oregonstate.edu/confluence/display/CO/Location+Frontend+API) for `locations` session configuration
+
+## Build
 
 Build the project:
 
