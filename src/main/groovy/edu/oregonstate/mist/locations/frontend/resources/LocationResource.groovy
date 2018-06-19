@@ -109,6 +109,12 @@ class LocationResource extends Resource {
                 return notFound().build()
             }
 
+            // validate ranges of lat and lon
+            if(!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) {
+                return badRequest("Longitude/latitude out of bounds. Bounds are: " +
+                        "-90 <= latitude <= 90 and -180 <= longitude <= 180").build()
+            }
+
             Integer weekday = DateTime.now().getDayOfWeek()
             String result = locationDAO.search(
                 trimmedQ, trimmedCampus, trimmedType, lat, lon,
