@@ -59,6 +59,11 @@ class LocationResourceTest {
         assert outOfRange.entity.developerMessage.contains("Longitude/latitude out of bounds")
         assert outOfRange.entity.code == 1400
 
+        // Test: in range lat/lon
+        def inRange = resource.list(null, null,
+                null, -40, 120, null, null, null, null, null, null, null, null, null)
+        assert inRange.status == 200
+
         mock.verify(dao)
     }
 
