@@ -52,10 +52,8 @@ class LocationResourceTest {
         assert geoJsonRes.entity.hasProperty('features')
 
         // Test: out of range lat/lon
-        def outOfRange = resource.list('dixon', null, null, -100,
-                200, null, null, null, null,
-                null, null, null,
-                null, null)
+        def outOfRange = resource.list(null, null,
+            null, -100, 200, null, null, null, null, null, null, null, null, null)
         assert outOfRange.status == 400
         assert outOfRange.entity.userMessage.contains("Bad Request")
         assert outOfRange.entity.developerMessage.contains("Longitude/latitude out of bounds")
