@@ -85,7 +85,7 @@ if __name__ == "__main__":
             print "\nThese are the totally new buildings\n"
             for gone_b in totallyNewBuildings:
                 print gone_b + "  ---  " + new_building_data_dict[gone_b]['attributes']['name']
-            # print new_bdict_view - old_bdict_view
+
         else:
             print "There are no differences."
 
