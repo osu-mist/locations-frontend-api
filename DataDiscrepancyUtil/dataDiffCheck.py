@@ -14,6 +14,18 @@ args = docopt(__doc__, version='1.0.0rc2')
 import sys
 import json
 
+def create_mappings(buildings_json):
+    building_data = {}
+    names2ids = {}
+
+    for building in buildings_json['data']:
+        #map id to building data
+        building_data[building['id']] = building
+        #map name to id
+        names2ids[ building['attributes']['name'] ] = building['id']
+
+    return (building_data, names2ids)
+
 if __name__ == "__main__":
     print("Expecting old.json and new.json as input files 1 and 2.")
     # old.json being the data from https://api.oregonstate.edu/v1/locations?page[size]=10000&type=building
@@ -25,28 +37,12 @@ if __name__ == "__main__":
     else:
 
         with open(args['<old_data_path>'], "r") as old_file:
-            old_building_data_json = json.loads(old_file.read())
-        with open(args['<new_data_path>'], "r") as new_file:
-            new_building_data_json = json.loads(new_file.read())
+            with open(args['<new_data_path>'], "r") as new_file:
+                old_building_data_json = json.loads(old_file.read())
+                new_building_data_json = json.loads(new_file.read())
 
-        new_building_data_dict = {}
-        old_building_data_dict = {}
-
-        # TODO Rename this name view dict
-        # This is for the NAME : {OLD, NEW} stuff
-        new_bdata_name_dict = {}
-        old_bdata_name_dict = {}
-
-        # Create a dict of the new building data to make the next loop simpler
-        for new_building in new_building_data_json['data']:
-            new_building_data_dict[new_building['id']] = new_building
-            new_bdata_name_dict[new_building['attributes']
-                                ['name']] = new_building['id']
-
-        for old_building in old_building_data_json['data']:
-            old_building_data_dict[old_building['id']] = old_building
-            old_bdata_name_dict[old_building['attributes']
-                                ['name']] = old_building['id']
+                new_building_data_dict, new_names2ids = create_mappings(new_building_data_json)
+                old_building_data_dict, old_names2ids = create_mappings(old_building_data_json)
 
         old_bdict_view = old_building_data_dict.viewkeys()
         new_bdict_view = new_building_data_dict.viewkeys()
