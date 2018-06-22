@@ -1,3 +1,16 @@
+"""
+    Usage:
+    dataDiffCheck.py <old_data_path> <new_data_path>
+
+    Arguments:
+        old_data_path: File path of old building json
+        new_data_path: File path of new building json
+"""
+from docopt import docopt
+print(docopt(__doc__, version='1.0.0rc2'))
+
+args = docopt(__doc__, version='1.0.0rc2')
+
 import sys
 import json
 
@@ -6,15 +19,14 @@ if __name__ == "__main__":
     # old.json being the data from https://api.oregonstate.edu/v1/locations?page[size]=10000&type=building
     # new.json being the data from https://localhost:8082/api/v0/locations?page[size]=10000&type=building - locations-frontend-api commit b1bec1e013cf29f16a0a01b9dd7c3777e3b4e192
 
-    if(len(sys.argv) >= 3):
-        if(sys.argv[1] == sys.argv[2]):
-            print "These are the same file..."
-        print sys.argv[1] + " as old_file"
-        print sys.argv[2] + " as new_file"
+    if(args['<old_data_path>'] == args['<new_data_path>']):
+        print "These are the same file..."
+        sys.exit(1)
+    else:
 
-        with open(sys.argv[1], "r") as old_file:
+        with open(args['<old_data_path>'], "r") as old_file:
             old_building_data_json = json.loads(old_file.read())
-        with open(sys.argv[2], "r") as new_file:
+        with open(args['<new_data_path>'], "r") as new_file:
             new_building_data_json = json.loads(new_file.read())
 
         new_building_data_dict = {}
