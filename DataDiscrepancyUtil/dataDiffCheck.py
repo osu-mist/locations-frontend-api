@@ -92,7 +92,6 @@ if __name__ == "__main__":
                 if rekeyCheckDict.has_key(bname):
                     print gone_b + "  --- REKEYED! ---  " + new_building_data_dict[gone_b]['attributes']['name']
                     rekeyedBuildings.append(gone_b)
-                    # TODO put all the rekeyed buildings into array https://jira.sig.oregonstate.edu/browse/CO-932
                 else:
                     totallyNewBuildings.append(gone_b)
 
