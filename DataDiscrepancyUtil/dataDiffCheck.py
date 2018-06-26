@@ -8,14 +8,13 @@
 """
 # old.json being the data from https://api.oregonstate.edu/v1/locations?page[size]=10000&type=building
 # new.json being the data from https://localhost:8082/api/v0/locations?page[size]=10000&type=building - locations-frontend-api commit b1bec1e013cf29f16a0a01b9dd7c3777e3b4e192
-
+import sys
+import json
 from docopt import docopt
 print(docopt(__doc__, version='1.0.0rc2'))
 
 args = docopt(__doc__, version='1.0.0rc2')
 
-import sys
-import json
 
 def create_mappings(buildings_json):
     building_data = {}
@@ -35,10 +34,9 @@ if __name__ == "__main__":
         sys.exit(1)
     else:
 
-        with open(args['<old_data_path>'], "r") as old_json_file:
-            with open(args['<new_data_path>'], "r") as new_json_file:
-                new_building_data_dict, new_names2ids = create_mappings(json.loads(new_json_file.read()))
-                old_building_data_dict, old_names2ids = create_mappings(json.loads(old_json_file.read()))
+        with open(args['<old_data_path>'], "r") as old_json_file, open(args['<new_data_path>'], "r") as new_json_file:
+            new_building_data_dict, new_names2ids = create_mappings(json.loads(new_json_file.read()))
+            old_building_data_dict, old_names2ids = create_mappings(json.loads(old_json_file.read()))
 
         old_bdict_view = old_building_data_dict.viewkeys()
         new_bdict_view = new_building_data_dict.viewkeys()
@@ -76,7 +74,7 @@ if __name__ == "__main__":
             gone_new_buildings = list(new_bdict_view - old_bdict_view)
             for gone_b in gone_new_buildings:
                 bname = new_building_data_dict[gone_b]['attributes']['name']
-                if rekeyCheckDict.has_key(bname):
+                if bname in rekeyCheckDict:
                     print gone_b + "  --- REKEYED! ---  " + new_building_data_dict[gone_b]['attributes']['name']
                     rekeyedBuildings.append(gone_b)
                 else:
