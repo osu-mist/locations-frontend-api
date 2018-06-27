@@ -56,7 +56,7 @@ class LocationResourceTest {
             null, -100, 200, null, null, null, null, null, null, null, null, null)
         assert outOfRange.status == 400
         assert outOfRange.entity.userMessage.contains("Bad Request")
-        assert outOfRange.entity.developerMessage.contains("Longitude/latitude out of bounds")
+        assert outOfRange.entity.developerMessage.contains("Invalid latitude/longitude")
         assert outOfRange.entity.code == 1400
 
         // Test: in range lat/lon
