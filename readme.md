@@ -13,7 +13,7 @@ This API is based on the web-api-skeleton. For more documentation on the skeleto
 
 ## Prerequisites
 
-* Install [elasticsearch](https://www.elastic.co/) or run elasticsearch in a docker container:
+* Install [Elasticsearch](https://www.elastic.co/) or run Elasticsearch in a docker container:
 
   ```
   $ docker run \
@@ -24,12 +24,14 @@ This API is based on the web-api-skeleton. For more documentation on the skeleto
   elasticsearch:2.4.4
   ```
 
+* [Post index templates](https://github.com/osu-mist/locations-api#post-to-elasticsearch) to Elasticsearch.
+
 * Use [location-api](https://github.com/osu-mist/locations-api) to fetch `locations-combined.json` and `services.json` by calling `/locations/combined` and `/locations/services`. You can also get these files from the workspaces of the following Jenkins jobs:
 
   * [Locations API Backend ES Update (api-dev)](http://act-jenkins.ucsadm.oregonstate.edu:8080/view/APIs/job/apis%20Locations%20API%20Backend%20ES%20Update%20%28api-dev%29)
   * [Locations API Backend ES Update (api-prod)](http://act-jenkins.ucsadm.oregonstate.edu:8080/view/APIs/job/apis%20Locations%20API%20Backend%20ES%20Update%20%28api-prod%29)
 
-* Post binary data to elasticsearch by using [ES Manager](https://github.com/osu-mist/es-manager):
+* Post binary data to Elasticsearch by using [ES Manager](https://github.com/osu-mist/es-manager):
 
   ```
   $ python3 esmanager.py -i locations -t locations locations.json
