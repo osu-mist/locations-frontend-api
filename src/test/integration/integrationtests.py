@@ -15,7 +15,9 @@ from api_request import blank_result, \
                         response_time, \
                         results_with_links, \
                         unauth_request
-from configuration_load import get_access_token, get_single_resource_id, get_url
+from configuration_load import get_access_token, \
+                               get_single_resource_id, \
+                               get_url
 
 
 class gateway_tests(unittest.TestCase):
@@ -36,7 +38,8 @@ class gateway_tests(unittest.TestCase):
 
                 self.assertEqual(building_id, str(parent_id))
 
-            # Test that the relationships object and the services endpoint have the same number of services
+            # Test that the relationships object and the services endpoint
+            # have the same number of services
             request_url = locations_url + "/" + building_id + "/services"
             building_services = query_request(request_url, access_token, "get",
                                               query_params).json()
@@ -66,12 +69,12 @@ class gateway_tests(unittest.TestCase):
             query_request(locations_url, access_token, "get",
                           query_params).status_code, 200)
 
-        # DW not returning allowed methods headers, Apigee returning bad gateway
+        # DW not returning allowed methods headers,
+        # Apigee returning bad gateway
         if query_request(locations_url, access_token, "post",
                          query_params).status_code == 502:
-            self.skipTest(
-                'DW not returning allowed methods headers that Apigee is expecting'
-            )
+            self.skipTest("""DW not returning allowed methods headers
+                   that Apigee is expecting""")
 
         self.assertEqual(
             query_request(locations_url, access_token, "post",
@@ -250,7 +253,8 @@ class gateway_tests(unittest.TestCase):
             type(magruder_geometry['coordinates'][0][0][0][0]), float)
         self.assertEqual(
             type(magruder_geometry['coordinates'][0][0][0][1]), float)
-        # First and last coordinate pairs in a ring should be equal: https://tools.ietf.org/html/rfc7946#section-3.1.6
+        # First and last coordinate pairs in a ring should be equal
+        # https://tools.ietf.org/html/rfc7946#section-3.1.6
         self.assertEqual(magruder_geometry['coordinates'][0][0][0],
                          magruder_geometry['coordinates'][0][0][-1])
         self.assertEqual(magruder_geometry['coordinates'][-1][0][0],
@@ -268,7 +272,8 @@ class gateway_tests(unittest.TestCase):
         self.assertEqual(mu_geometry['coordinates'][0][0],
                          mu_geometry['coordinates'][0][-1])
 
-    # Tests results of a query that should return only locations with gender inclusive restrooms
+    # Tests results of a query that should return only locations with gender
+    # inclusive restrooms
     def test_gender_inclusive_rr(self):
         gi_rr = query_request(locations_url, access_token, "get", {
             'giRestroom': 'true',
@@ -311,7 +316,8 @@ class gateway_tests(unittest.TestCase):
 
         self.assertEqual(parking_zones, result_parking_zones)
 
-    # Test results returned with isOpen=true are actually open given what their openHours say
+    # Test results returned with isOpen=true are actually open given what their
+    # openHours say
     def test_isopen(self):
         def test_resource(resource_url):
             all_open_resources = query_request(resource_url, access_token,
@@ -324,7 +330,8 @@ class gateway_tests(unittest.TestCase):
             weekday = str(datetime.today().weekday() + 1)
 
             for open_resource in all_open_resources['data']:
-                # Test that only open resources are returned when they should be and each open resource has a related open hours
+                # Test that only open resources are returned when they should
+                # be and each open resource has a related open hours
                 open_hours = open_resource['attributes']['openHours']
                 self.assertIsNotNone(open_hours)
                 self.assertTrue(
@@ -334,7 +341,8 @@ class gateway_tests(unittest.TestCase):
         test_resource(locations_url)
         test_resource(services_url)
 
-    # test the query parameters of adaParkingSpaceCount, motorcycleParkingSpaceCount, evParkingSpaceCount
+    # test the query parameters of adaParkingSpaceCount,
+    # motorcycleParkingSpaceCount, evParkingSpaceCount
     def test_parking_spaces_filters(self):
         payload = {
             'adaParkingSpaceCount': randint(0, 5),
@@ -571,7 +579,8 @@ class gateway_tests(unittest.TestCase):
         return (7 - invalid_days) >= 3
 
     def is_valid_open_slot(self, open_slot):
-        return open_slot is not None and open_slot["start"] is not None and open_slot["end"] is not None
+        return (open_slot is not None and open_slot["start"] is not None
+                and open_slot["end"] is not None)
 
     # Tests that API response time is less than a value
     def test_response_time(self):
