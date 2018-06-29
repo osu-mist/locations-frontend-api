@@ -17,7 +17,11 @@ def get_access_token(config_path):
     access_token_url = config_data["token_api"]
     client_id = config_data["client_id"]
     client_secret = config_data["client_secret"]
-    post_data = {'client_id': client_id, 'client_secret': client_secret, 'grant_type': 'client_credentials'}
+    post_data = {
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'grant_type': 'client_credentials'
+    }
     request = requests.post(access_token_url, data=post_data)
     response = request.json()
     return 'Bearer ' + response["access_token"]

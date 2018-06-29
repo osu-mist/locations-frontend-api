@@ -15,28 +15,37 @@ from api_request import blank_result, \
                         response_time, \
                         results_with_links, \
                         unauth_request
-from configuration_load import get_access_token, get_single_resource_id, get_url
+from configuration_load import get_access_token, \
+                               get_single_resource_id, \
+                               get_url
 
 
 class gateway_tests(unittest.TestCase):
-
     def test_services(self):
         buildings = get_buildings_with_services(services_url, access_token)
         query_params = {'page[size]': 500}
 
         for building_id in buildings:
             # Test that a building's service links back to the same building
-            building_object = id_request(locations_url, access_token, building_id)
-            for service in building_object['data']['relationships']['services']['data']:
-                service_object = id_request(services_url, access_token, service['id'])
-                parent_id = service_object['data']['relationships']['locations']['data'][0]['id']
+            building_object = id_request(locations_url, access_token,
+                                         building_id)
+            for service in building_object['data']['relationships'][
+                    'services']['data']:
+                service_object = id_request(services_url, access_token,
+                                            service['id'])
+                parent_id = service_object['data']['relationships'][
+                    'locations']['data'][0]['id']
 
                 self.assertEqual(building_id, str(parent_id))
 
-            # Test that the relationships object and the services endpoint have the same number of services
+            # Test that the relationships object and the services endpoint
+            # have the same number of services
             request_url = locations_url + "/" + building_id + "/services"
-            building_services = query_request(request_url, access_token, "get", query_params).json()
-            self.assertEqual(len(building_object['data']['relationships']['services']['data']), len(building_services['data']))
+            building_services = query_request(request_url, access_token, "get",
+                                              query_params).json()
+            self.assertEqual(
+                len(building_object['data']['relationships']['services'][
+                    'data']), len(building_services['data']))
 
     # Tests a single resource ID in different case styles
     def test_id(self):
@@ -44,55 +53,96 @@ class gateway_tests(unittest.TestCase):
         self.assertIsNotNone(response["data"])
         self.assertEqual(response["data"]["id"], single_resourse_id)
 
-        response = id_request(locations_url, access_token, single_resourse_id.upper())
+        response = id_request(locations_url, access_token,
+                              single_resourse_id.upper())
         self.assertIsNotNone(response["data"])
 
-        response = id_request(locations_url, access_token, single_resourse_id.lower())
+        response = id_request(locations_url, access_token,
+                              single_resourse_id.lower())
         self.assertIsNotNone(response["data"])
 
     # Tests that different verbs return expected responses
     def test_verbs(self):
         query_params = {'q': 'Oxford'}
 
-        self.assertEqual(query_request(locations_url, access_token, "get", query_params).status_code, 200)
+        self.assertEqual(
+            query_request(locations_url, access_token, "get",
+                          query_params).status_code, 200)
 
-        # DW not returning allowed methods headers, Apigee returning bad gateway
-        if query_request(locations_url, access_token, "post", query_params).status_code == 502:
-            self.skipTest('DW not returning allowed methods headers that Apigee is expecting')
+        # DW not returning allowed methods headers,
+        # Apigee returning bad gateway
+        if query_request(locations_url, access_token, "post",
+                         query_params).status_code == 502:
+            self.skipTest("""DW not returning allowed methods headers
+                   that Apigee is expecting""")
 
-        self.assertEqual(query_request(locations_url, access_token, "post", query_params).status_code, 405)
-        self.assertEqual(query_request(locations_url, access_token, "put", query_params).status_code, 405)
-        self.assertEqual(query_request(locations_url, access_token, "delete", query_params).status_code, 405)
+        self.assertEqual(
+            query_request(locations_url, access_token, "post",
+                          query_params).status_code, 405)
+        self.assertEqual(
+            query_request(locations_url, access_token, "put",
+                          query_params).status_code, 405)
+        self.assertEqual(
+            query_request(locations_url, access_token, "delete",
+                          query_params).status_code, 405)
 
     # Tests that certain parameters return expected number of results
     def test_results(self):
-        all_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon'}).json()
+        all_dixon = query_request(locations_url, access_token, "get", {
+            'q': 'Dixon'
+        }).json()
         self.assertEqual(len(all_dixon['data']), 3)
 
-        dining_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon', 'type': 'dining'}).json()
+        dining_dixon = query_request(locations_url, access_token, "get", {
+            'q': 'Dixon',
+            'type': 'dining'
+        }).json()
         self.assertEqual(len(dining_dixon['data']), 1)
 
-        building_dixon = query_request(locations_url, access_token, "get", {'q': 'Dixon', 'type': 'building'}).json()
+        building_dixon = query_request(locations_url, access_token, "get", {
+            'q': 'Dixon',
+            'type': 'building'
+        }).json()
         self.assertEqual(len(building_dixon['data']), 1)
 
         # test search only from name + abbr
-        building_library = query_request(locations_url, access_token, "get", {'q': 'library', 'campus': 'corvallis', 'type': 'building'}).json()
+        building_library = query_request(locations_url, access_token, "get", {
+            'q': 'library',
+            'campus': 'corvallis',
+            'type': 'building'
+        }).json()
         self.assertEqual(len(building_library['data']), 1)
 
-        building_library = query_request(locations_url, access_token, "get", {'q': 'vlib'}).json()
+        building_library = query_request(locations_url, access_token, "get", {
+            'q': 'vlib'
+        }).json()
         self.assertEqual(len(building_library['data']), 1)
 
         # test filter
-        dining_library = query_request(locations_url, access_token, "get", {'q': 'library', 'type': 'dining'}).json()
+        dining_library = query_request(locations_url, access_token, "get", {
+            'q': 'library',
+            'type': 'dining'
+        }).json()
         self.assertEqual(len(dining_library['data']), 0)
 
-        building_engineering = query_request(locations_url, access_token, "get", {
-            'q': 'engineering', 'type': 'building', 'campus': 'corvallis'}).json()
+        building_engineering = query_request(locations_url, access_token,
+                                             "get", {
+                                                 'q': 'engineering',
+                                                 'type': 'building',
+                                                 'campus': 'corvallis'
+                                             }).json()
         self.assertEqual(len(building_engineering['data']), 3)
 
     def test_multi_type(self):
         # test search using multiple type= parameters
-        results = query_request(locations_url, access_token, "get", {'type': ['building', 'dining'], 'lat': '44.5602', 'lon': '-123.2761', 'distance': 100, 'distanceUnit': 'ft'}).json()
+        results = query_request(
+            locations_url, access_token, "get", {
+                'type': ['building', 'dining'],
+                'lat': '44.5602',
+                'lon': '-123.2761',
+                'distance': 100,
+                'distanceUnit': 'ft'
+            }).json()
         self.assertEqual(len(results['data']), 2)
         returned_types = [x['attributes']['type'] for x in results['data']]
         returned_types.sort()
@@ -104,11 +154,25 @@ class gateway_tests(unittest.TestCase):
 
         # and of course sending only one type gets only one result
 
-        results = query_request(locations_url, access_token, "get", {'type': 'building', 'lat': '44.5602', 'lon': '-123.2761', 'distance': 100, 'distanceUnit': 'ft'}).json()
+        results = query_request(
+            locations_url, access_token, "get", {
+                'type': 'building',
+                'lat': '44.5602',
+                'lon': '-123.2761',
+                'distance': 100,
+                'distanceUnit': 'ft'
+            }).json()
         self.assertEqual(len(results['data']), 1)
         self.assertEqual(results['data'][0]['attributes']['type'], 'building')
 
-        results = query_request(locations_url, access_token, "get", {'type': 'dining', 'lat': '44.5602', 'lon': '-123.2761', 'distance': 100, 'distanceUnit': 'ft'}).json()
+        results = query_request(
+            locations_url, access_token, "get", {
+                'type': 'dining',
+                'lat': '44.5602',
+                'lon': '-123.2761',
+                'distance': 100,
+                'distanceUnit': 'ft'
+            }).json()
         self.assertEqual(len(results['data']), 1)
         self.assertEqual(results['data'][0]['attributes']['type'], 'dining')
 
@@ -121,58 +185,100 @@ class gateway_tests(unittest.TestCase):
         # and we weren't ordering the results by relevance.
         # See CO-813
 
-        results = query_request(locations_url, access_token, "get", {'q': 'Milam Hall'}).json()
+        results = query_request(locations_url, access_token, "get", {
+            'q': 'Milam Hall'
+        }).json()
         self.assertEqual(len(results['data']), 10)
-        self.assertEqual(results['data'][0]['attributes']['name'], 'Milam Hall')
+        self.assertEqual(results['data'][0]['attributes']['name'],
+                         'Milam Hall')
 
     def test_geo_location(self):
         # test geo query
-        building_library = query_request(locations_url, access_token, "get", {
-            'lat': 44.565066, 'lon': -123.276147}).json()
-        self.assertEqual(len(building_library['data']), 10)
-        self.assertEqual(building_library['data'][0]['id'], "d409d908ecc6010a04a3b0387f063145")
-        self.assertEqual(type(building_library['data'][0]['attributes']['latitude']), unicode)
-        self.assertEqual(type(building_library['data'][0]['attributes']['longitude']), unicode)
+        lat = 44.565066
+        lon = -123.276147
 
         building_library = query_request(locations_url, access_token, "get", {
-            'lat': 44.565066, 'lon': -123.276147, 'distance': 1, 'distanceUnit': 'yd'}).json()
+            'lat': lat,
+            'lon': lon
+        }).json()
+        self.assertEqual(len(building_library['data']), 10)
+        self.assertEqual(building_library['data'][0]['id'],
+                         "d409d908ecc6010a04a3b0387f063145")
+        self.assertEqual(
+            type(building_library['data'][0]['attributes']['latitude']),
+            unicode)
+        self.assertEqual(
+            type(building_library['data'][0]['attributes']['longitude']),
+            unicode)
+
+        building_library = query_request(locations_url, access_token, "get", {
+            'lat': lat,
+            'lon': lon,
+            'distance': 1,
+            'distanceUnit': 'yd'
+        }).json()
         self.assertEqual(len(building_library['data']), 1)
 
-        extensions = query_request(locations_url, access_token, "get", {
-            'lat': 44.565066, 'lon': -123.276147, 'distance': 10, 'distanceUnit': 'mi',
-            'campus': 'extension'}).json()
-        self.assertEqual(len(extensions['data']), 3)
+        extensions = query_request(
+            locations_url, access_token, "get", {
+                'lat': lat,
+                'lon': lon,
+                'distance': 10,
+                'distanceUnit': 'mi',
+                'campus': 'extension'
+            }).json()
+        self.assertEqual(len(extensions['data']), 2)
 
         dining_java = query_request(locations_url, access_token, "get", {
-            'lat': 44.565066, 'lon': -123.276147, 'isopen': True, 'distanceUnit': 'yd'}).json()
+            'lat': lat,
+            'lon': lon,
+            'isopen': True,
+            'distanceUnit': 'yd'
+        }).json()
         self.assertEqual(len(dining_java['data']), 1)
 
     def test_geometries(self):
         # MultiPolygon location
         building_magruder = query_request(locations_url, access_token, "get", {
-            'q': 'magruder', 'type': 'building', 'campus': 'corvallis'}).json()
-        magruder_geometry = building_magruder['data'][0]['attributes']['geometry']
+            'q': 'magruder',
+            'type': 'building',
+            'campus': 'corvallis'
+        }).json()
+        magruder_geometry = building_magruder['data'][0]['attributes'][
+            'geometry']
         self.assertEqual(magruder_geometry['type'], "MultiPolygon")
         self.assertEqual(len(magruder_geometry['coordinates']), 4)
         self.assertEqual(len(magruder_geometry['coordinates'][0][0][0]), 2)
-        self.assertEqual(type(magruder_geometry['coordinates'][0][0][0][0]), float)
-        self.assertEqual(type(magruder_geometry['coordinates'][0][0][0][1]), float)
-        # First and last coordinate pairs in a ring should be equal: https://tools.ietf.org/html/rfc7946#section-3.1.6
-        self.assertEqual(magruder_geometry['coordinates'][0][0][0], magruder_geometry['coordinates'][0][0][-1])
-        self.assertEqual(magruder_geometry['coordinates'][-1][0][0], magruder_geometry['coordinates'][-1][0][-1])
+        self.assertEqual(
+            type(magruder_geometry['coordinates'][0][0][0][0]), float)
+        self.assertEqual(
+            type(magruder_geometry['coordinates'][0][0][0][1]), float)
+        # First and last coordinate pairs in a ring should be equal
+        # https://tools.ietf.org/html/rfc7946#section-3.1.6
+        self.assertEqual(magruder_geometry['coordinates'][0][0][0],
+                         magruder_geometry['coordinates'][0][0][-1])
+        self.assertEqual(magruder_geometry['coordinates'][-1][0][0],
+                         magruder_geometry['coordinates'][-1][0][-1])
 
         # Polygon location
         building_mu = query_request(locations_url, access_token, "get", {
-            'q': 'memorial', 'type': 'building', 'campus': 'corvallis'}).json()
+            'q': 'memorial',
+            'type': 'building',
+            'campus': 'corvallis'
+        }).json()
         mu_geometry = building_mu['data'][0]['attributes']['geometry']
         self.assertEqual(mu_geometry['type'], "Polygon")
         self.assertEqual(len(mu_geometry['coordinates']), 1)
-        self.assertEqual(mu_geometry['coordinates'][0][0], mu_geometry['coordinates'][0][-1])
+        self.assertEqual(mu_geometry['coordinates'][0][0],
+                         mu_geometry['coordinates'][0][-1])
 
-    # Tests results of a query that should return only locations with gender inclusive restrooms
+    # Tests results of a query that should return only locations with gender
+    # inclusive restrooms
     def test_gender_inclusive_rr(self):
         gi_rr = query_request(locations_url, access_token, "get", {
-            'giRestroom': 'true', 'page[size]': 5000}).json()
+            'giRestroom': 'true',
+            'page[size]': 5000
+        }).json()
 
         for location in gi_rr['data']:
             attributes = location['attributes']
@@ -184,7 +290,9 @@ class gateway_tests(unittest.TestCase):
         # Test that only parking locations are returned when they should be
         # and each parking location has a related parkingZoneGroup
         all_parking = query_request(locations_url, access_token, "get", {
-            'type': 'parking', 'page[size]': max_page_size}).json()
+            'type': 'parking',
+            'page[size]': max_page_size
+        }).json()
 
         for parking_location in all_parking['data']:
             attributes = parking_location['attributes']
@@ -194,36 +302,47 @@ class gateway_tests(unittest.TestCase):
         # Test that a multi-query-parameter request for parkingZoneGroup
         # only returns parking locations that match one of the specified zones
         parking_zones = set(['A1', 'C', 'B2'])
-        multi_zone_query = query_request(locations_url, access_token, "get", {
-            'parkingZoneGroup': parking_zones, 'campus': 'corvallis', 'page[size]': max_page_size}).json()
+        multi_zone_query = query_request(
+            locations_url, access_token, "get", {
+                'parkingZoneGroup': parking_zones,
+                'campus': 'corvallis',
+                'page[size]': max_page_size
+            }).json()
 
-        result_parking_zones = set([parking_location['attributes']['parkingZoneGroup'] for parking_location in multi_zone_query['data']])
+        result_parking_zones = set([
+            parking_location['attributes']['parkingZoneGroup']
+            for parking_location in multi_zone_query['data']
+        ])
 
         self.assertEqual(parking_zones, result_parking_zones)
 
-    # Test results returned with isOpen=true are actually open given what their openHours say
+    # Test results returned with isOpen=true are actually open given what their
+    # openHours say
     def test_isopen(self):
         def test_resource(resource_url):
-            all_open_resources = query_request(
-                resource_url,
-                access_token,
-                'get',
-                {'page[size]': max_page_size, 'isOpen': 'true'}
-            ).json()
+            all_open_resources = query_request(resource_url, access_token,
+                                               'get', {
+                                                   'page[size]': max_page_size,
+                                                   'isOpen': 'true'
+                                               }).json()
 
             now = datetime.utcnow().replace(microsecond=0).isoformat()
             weekday = str(datetime.today().weekday() + 1)
 
             for open_resource in all_open_resources['data']:
-                # Test that only open resources are returned when they should be and each open resource has a related open hours
+                # Test that only open resources are returned when they should
+                # be and each open resource has a related open hours
                 open_hours = open_resource['attributes']['openHours']
                 self.assertIsNotNone(open_hours)
-                self.assertTrue(any(open_hour['start'] <= now + 'Z' <= open_hour['end'] for open_hour in open_hours[weekday]))
+                self.assertTrue(
+                    any(open_hour['start'] <= now + 'Z' <= open_hour['end']
+                        for open_hour in open_hours[weekday]))
 
         test_resource(locations_url)
         test_resource(services_url)
 
-    # test the query parameters of adaParkingSpaceCount, motorcycleParkingSpaceCount, evParkingSpaceCount
+    # test the query parameters of adaParkingSpaceCount,
+    # motorcycleParkingSpaceCount, evParkingSpaceCount
     def test_parking_spaces_filters(self):
         payload = {
             'adaParkingSpaceCount': randint(0, 5),
@@ -231,12 +350,19 @@ class gateway_tests(unittest.TestCase):
             'evParkingSpaceCount': randint(0, 5)
         }
 
-        all_parkings = query_request(locations_url, access_token, 'get', payload).json()
+        all_parkings = query_request(locations_url, access_token, 'get',
+                                     payload).json()
 
         for parking in all_parkings['data']:
-            self.assertGreaterEqual(parking['attributes']['adaParkingSpaceCount'], payload['adaParkingSpaceCount'])
-            self.assertGreaterEqual(parking['attributes']['motorcycleParkingSpaceCount'], payload['motorcycleParkingSpaceCount'])
-            self.assertGreaterEqual(parking['attributes']['evParkingSpaceCount'], payload['evParkingSpaceCount'])
+            self.assertGreaterEqual(
+                parking['attributes']['adaParkingSpaceCount'],
+                payload['adaParkingSpaceCount'])
+            self.assertGreaterEqual(
+                parking['attributes']['motorcycleParkingSpaceCount'],
+                payload['motorcycleParkingSpaceCount'])
+            self.assertGreaterEqual(
+                parking['attributes']['evParkingSpaceCount'],
+                payload['evParkingSpaceCount'])
 
     # private function: convert result to GeoJSON object
     def __to_geojson(self, json_res):
@@ -246,8 +372,10 @@ class gateway_tests(unittest.TestCase):
 
     # Test GeoJSON result contains multiple GeoJSON objects
     def test_geojson_feature_collection(self):
-        geo_object = self.__to_geojson(query_request(
-            locations_url, access_token, "get", {'geojson': 'true'}).json())
+        geo_object = self.__to_geojson(
+            query_request(locations_url, access_token, "get", {
+                'geojson': 'true'
+            }).json())
         self.assertTrue(geo_object.is_valid)
         self.assertIsInstance(geo_object, type(geojson.FeatureCollection([])))
 
@@ -255,15 +383,17 @@ class gateway_tests(unittest.TestCase):
     def test_geojson_geometry_collection(self):
         resource_ids = [
             '81b24334a8fe31fbcf2c56de923c1523',  # Polygon and Point
-            '52691ff2fca1a0c6a73230fd7241131d'   # MultiPolygon and Point
+            '52691ff2fca1a0c6a73230fd7241131d'  # MultiPolygon and Point
         ]
         for resource_id in resource_ids:
-            geo_object = self.__to_geojson(id_request(
-                locations_url, access_token, resource_id, {'geojson': 'true'}))
+            geo_object = self.__to_geojson(
+                id_request(locations_url, access_token, resource_id,
+                           {'geojson': 'true'}))
             geo_collection = geo_object.geometry
             self.assertTrue(geo_object.is_valid)
             self.assertIsInstance(geo_object, type(geojson.Feature()))
-            self.assertIsInstance(geo_collection, type(geojson.GeometryCollection()))
+            self.assertIsInstance(geo_collection,
+                                  type(geojson.GeometryCollection()))
 
             geo_types = [
                 type(geojson.Polygon()),
@@ -281,8 +411,9 @@ class gateway_tests(unittest.TestCase):
         }
 
         for resource_id in geometry_list.keys():
-            geo_object = self.__to_geojson(id_request(
-                locations_url, access_token, resource_id, {'geojson': 'true'}))
+            geo_object = self.__to_geojson(
+                id_request(locations_url, access_token, resource_id,
+                           {'geojson': 'true'}))
             geometry = geo_object.geometry
             self.assertTrue(geo_object.is_valid)
             self.assertIsInstance(geo_object, type(geojson.Feature()))
@@ -291,8 +422,9 @@ class gateway_tests(unittest.TestCase):
     # Test GeoJson result neither contains Points nor Polygon
     def test_geojson_none(self):
         resource_id = '5d3231555780488ab8d22e764bae5805'
-        geo_object = self.__to_geojson(id_request(
-            locations_url, access_token, resource_id, {'geojson': 'true'}))
+        geo_object = self.__to_geojson(
+            id_request(locations_url, access_token, resource_id,
+                       {'geojson': 'true'}))
         geometry = geo_object.geometry
         self.assertTrue(geo_object.is_valid)
         self.assertIsInstance(geo_object, type(geojson.Feature()))
@@ -301,19 +433,18 @@ class gateway_tests(unittest.TestCase):
     # Test that synonym searching returns expected results
     def test_synonyms(self):
         gill_coliseum = query_request(locations_url, access_token, "get", {
-            'q': 'basketball'}).json()
+            'q': 'basketball'
+        }).json()
         self.assertEqual(len(gill_coliseum["data"]), 1)
         self.assertEqual(gill_coliseum["data"][0]["id"],
                          "cf6e802927cc01ec45f5f77b2f85a18a")
         self.assertEqual(gill_coliseum["data"][0]["attributes"]["name"],
                          "Gill Coliseum")
 
-        austin_hall_result = query_request(
-                locations_url,
-                access_token,
-                "get",
-                {'q': 'College of Business'}
-            ).json()
+        austin_hall_result = query_request(locations_url, access_token, "get",
+                                           {
+                                               'q': 'College of Business'
+                                           }).json()
         self.assertEqual(austin_hall_result["data"][0]["id"],
                          "b018683aa0e551280d1422301f8fb249")
         self.assertEqual(austin_hall_result["data"][0]["attributes"]["name"],
@@ -334,16 +465,28 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a nonexistent campus returns a 404
     def test_not_found(self):
-        self.assertEqual(not_found_request(locations_url, access_token, {
-            'q': 'Hello world', 'campus': 'Pluto'}).status_code, 404)
-        self.assertEqual(not_found_request(locations_url, access_token, {
-            'q': 'Hello world', 'type': 'invalid-type'}).status_code, 404)
-        self.assertEqual(not_found_request(locations_url, access_token, {
-            'q': 'Hello world', 'campus': 'Pluto', 'type': 'invalid-type'}).status_code, 404)
+        self.assertEqual(
+            not_found_request(locations_url, access_token, {
+                'q': 'Hello world',
+                'campus': 'Pluto'
+            }).status_code, 404)
+        self.assertEqual(
+            not_found_request(locations_url, access_token, {
+                'q': 'Hello world',
+                'type': 'invalid-type'
+            }).status_code, 404)
+        self.assertEqual(
+            not_found_request(locations_url, access_token, {
+                'q': 'Hello world',
+                'campus': 'Pluto',
+                'type': 'invalid-type'
+            }).status_code, 404)
 
     # Tests that a 404 response contains correct JSON fields
     def test_not_found_results(self):
-        response = not_found_request(locations_url, access_token, {'campus': 'Pluto'}).json()
+        response = not_found_request(locations_url, access_token, {
+            'campus': 'Pluto'
+        }).json()
         self.assertIsNotNone(response["status"])
         self.assertIsNotNone(response["developerMessage"])
         self.assertIsNotNone(response["userMessage"])
@@ -357,12 +500,15 @@ class gateway_tests(unittest.TestCase):
     # Tests that a request for all locations is successful
     def test_all_locations(self):
         query_params = {'page[number]': 1, 'page[size]': max_page_size}
-        self.assertEqual(query_request(locations_url, access_token, "get", query_params).status_code, 200)
+        self.assertEqual(
+            query_request(locations_url, access_token, "get",
+                          query_params).status_code, 200)
 
     # Test that all extension locations are valid
     def test_extension(self):
         query_params = {'campus': 'extension', 'page[size]': max_page_size}
-        offices = query_request(locations_url, access_token, "get", query_params).json()
+        offices = query_request(locations_url, access_token, "get",
+                                query_params).json()
 
         # check that we have extension locations
         self.assertGreater(len(offices["data"]), 10)
@@ -382,14 +528,20 @@ class gateway_tests(unittest.TestCase):
 
     def test_dining(self):
         query_params = {'type': 'dining', 'page[size]': max_page_size}
-        restaurants = query_request(locations_url, access_token, "get", query_params).json()
+        restaurants = query_request(locations_url, access_token, "get",
+                                    query_params).json()
 
         test_slot = None
-        test_diners = [diner for diner in restaurants["data"] if self.has_valid_open_hours(diner)]
+        test_diners = [
+            diner for diner in restaurants["data"]
+            if self.has_valid_open_hours(diner)
+        ]
         open_hours = test_diners[0]["attributes"]["openHours"]
 
         for day, open_hour_list in open_hours.iteritems():
-            valid_slots = [i for i in open_hour_list if self.is_valid_open_slot(i)]
+            valid_slots = [
+                i for i in open_hour_list if self.is_valid_open_slot(i)
+            ]
             if len(valid_slots) > 0:
                 test_slot = valid_slots[0]
                 break
@@ -401,11 +553,12 @@ class gateway_tests(unittest.TestCase):
 
         self.assertGreater(len(restaurants["data"]), 10)
 
-        invalid_dining_count = len([diner for diner in restaurants["data"] if
-                                    diner["attributes"]["name"] is None or
-                                    diner["attributes"]["summary"] is None or
-                                    diner["attributes"]["latitude"] is None or
-                                    diner["attributes"]["longitude"] is None])
+        invalid_dining_count = len([
+            diner for diner in restaurants["data"]
+            if diner["attributes"]["name"] is None or diner["attributes"]
+            ["summary"] is None or diner["attributes"]["latitude"] is None
+            or diner["attributes"]["longitude"] is None
+        ])
         self.assertLessEqual(invalid_dining_count, 3)
 
     def has_valid_open_hours(self, location):
@@ -415,16 +568,19 @@ class gateway_tests(unittest.TestCase):
         if "openHours" not in location["attributes"]:
             return False
 
-        for day, open_hour_list in location["attributes"]["openHours"].iteritems():
+        for day, open_hour_list in location["attributes"][
+                "openHours"].iteritems():
             valid_day_index = int(day) in valid_day_range
-            invalid_time_slot_count = len([i for i in open_hour_list if not self.is_valid_open_slot(i)])
+            invalid_time_slot_count = len(
+                [i for i in open_hour_list if not self.is_valid_open_slot(i)])
             if invalid_time_slot_count > 1 or not valid_day_index:
                 invalid_days += 1
 
         return (7 - invalid_days) >= 3
 
     def is_valid_open_slot(self, open_slot):
-        return open_slot is not None and open_slot["start"] is not None and open_slot["end"] is not None
+        return (open_slot is not None and open_slot["start"] is not None
+                and open_slot["end"] is not None)
 
     # Tests that API response time is less than a value
     def test_response_time(self):
@@ -432,7 +588,8 @@ class gateway_tests(unittest.TestCase):
 
     # Tests that a call using TLSv1 is successful
     def test_tls_v1(self):
-        self.assertTrue(check_ssl(ssl.PROTOCOL_TLSv1, locations_url, access_token))
+        self.assertTrue(
+            check_ssl(ssl.PROTOCOL_TLSv1, locations_url, access_token))
 
     # Tests that a call using SSLv2 is unsuccessful
     def test_ssl_v2(self):
@@ -442,7 +599,8 @@ class gateway_tests(unittest.TestCase):
             ssl.PROTOCOL_SSLv2
         except AttributeError:
             self.skipTest('SSLv2 support not available')
-        self.assertFalse(check_ssl(ssl.PROTOCOL_SSLv2, locations_url, access_token))
+        self.assertFalse(
+            check_ssl(ssl.PROTOCOL_SSLv2, locations_url, access_token))
 
     # Tests that a call using SSLv3 is unsuccessful
     def test_ssl_v3(self):
@@ -452,7 +610,8 @@ class gateway_tests(unittest.TestCase):
             ssl.PROTOCOL_SSLv3
         except AttributeError:
             self.skipTest('SSLv3 support not available')
-        self.assertFalse(check_ssl(ssl.PROTOCOL_SSLv3, locations_url, access_token))
+        self.assertFalse(
+            check_ssl(ssl.PROTOCOL_SSLv3, locations_url, access_token))
 
 
 if __name__ == '__main__':
@@ -462,7 +621,7 @@ if __name__ == '__main__':
     for i, config_path in enumerate(sys.argv):
         if config_path in options_tpl:
             del_list.append(i)
-            del_list.append(i+1)
+            del_list.append(i + 1)
 
     del_list.reverse()
 

@@ -73,7 +73,8 @@ def response_time(url, access_token):
 def check_ssl(protocol, url, access_token):
     try:
         context = ssl.SSLContext(protocol)
-        request = urllib2.Request(url + "?q=Oxford", headers={"Authorization": access_token})
+        request = urllib2.Request(
+            url + "?q=Oxford", headers={"Authorization": access_token})
         urllib2.urlopen(request, context=context)
     except (urllib2.URLError):
         return False
