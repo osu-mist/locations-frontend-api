@@ -14,6 +14,8 @@ import org.elasticsearch.search.sort.SortOrder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import org.apache.lucene.search.join.ScoreMode
+
 /**
  * Handles HTTP requests against ElasticSearch. Operation supported are:
  * search, searchService, getRelatedService, getById, and getServiceById.
@@ -239,8 +241,7 @@ class LocationDAO {
                         .distance(searchDistance)
                         .point(lat, lon))
 
-            req.addSort(SortBuilders.geoDistanceSort("attributes.geoLocation")
-                        .point(lat, lon)
+            req.addSort(SortBuilders.geoDistanceSort("attributes.geoLocation", lat, lon)
                         .order(SortOrder.ASC)
                         .unit(DistanceUnit.KILOMETERS)
                         .geoDistance(GeoDistance.PLANE))
@@ -252,7 +253,7 @@ class LocationDAO {
             query.filter(
                     QueryBuilders.nestedQuery(path, QueryBuilders.boolQuery()
                         .filter(QueryBuilders.rangeQuery(path + ".start").lte("now"))
-                        .filter(QueryBuilders.rangeQuery(path + ".end").gt("now"))))
+                        .filter(QueryBuilders.rangeQuery(path + ".end").gt("now")), ScoreMode.Avg))
         }
 
         if (giRestroom) {

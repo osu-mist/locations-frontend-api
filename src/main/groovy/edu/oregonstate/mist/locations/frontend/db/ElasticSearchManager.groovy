@@ -4,7 +4,9 @@ import groovy.transform.TypeChecked
 import io.dropwizard.lifecycle.Managed
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
-import org.elasticsearch.common.transport.InetSocketTransportAddress
+import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.common.transport.TransportAddress
+import org.elasticsearch.transport.client.PreBuiltTransportClient
 
 @TypeChecked
 class ElasticSearchManager implements Managed {
@@ -22,10 +24,16 @@ class ElasticSearchManager implements Managed {
             port = 9300
         }
 
-        this.esClient = TransportClient.builder().build()
+        Settings settings = Settings.builder()
+                .put("client.transport.ignore_cluster_name", true)
+                .put("client.transport.sniff", true)
+//                .put("cluster.name", "docker-cluster")
+                .build()
+
+        this.esClient = new PreBuiltTransportClient(settings)
         this.esClient.addTransportAddress(
-                new InetSocketTransportAddress(
-                        new InetSocketAddress(this.esUrl.host, port)))
+                new TransportAddress(InetAddress.getByName(this.esUrl.host), port)
+        )
     }
 
     Client getClient() {
