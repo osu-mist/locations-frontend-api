@@ -25,10 +25,11 @@ class ElasticSearchManager implements Managed {
         }
 
         Settings settings = Settings.builder()
+                // Ignore cluster name. Running ES 6.2.4 in Docker will have
+                // the cluster name "docker-cluster" instead of default "elasticsearch"
                 .put("client.transport.ignore_cluster_name", true)
-                // this has to be false
+                // Sniffing must be turned off. Possibly due to running ES in Docker
                 .put("client.transport.sniff", false)
-                .put("cluster.name", "docker-cluster")
                 .build()
 
         this.esClient = new PreBuiltTransportClient(settings)
