@@ -81,7 +81,7 @@ class LocationDAO {
                                      isOpen, weekday, giRestroom, parkingZoneGroup,
                                      adaParkingSpaceCount, motorcycleParkingSpaceCount,
                                      evParkingSpaceCount, pageNumber, pageSize)
-        LOGGER.info("elastic search query: " + esQuery.toString())
+        LOGGER.debug("elastic search query: " + esQuery.toString())
 
         def resp = esQuery.get()
         // TODO: think about error conditions
