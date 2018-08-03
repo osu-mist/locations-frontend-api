@@ -26,8 +26,9 @@ class ElasticSearchManager implements Managed {
 
         Settings settings = Settings.builder()
                 .put("client.transport.ignore_cluster_name", true)
-                .put("client.transport.sniff", true)
-//                .put("cluster.name", "docker-cluster")
+                // this has to be false
+                .put("client.transport.sniff", false)
+                .put("cluster.name", "docker-cluster")
                 .build()
 
         this.esClient = new PreBuiltTransportClient(settings)
