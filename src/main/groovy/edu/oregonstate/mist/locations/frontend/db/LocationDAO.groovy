@@ -3,6 +3,9 @@ package edu.oregonstate.mist.locations.frontend.db
 import groovy.transform.InheritConstructors
 import groovy.transform.PackageScope
 import groovy.transform.TypeChecked
+
+import org.apache.lucene.search.join.ScoreMode
+
 import org.elasticsearch.action.get.GetResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.client.Client
@@ -13,8 +16,6 @@ import org.elasticsearch.search.sort.SortBuilders
 import org.elasticsearch.search.sort.SortOrder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import org.apache.lucene.search.join.ScoreMode
 
 /**
  * Handles HTTP requests against ElasticSearch. Operation supported are:
