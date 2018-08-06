@@ -631,7 +631,6 @@ public class LocationDAOTest {
             }
           ]
         }""")
-        println(request.toString())
         assertEquals(COMPARE_STRING, request.toString())
     }
 
