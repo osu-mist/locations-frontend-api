@@ -19,9 +19,7 @@ This API is based on the web-api-skeleton. For more documentation on the skeleto
   $ docker run \
   -p 9200:9200 \
   -p 9300:9300 \
-  -e "http.host=0.0.0.0" \
-  -e "transport.host=127.0.0.1" \
-  elasticsearch:2.4.4
+  docker.elastic.co/elasticsearch/elasticsearch:6.2.4
   ```
 
 * [Post index templates](https://github.com/osu-mist/locations-api#post-to-elasticsearch) to Elasticsearch.

@@ -3,6 +3,9 @@ package edu.oregonstate.mist.locations.frontend.db
 import groovy.transform.InheritConstructors
 import groovy.transform.PackageScope
 import groovy.transform.TypeChecked
+
+import org.apache.lucene.search.join.ScoreMode
+
 import org.elasticsearch.action.get.GetResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.client.Client
@@ -239,8 +242,7 @@ class LocationDAO {
                         .distance(searchDistance)
                         .point(lat, lon))
 
-            req.addSort(SortBuilders.geoDistanceSort("attributes.geoLocation")
-                        .point(lat, lon)
+            req.addSort(SortBuilders.geoDistanceSort("attributes.geoLocation", lat, lon)
                         .order(SortOrder.ASC)
                         .unit(DistanceUnit.KILOMETERS)
                         .geoDistance(GeoDistance.PLANE))
@@ -252,7 +254,7 @@ class LocationDAO {
             query.filter(
                     QueryBuilders.nestedQuery(path, QueryBuilders.boolQuery()
                         .filter(QueryBuilders.rangeQuery(path + ".start").lte("now"))
-                        .filter(QueryBuilders.rangeQuery(path + ".end").gt("now"))))
+                        .filter(QueryBuilders.rangeQuery(path + ".end").gt("now")), ScoreMode.Avg))
         }
 
         if (giRestroom) {
