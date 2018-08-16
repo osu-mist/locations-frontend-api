@@ -586,8 +586,17 @@ class gateway_tests(unittest.TestCase):
     def test_response_time(self):
         self.assertLess(response_time(locations_url, access_token), 1)
 
+    # Tests that a call using TLSv1.0 fails
+    def test_tls_v1_0(self):
+        self.assertFalse(self.check_ssl(ssl.PROTOCOL_TLSv1, self.url))
+
+    # Tests that a call using TLSv1.1 fails
+    def test_tls_v1_1(self):
+        self.assertFalse(
+            self.check_ssl(ssl.PROTOCOL_TLSv1_1, self.url))
+
     # Tests that a call using TLSv1.2 is successful
-    def test_tls_v1(self):
+    def test_tls_v1_2(self):
         self.assertTrue(
             check_ssl(ssl.PROTOCOL_TLSv1_2, locations_url, access_token))
 
