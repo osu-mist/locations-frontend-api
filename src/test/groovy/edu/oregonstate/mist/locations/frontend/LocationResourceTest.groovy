@@ -51,6 +51,19 @@ class LocationResourceTest {
         assert geoJsonRes.entity.type == 'FeatureCollection'
         assert geoJsonRes.entity.hasProperty('features')
 
+        // Test: out of range lat/lon
+        def outOfRange = resource.list(null, null,
+            null, -100, 200, null, null, null, null, null, null, null, null, null, null)
+        assert outOfRange.status == 400
+        assert outOfRange.entity.userMessage.contains("Bad Request")
+        assert outOfRange.entity.developerMessage.contains("Invalid latitude/longitude")
+        assert outOfRange.entity.code == 1400
+
+        // Test: in range lat/lon
+        def inRange = resource.list(null, null,
+                null, -40, 120, null, null, null, null, null, null, null, null, null, null)
+        assert inRange.status == 200
+
         mock.verify(dao)
     }
 

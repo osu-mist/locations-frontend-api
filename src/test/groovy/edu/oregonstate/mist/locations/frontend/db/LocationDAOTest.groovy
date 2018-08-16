@@ -44,23 +44,45 @@ public class LocationDAOTest {
         request = dao.buildSearchRequest(request, "hello", null, null,
                 null, null, null,
                 null, null, null, null, null, null, null, null, 1, 10)
-        assertEquals('''{
-  "from" : 0,
-  "size" : 10,
-  "query" : {
-    "bool" : {
-      "must" : {
-        "multi_match" : {
-          "query" : "hello",
-          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
-        }
-      }
-    }
-  },
-  "sort" : [ {
-    "_score" : { }
-  } ]
-}''', request.toString())
+        final String COMPARE_STRING = stripSpace("""{
+          "from": 0,
+          "size": 10,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "multi_match": {
+                    "query": "hello",
+                    "fields": [
+                      "attributes.abbreviation^1.0",
+                      "attributes.name^1.0",
+                      "attributes.synonyms^1.0"
+                    ],
+                    "type": "best_fields",
+                    "operator": "OR",
+                    "slop": 0,
+                    "prefix_length": 0,
+                    "max_expansions": 50,
+                    "zero_terms_query": "NONE",
+                    "auto_generate_synonyms_phrase_query": true,
+                    "fuzzy_transpositions": true,
+                    "boost": 1.0
+                  }
+                }
+              ],
+              "adjust_pure_negative": true,
+              "boost": 1.0
+            }
+          },
+          "sort": [
+            {
+              "_score": {
+                "order": "desc"
+              }
+            }
+          ]
+        }""")
+        assertEquals(COMPARE_STRING, request.toString())
     }
 
     @Test
@@ -68,30 +90,60 @@ public class LocationDAOTest {
         request = dao.buildSearchRequest(request, "building", "corvallis", null,
                 null, null, null,
                 null, null, null, null, null, null, null, null, 1, 10)
-        assertEquals('''{
-  "from" : 0,
-  "size" : 10,
-  "query" : {
-    "bool" : {
-      "must" : [ {
-        "match" : {
-          "attributes.campus" : {
-            "query" : "corvallis",
-            "type" : "boolean"
-          }
-        }
-      }, {
-        "multi_match" : {
-          "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
-        }
-      } ]
-    }
-  },
-  "sort" : [ {
-    "_score" : { }
-  } ]
-}''', request.toString())
+        final String COMPARE_STRING = stripSpace("""{
+          "from": 0,
+          "size": 10,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "match": {
+                    "attributes.campus": {
+                      "query": "corvallis",
+                      "operator": "OR",
+                      "prefix_length": 0,
+                      "max_expansions": 50,
+                      "fuzzy_transpositions": true,
+                      "lenient": false,
+                      "zero_terms_query": "NONE",
+                      "auto_generate_synonyms_phrase_query": true,
+                      "boost": 1.0
+                    }
+                  }
+                },
+                {
+                  "multi_match": {
+                    "query": "building",
+                    "fields": [
+                      "attributes.abbreviation^1.0",
+                      "attributes.name^1.0",
+                      "attributes.synonyms^1.0"
+                    ],
+                    "type": "best_fields",
+                    "operator": "OR",
+                    "slop": 0,
+                    "prefix_length": 0,
+                    "max_expansions": 50,
+                    "zero_terms_query": "NONE",
+                    "auto_generate_synonyms_phrase_query": true,
+                    "fuzzy_transpositions": true,
+                    "boost": 1.0
+                  }
+                }
+              ],
+              "adjust_pure_negative": true,
+              "boost": 1.0
+            }
+          },
+          "sort": [
+            {
+              "_score": {
+                "order": "desc"
+              }
+            }
+          ]
+        }""")
+        assertEquals(COMPARE_STRING, request.toString())
     }
 
     @Test
@@ -99,34 +151,68 @@ public class LocationDAOTest {
         request = dao.buildSearchRequest(request, "building", "", ["cultural-center"],
                 null, null, null,
                 null, null, null, null, null, null, null, null, 1, 10)
-        assertEquals('''{
-  "from" : 0,
-  "size" : 10,
-  "query" : {
-    "bool" : {
-      "must" : [ {
-        "bool" : {
-          "should" : {
-            "match" : {
-              "attributes.tags" : {
-                "query" : "cultural-center",
-                "type" : "boolean"
+        final String COMPARE_STRING = stripSpace("""{
+          "from": 0,
+          "size": 10,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "bool": {
+                    "should": [
+                      {
+                        "match": {
+                          "attributes.tags": {
+                            "query": "cultural-center",
+                            "operator": "OR",
+                            "prefix_length": 0,
+                            "max_expansions": 50,
+                            "fuzzy_transpositions": true,
+                            "lenient": false,
+                            "zero_terms_query": "NONE",
+                            "auto_generate_synonyms_phrase_query": true,
+                            "boost": 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative": true,
+                    "boost": 1.0
+                  }
+                },
+                {
+                  "multi_match": {
+                    "query": "building",
+                    "fields": [
+                      "attributes.abbreviation^1.0",
+                      "attributes.name^1.0",
+                      "attributes.synonyms^1.0"
+                    ],
+                    "type": "best_fields",
+                    "operator": "OR",
+                    "slop": 0,
+                    "prefix_length": 0,
+                    "max_expansions": 50,
+                    "zero_terms_query": "NONE",
+                    "auto_generate_synonyms_phrase_query": true,
+                    "fuzzy_transpositions": true,
+                    "boost": 1.0
+                  }
+                }
+              ],
+              "adjust_pure_negative": true,
+              "boost": 1.0
+            }
+          },
+          "sort": [
+            {
+              "_score": {
+                "order": "desc"
               }
             }
-          }
-        }
-      }, {
-        "multi_match" : {
-          "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
-        }
-      } ]
-    }
-  },
-  "sort" : [ {
-    "_score" : { }
-  } ]
-}''', request.toString())
+          ]
+        }""")
+        assertEquals(COMPARE_STRING, request.toString())
     }
 
     @Test
@@ -135,34 +221,68 @@ public class LocationDAOTest {
         request = dao.buildSearchRequest(request, "building", "", ["dining"],
                 null, null, null,
                 null, null, null, null, null, null, null, null, 1, 10)
-        assertEquals('''{
-  "from" : 0,
-  "size" : 10,
-  "query" : {
-    "bool" : {
-      "must" : [ {
-        "bool" : {
-          "should" : {
-            "match" : {
-              "attributes.type" : {
-                "query" : "dining",
-                "type" : "boolean"
+        final String COMPARE_STRING = stripSpace("""{
+          "from": 0,
+          "size": 10,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "bool": {
+                    "should": [
+                      {
+                        "match": {
+                          "attributes.type": {
+                            "query": "dining",
+                            "operator": "OR",
+                            "prefix_length": 0,
+                            "max_expansions": 50,
+                            "fuzzy_transpositions": true,
+                            "lenient": false,
+                            "zero_terms_query": "NONE",
+                            "auto_generate_synonyms_phrase_query": true,
+                            "boost": 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative": true,
+                    "boost": 1.0
+                  }
+                },
+                {
+                  "multi_match": {
+                    "query": "building",
+                    "fields": [
+                      "attributes.abbreviation^1.0",
+                      "attributes.name^1.0",
+                      "attributes.synonyms^1.0"
+                    ],
+                    "type": "best_fields",
+                    "operator": "OR",
+                    "slop": 0,
+                    "prefix_length": 0,
+                    "max_expansions": 50,
+                    "zero_terms_query": "NONE",
+                    "auto_generate_synonyms_phrase_query": true,
+                    "fuzzy_transpositions": true,
+                    "boost": 1.0
+                  }
+                }
+              ],
+              "adjust_pure_negative": true,
+              "boost": 1.0
+            }
+          },
+          "sort": [
+            {
+              "_score": {
+                "order": "desc"
               }
             }
-          }
-        }
-      }, {
-        "multi_match" : {
-          "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
-        }
-      } ]
-    }
-  },
-  "sort" : [ {
-    "_score" : { }
-  } ]
-}''', request.toString())
+          ]
+        }""")
+        assertEquals(COMPARE_STRING, request.toString())
     }
 
     @Test
@@ -171,41 +291,83 @@ public class LocationDAOTest {
         request = dao.buildSearchRequest(request, "building", "", ["dining", "cultural-center"],
                 null, null, null,
                 null, null, null, null, null, null, null, null, 1, 10)
-        assertEquals('''{
-  "from" : 0,
-  "size" : 10,
-  "query" : {
-    "bool" : {
-      "must" : [ {
-        "bool" : {
-          "should" : [ {
-            "match" : {
-              "attributes.type" : {
-                "query" : "dining",
-                "type" : "boolean"
+        final String COMPARE_STRING = stripSpace("""{
+          "from": 0,
+          "size": 10,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "bool": {
+                    "should": [
+                      {
+                        "match": {
+                          "attributes.type": {
+                            "query": "dining",
+                            "operator": "OR",
+                            "prefix_length": 0,
+                            "max_expansions": 50,
+                            "fuzzy_transpositions": true,
+                            "lenient": false,
+                            "zero_terms_query": "NONE",
+                            "auto_generate_synonyms_phrase_query": true,
+                            "boost": 1.0
+                          }
+                        }
+                      },
+                      {
+                        "match": {
+                          "attributes.tags": {
+                            "query": "cultural-center",
+                            "operator": "OR",
+                            "prefix_length": 0,
+                            "max_expansions": 50,
+                            "fuzzy_transpositions": true,
+                            "lenient": false,
+                            "zero_terms_query": "NONE",
+                            "auto_generate_synonyms_phrase_query": true,
+                            "boost": 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative": true,
+                    "boost": 1.0
+                  }
+                },
+                {
+                  "multi_match": {
+                    "query": "building",
+                    "fields": [
+                      "attributes.abbreviation^1.0",
+                      "attributes.name^1.0",
+                      "attributes.synonyms^1.0"
+                    ],
+                    "type": "best_fields",
+                    "operator": "OR",
+                    "slop": 0,
+                    "prefix_length": 0,
+                    "max_expansions": 50,
+                    "zero_terms_query": "NONE",
+                    "auto_generate_synonyms_phrase_query": true,
+                    "fuzzy_transpositions": true,
+                    "boost": 1.0
+                  }
+                }
+              ],
+              "adjust_pure_negative": true,
+              "boost": 1.0
+            }
+          },
+          "sort": [
+            {
+              "_score": {
+                "order": "desc"
               }
             }
-          }, {
-            "match" : {
-              "attributes.tags" : {
-                "query" : "cultural-center",
-                "type" : "boolean"
-              }
-            }
-          } ]
-        }
-      }, {
-        "multi_match" : {
-          "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
-        }
-      } ]
-    }
-  },
-  "sort" : [ {
-    "_score" : { }
-  } ]
-}''', request.toString())
+          ]
+        }""")
+        assertEquals(COMPARE_STRING, request.toString())
     }
 
     @Test
@@ -214,38 +376,74 @@ public class LocationDAOTest {
         request = dao.buildSearchRequest(request, "building", "", [],
                 (Double) 42.39561, (Double) -71.13051, "2miles",
                 null, null, null, null, null, null, null, null, 1, 10)
-        assertEquals(request.toString(), '''{
-  "from" : 0,
-  "size" : 10,
-  "query" : {
-    "bool" : {
-      "must" : {
-        "multi_match" : {
-          "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
-        }
-      },
-      "filter" : {
-        "geo_distance" : {
-          "attributes.geoLocation" : [ -71.13051, 42.39561 ],
-          "distance" : "2miles"
-        }
-      }
-    }
-  },
-  "sort" : [ {
-    "_geo_distance" : {
-      "attributes.geoLocation" : [ {
-        "lat" : 42.39561,
-        "lon" : -71.13051
-      } ],
-      "unit" : "km",
-      "distance_type" : "plane"
-    }
-  }, {
-    "_score" : { }
-  } ]
-}''')
+        final String COMPARE_STRING = stripSpace("""{
+          "from": 0,
+          "size": 10,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "multi_match": {
+                    "query": "building",
+                    "fields": [
+                      "attributes.abbreviation^1.0",
+                      "attributes.name^1.0",
+                      "attributes.synonyms^1.0"
+                    ],
+                    "type": "best_fields",
+                    "operator": "OR",
+                    "slop": 0,
+                    "prefix_length": 0,
+                    "max_expansions": 50,
+                    "zero_terms_query": "NONE",
+                    "auto_generate_synonyms_phrase_query": true,
+                    "fuzzy_transpositions": true,
+                    "boost": 1.0
+                  }
+                }
+              ],
+              "filter": [
+                {
+                  "geo_distance": {
+                    "attributes.geoLocation": [
+                      -71.13051,
+                      42.39561
+                    ],
+                    "distance": 3218.688,
+                    "distance_type": "arc",
+                    "validation_method": "STRICT",
+                    "ignore_unmapped": false,
+                    "boost": 1.0
+                  }
+                }
+              ],
+              "adjust_pure_negative": true,
+              "boost": 1.0
+            }
+          },
+          "sort": [
+            {
+              "_geo_distance": {
+                "attributes.geoLocation": [
+                  {
+                    "lat": 42.39561,
+                    "lon": -71.13051
+                  }
+                ],
+                "unit": "km",
+                "distance_type": "plane",
+                "order": "asc",
+                "validation_method": "STRICT"
+              }
+            },
+            {
+              "_score": {
+                "order": "desc"
+              }
+            }
+          ]
+        }""")
+        assertEquals(COMPARE_STRING, request.toString())
     }
 
     @Test
@@ -254,51 +452,85 @@ public class LocationDAOTest {
         request = dao.buildSearchRequest(request, "building", "", [],
                 null, null, null,
                 Boolean.TRUE, weekday, null, null, null, null, null, null, 1, 10)
-        assertEquals(request.toString(), '''{
-  "from" : 0,
-  "size" : 10,
-  "query" : {
-    "bool" : {
-      "must" : {
-        "multi_match" : {
-          "query" : "building",
-          "fields" : [ "attributes.name", "attributes.abbreviation", "attributes.synonyms" ]
-        }
-      },
-      "filter" : {
-        "nested" : {
-          "query" : {
-            "bool" : {
-              "filter" : [ {
-                "range" : {
-                  "attributes.openHours.1.start" : {
-                    "from" : null,
-                    "to" : "now",
-                    "include_lower" : true,
-                    "include_upper" : true
+        final String COMPARE_STRING = stripSpace("""{
+          "from": 0,
+          "size": 10,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "multi_match": {
+                    "query": "building",
+                    "fields": [
+                      "attributes.abbreviation^1.0",
+                      "attributes.name^1.0",
+                      "attributes.synonyms^1.0"
+                    ],
+                    "type": "best_fields",
+                    "operator": "OR",
+                    "slop": 0,
+                    "prefix_length": 0,
+                    "max_expansions": 50,
+                    "zero_terms_query": "NONE",
+                    "auto_generate_synonyms_phrase_query": true,
+                    "fuzzy_transpositions": true,
+                    "boost": 1.0
                   }
                 }
-              }, {
-                "range" : {
-                  "attributes.openHours.1.end" : {
-                    "from" : "now",
-                    "to" : null,
-                    "include_lower" : false,
-                    "include_upper" : true
+              ],
+              "filter": [
+                {
+                  "nested": {
+                    "query": {
+                      "bool": {
+                        "filter": [
+                          {
+                            "range": {
+                              "attributes.openHours.1.start": {
+                                "from": null,
+                                "to": "now",
+                                "include_lower": true,
+                                "include_upper": true,
+                                "boost": 1.0
+                              }
+                            }
+                          },
+                          {
+                            "range": {
+                              "attributes.openHours.1.end": {
+                                "from": "now",
+                                "to": null,
+                                "include_lower": false,
+                                "include_upper": true,
+                                "boost": 1.0
+                              }
+                            }
+                          }
+                        ],
+                        "adjust_pure_negative": true,
+                        "boost": 1.0
+                      }
+                    },
+                    "path": "attributes.openHours.1",
+                    "ignore_unmapped": false,
+                    "score_mode": "avg",
+                    "boost": 1.0
                   }
                 }
-              } ]
+              ],
+              "adjust_pure_negative": true,
+              "boost": 1.0
             }
           },
-          "path" : "attributes.openHours.1"
-        }
-      }
-    }
-  },
-  "sort" : [ {
-    "_score" : { }
-  } ]
-}''')
+          "sort": [
+            {
+              "_score": {
+                "order": "desc"
+              }
+            }
+          ]
+        }""")
+        assertEquals(COMPARE_STRING, request.toString())
     }
 
     @Test
@@ -307,72 +539,102 @@ public class LocationDAOTest {
         request = dao.buildSearchRequest(request, null, null, [],
             null, null, null,
             Boolean.TRUE, weekday, null, null, 1, 1, 1, null, 1, 10)
-        assertEquals(request.toString(), '''{
-  "from" : 0,
-  "size" : 10,
-  "query" : {
-    "bool" : {
-      "must" : [ {
-        "range" : {
-          "attributes.adaParkingSpaceCount" : {
-            "from" : 1,
-            "to" : null,
-            "include_lower" : true,
-            "include_upper" : true
-          }
-        }
-      }, {
-        "range" : {
-          "attributes.motorcycleParkingSpaceCount" : {
-            "from" : 1,
-            "to" : null,
-            "include_lower" : true,
-            "include_upper" : true
-          }
-        }
-      }, {
-        "range" : {
-          "attributes.evParkingSpaceCount" : {
-            "from" : 1,
-            "to" : null,
-            "include_lower" : true,
-            "include_upper" : true
-          }
-        }
-      } ],
-      "filter" : {
-        "nested" : {
-          "query" : {
-            "bool" : {
-              "filter" : [ {
-                "range" : {
-                  "attributes.openHours.1.start" : {
-                    "from" : null,
-                    "to" : "now",
-                    "include_lower" : true,
-                    "include_upper" : true
+        final String COMPARE_STRING = stripSpace("""{
+          "from": 0,
+          "size": 10,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "range": {
+                    "attributes.adaParkingSpaceCount": {
+                      "from": 1,
+                      "to": null,
+                      "include_lower": true,
+                      "include_upper": true,
+                      "boost": 1.0
+                    }
+                  }
+                },
+                {
+                  "range": {
+                    "attributes.motorcycleParkingSpaceCount": {
+                      "from": 1,
+                      "to": null,
+                      "include_lower": true,
+                      "include_upper": true,
+                      "boost": 1.0
+                    }
+                  }
+                },
+                {
+                  "range": {
+                    "attributes.evParkingSpaceCount": {
+                      "from": 1,
+                      "to": null,
+                      "include_lower": true,
+                      "include_upper": true,
+                      "boost": 1.0
+                    }
                   }
                 }
-              }, {
-                "range" : {
-                  "attributes.openHours.1.end" : {
-                    "from" : "now",
-                    "to" : null,
-                    "include_lower" : false,
-                    "include_upper" : true
+              ],
+              "filter": [
+                {
+                  "nested": {
+                    "query": {
+                      "bool": {
+                        "filter": [
+                          {
+                            "range": {
+                              "attributes.openHours.1.start": {
+                                "from": null,
+                                "to": "now",
+                                "include_lower": true,
+                                "include_upper": true,
+                                "boost": 1.0
+                              }
+                            }
+                          },
+                          {
+                            "range": {
+                              "attributes.openHours.1.end": {
+                                "from": "now",
+                                "to": null,
+                                "include_lower": false,
+                                "include_upper": true,
+                                "boost": 1.0
+                              }
+                            }
+                          }
+                        ],
+                        "adjust_pure_negative": true,
+                        "boost": 1.0
+                      }
+                    },
+                    "path": "attributes.openHours.1",
+                    "ignore_unmapped": false,
+                    "score_mode": "avg",
+                    "boost": 1.0
                   }
                 }
-              } ]
+              ],
+              "adjust_pure_negative": true,
+              "boost": 1.0
             }
           },
-          "path" : "attributes.openHours.1"
-        }
-      }
+          "sort": [
+            {
+              "_score": {
+                "order": "desc"
+              }
+            }
+          ]
+        }""")
+        assertEquals(COMPARE_STRING, request.toString())
     }
-  },
-  "sort" : [ {
-    "_score" : { }
-  } ]
-}''')
+
+    private static String stripSpace(String str) {
+        str.replaceAll("\\s", "")
     }
 }

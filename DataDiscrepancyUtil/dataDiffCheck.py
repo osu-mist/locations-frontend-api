@@ -1,61 +1,58 @@
+"""
+    Usage:
+    dataDiffCheck.py <old_data_path> <new_data_path>
+
+    Arguments:
+        old_data_path: File path of old building json
+        new_data_path: File path of new building json
+"""
+# old.json being the data from https://api.oregonstate.edu/v1/locations?page[size]=10000&type=building
+# new.json being the data from https://localhost:8082/api/v0/locations?page[size]=10000&type=building - locations-frontend-api commit b1bec1e013cf29f16a0a01b9dd7c3777e3b4e192
 import sys
 import json
+from docopt import docopt
+print(docopt(__doc__, version='1.0.0rc2'))
+
+args = docopt(__doc__, version='1.0.0rc2')
+
+
+def create_mappings(buildings_json):
+    building_data = {}
+    names2ids = {}
+    #map id to building data
+    #map name to id
+    for building in buildings_json['data']:
+        building_data[building['id']] = building
+        names2ids[ building['attributes']['name'] ] = building['id']
+        
+    return (building_data, names2ids)
 
 if __name__ == "__main__":
-    print("Expecting old.json and new.json as input files 1 and 2.")
-    # old.json being the data from https://api.oregonstate.edu/v1/locations?page[size]=10000&type=building
-    # new.json being the data from https://localhost:8082/api/v0/locations?page[size]=10000&type=building - locations-frontend-api commit b1bec1e013cf29f16a0a01b9dd7c3777e3b4e192
+    
+    if(args['<old_data_path>'] == args['<new_data_path>']):
+        print "These are the same file..."
+        sys.exit(1)
+    else:
 
-    if(len(sys.argv) >= 3):
-        if(sys.argv[1] == sys.argv[2]):
-            print "These are the same file..."
-        print sys.argv[1] + " as old_file"
-        print sys.argv[2] + " as new_file"
-
-        with open(sys.argv[1], "r") as old_file:
-            old_building_data_json = json.loads(old_file.read())
-        with open(sys.argv[2], "r") as new_file:
-            new_building_data_json = json.loads(new_file.read())
-
-        new_building_data_dict = {}
-        old_building_data_dict = {}
-
-        # TODO Rename this name view dict
-        # This is for the NAME : {OLD, NEW} stuff
-        new_bdata_name_dict = {}
-        old_bdata_name_dict = {}
-
-        # Create a dict of the new building data to make the next loop simpler
-        for new_building in new_building_data_json['data']:
-            new_building_data_dict[new_building['id']] = new_building
-            new_bdata_name_dict[new_building['attributes']
-                                ['name']] = new_building['id']
-
-        for old_building in old_building_data_json['data']:
-            old_building_data_dict[old_building['id']] = old_building
-            old_bdata_name_dict[old_building['attributes']
-                                ['name']] = old_building['id']
+        with open(args['<old_data_path>'], "r") as old_json_file, open(args['<new_data_path>'], "r") as new_json_file:
+            new_building_data_dict, new_names2ids = create_mappings(json.loads(new_json_file.read()))
+            old_building_data_dict, old_names2ids = create_mappings(json.loads(old_json_file.read()))
 
         old_bdict_view = old_building_data_dict.viewkeys()
         new_bdict_view = new_building_data_dict.viewkeys()
 
-        # NAME : {OLD, NEW} Processing
-        new_bdata_name_view = new_bdata_name_dict.viewkeys()
-        old_bdata_name_view = old_bdata_name_dict.viewkeys()
-        building_key_intersection = old_bdata_name_view & new_bdata_name_view
-
-        bkey_intersection_dict = {}
-
-        for k in building_key_intersection:
-            bkey_intersection_dict[k] = {
-                "old": old_bdata_name_dict[k],
-                "new": new_bdata_name_dict[k]
+        bkey_intersections = {}
+        for k in old_names2ids.viewkeys() & new_names2ids.viewkeys():
+            bkey_intersections[k] = {
+                "old": old_names2ids[k],
+                "new": new_names2ids[k]
             }
+
         # TODO Add -o output filename option for (OLD,NEW) keyed building json file
         print "\n Outputing buildings with new and old keys to buildingsWithOldNewKeys.json\n"
         with open("buildingsWithOldNewKeys.json", "w") as intersection_file:
             intersection_file.write(json.dumps(
-                {"buildings": bkey_intersection_dict},indent=4, sort_keys=True))
+                {"buildings": bkey_intersections},indent=4, sort_keys=True))
         # Report Processing
         rekeyCheckDict = {}
         rekeyedBuildings = []
@@ -77,17 +74,16 @@ if __name__ == "__main__":
             gone_new_buildings = list(new_bdict_view - old_bdict_view)
             for gone_b in gone_new_buildings:
                 bname = new_building_data_dict[gone_b]['attributes']['name']
-                if rekeyCheckDict.has_key(bname):
+                if bname in rekeyCheckDict:
                     print gone_b + "  --- REKEYED! ---  " + new_building_data_dict[gone_b]['attributes']['name']
                     rekeyedBuildings.append(gone_b)
-                    # TODO put all the rekeyed buildings into array https://jira.sig.oregonstate.edu/browse/CO-932
                 else:
                     totallyNewBuildings.append(gone_b)
 
             print "\nThese are the totally new buildings\n"
             for gone_b in totallyNewBuildings:
                 print gone_b + "  ---  " + new_building_data_dict[gone_b]['attributes']['name']
-            # print new_bdict_view - old_bdict_view
+
         else:
             print "There are no differences."
 

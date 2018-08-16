@@ -99,7 +99,7 @@ class LocationResource extends Resource {
             giRestroom = giRestroom == null ? false : giRestroom
 
             String searchDistance = null
-            if(lat && lon) {
+            if (lat && lon) {
                 distance = getDistance(distance)
                 distanceUnit = getDistanceUnit(distanceUnit)
                 searchDistance = buildSearchDistance(distance, distanceUnit)
@@ -108,6 +108,11 @@ class LocationResource extends Resource {
             // validate filtering parameters
             if (validateParameters(trimmedCampus, trimmedType, lat, lon, distanceUnit)) {
                 return notFound().build()
+            }
+
+            // validate ranges of lat and lon
+            if (lat && lon && !(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) {
+                return badRequest("Invalid latitude/longitude").build()
             }
 
             Integer weekday = DateTime.now().getDayOfWeek()
