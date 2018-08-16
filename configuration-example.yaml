@@ -12,7 +12,6 @@ server:
       certAlias: development
       trustStorePath: /path/to/development.truststore
       supportedProtocols:
-        - TLSv1.1
         - TLSv1.2
   adminConnectors:
     - type: https
@@ -22,7 +21,6 @@ server:
       certAlias: development
       trustStorePath: /path/to/development.truststore
       supportedProtocols:
-        - TLSv1.1
         - TLSv1.2
 
 logging:
