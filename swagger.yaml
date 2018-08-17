@@ -107,6 +107,11 @@ paths:
           type: number
           format: integer
         - in: query
+          name: abbreviation
+          description: "Search by building abbreviation"
+          required: false
+          type: string
+        - in: query
           name: page[size]
           description: "Number of results to return. Used in pagination."
           required: false

@@ -21,7 +21,7 @@ class LocationResourceTest {
             String q, String campus, List<String> type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
             Boolean giRestroom, String parkingZoneGroup, Integer adaParkingSpaceCount,
-            Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount,
+            Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount, String abbreviation,
             Integer pageNumber, Integer pageSize ->
                 '{"hits": {"total": 0, "hits": []}}'
         }
@@ -31,14 +31,14 @@ class LocationResourceTest {
 
         // Test: no result
         def noResultRsp = resource.list('dixon', null,
-            null, null, null, null, null, null, false, null, null, null, null, null)
+            null, null, null, null, null, null, false, null, null, null, null, null, null)
         assert noResultRsp.status == 200
         assert noResultRsp.entity.links == [:]
         assert noResultRsp.entity.data == []
 
         // Test: invalid campus
         def invalidCampRes = resource.list('dixon', 'invalid',
-            null, null, null, null, null, null, null, null, null, null,null, null)
+            null, null, null, null, null, null, null, null, null, null,null, null, null)
         assert invalidCampRes.status == 404
         assert invalidCampRes.entity.developerMessage.contains("Not Found")
         assert invalidCampRes.entity.userMessage.contains("Not Found")
@@ -46,14 +46,14 @@ class LocationResourceTest {
 
         // Test: geoJson
         def geoJsonRes = resource.list(null, null,
-            null, null, null, null, null, null, null, null, null, null, null, true)
+            null, null, null, null, null, null, null, null, null, null, null, true, null)
         assert geoJsonRes.status == 200
         assert geoJsonRes.entity.type == 'FeatureCollection'
         assert geoJsonRes.entity.hasProperty('features')
 
         // Test: out of range lat/lon
         def outOfRange = resource.list(null, null,
-            null, -100, 200, null, null, null, null, null, null, null, null, null)
+            null, -100, 200, null, null, null, null, null, null, null, null, null, null)
         assert outOfRange.status == 400
         assert outOfRange.entity.userMessage.contains("Bad Request")
         assert outOfRange.entity.developerMessage.contains("Invalid latitude/longitude")
@@ -61,7 +61,7 @@ class LocationResourceTest {
 
         // Test: in range lat/lon
         def inRange = resource.list(null, null,
-                null, -40, 120, null, null, null, null, null, null, null, null, null)
+                null, -40, 120, null, null, null, null, null, null, null, null, null, null)
         assert inRange.status == 200
 
         mock.verify(dao)
@@ -142,7 +142,7 @@ class LocationResourceTest {
             String q, String campus, List<String> type, Double lat,
             Double lon, String searchDistance, Boolean isOpen, Integer weekday,
             Boolean giRestroom, List<String> parkingZoneGroup, Integer adaParkingSpaceCount,
-            Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount,
+            Integer motorcycleParkingSpaceCount, Integer evParkingSpaceCount, String abbreviation,
             Integer pageNumber, Integer pageSize -> esStubData
         }
         def dao = mock.proxyInstance()
@@ -163,7 +163,8 @@ class LocationResourceTest {
             'adaParkingSpaceCount'       : 1,
             'motorcycleParkingSpaceCount': 1,
             'evParkingSpaceCount'        : 1,
-            'parkingZoneGroup'           : ['A2', 'C']
+            'parkingZoneGroup'           : ['A2', 'C'],
+            'abbreviation'               : "JOHN"
         ]
 
         Response res = resource.list(
@@ -180,7 +181,8 @@ class LocationResourceTest {
             (Integer) expectedParams['adaParkingSpaceCount'],
             (Integer) expectedParams['motorcycleParkingSpaceCount'],
             (Integer) expectedParams['evParkingSpaceCount'],
-            (Boolean) expectedParams['geojson'])
+            (Boolean) expectedParams['geojson'],
+            (String) expectedParams['abbreviation'])
         ResultObject resObj = res.entity
         String selfLinks = resObj.links["self"]
 
