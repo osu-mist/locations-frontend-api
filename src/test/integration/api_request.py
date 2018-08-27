@@ -1,6 +1,7 @@
-import requests
 import ssl
 import urllib2
+
+import requests
 
 
 def get_buildings_with_services(url, access_token):
@@ -80,3 +81,7 @@ def check_ssl(protocol, url, access_token):
         return False
     else:
         return True
+
+
+def get_weekly_menu(url):
+    return requests.get(url, allow_redirects=False)

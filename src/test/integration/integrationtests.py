@@ -1,10 +1,11 @@
 import json
-import geojson
 import ssl
 import sys
 import unittest
 from datetime import datetime
 from random import randint
+
+import geojson
 
 from api_request import blank_result, \
                         check_ssl, \
@@ -14,7 +15,8 @@ from api_request import blank_result, \
                         query_request, \
                         response_time, \
                         results_with_links, \
-                        unauth_request
+                        unauth_request, \
+                        get_weekly_menu
 from configuration_load import get_access_token, \
                                get_single_resource_id, \
                                get_url
@@ -530,6 +532,12 @@ class gateway_tests(unittest.TestCase):
         query_params = {'type': 'dining', 'page[size]': max_page_size}
         restaurants = query_request(locations_url, access_token, "get",
                                     query_params).json()
+
+        # Test weeklyMenu field for valid link with no redirects
+        for restaurant in restaurants["data"]:
+            menu_url = restaurant["attributes"]["weeklyMenu"]
+            if menu_url:
+                self.assertEqual(get_weekly_menu(menu_url).status_code, 200)
 
         test_slot = None
         test_diners = [
