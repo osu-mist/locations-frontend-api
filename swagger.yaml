@@ -468,6 +468,9 @@ definitions:
       motorcycleParkingSpaceCount:
         description: "Count of motorcycle parking spaces if the location is parking."
         type: integer
+      weeklyMenu:
+        description: "Link to a weekly menu if the location is dining."
+        type: string
 
   ServicesAttributes:
     properties:
