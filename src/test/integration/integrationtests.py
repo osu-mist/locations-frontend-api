@@ -105,7 +105,7 @@ class gateway_tests(unittest.TestCase):
             'q': 'Dixon',
             'type': 'building'
         }).json()
-        self.assertEqual(len(building_dixon['data']), 1)
+        self.assertEqual(len(building_dixon['data']), 2)
 
         # test search only from name + abbr
         building_library = query_request(locations_url, access_token, "get", {
