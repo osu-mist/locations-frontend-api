@@ -93,7 +93,7 @@ class gateway_tests(unittest.TestCase):
         all_dixon = query_request(locations_url, access_token, "get", {
             'q': 'Dixon'
         }).json()
-        self.assertEqual(len(all_dixon['data']), 3)
+        self.assertEqual(len(all_dixon['data']), 4)
 
         dining_dixon = query_request(locations_url, access_token, "get", {
             'q': 'Dixon',
