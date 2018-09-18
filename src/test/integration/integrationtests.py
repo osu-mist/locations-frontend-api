@@ -349,7 +349,8 @@ class gateway_tests(unittest.TestCase):
         payload = {
             'adaParkingSpaceCount': randint(0, 5),
             'motorcycleParkingSpaceCount': randint(0, 5),
-            'evParkingSpaceCount': randint(0, 5)
+            'evParkingSpaceCount': randint(0, 5),
+            'type': 'parking'
         }
 
         all_parkings = query_request(locations_url, access_token, 'get',
