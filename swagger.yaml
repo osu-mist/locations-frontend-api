@@ -1,9 +1,7 @@
 swagger: '2.0'
-
 info:
   version: "0.0.1"
   title: Locations API
-
 # Describe your paths here
 paths:
   # This is a path endpoint. Change it.
@@ -124,7 +122,7 @@ paths:
           required: false
           type: string
         - $ref: '#/parameters/pretty'
-
+        - $ref: '#/parameters/authorization'
       # Expected responses for this operation:
       responses:
         # Response code
@@ -142,7 +140,6 @@ paths:
             $ref: "#/definitions/Errors"
       security:
         - locations_api_key: []
-
   /locations/{locationID}:
     get:
       tags:
@@ -157,6 +154,7 @@ paths:
           description: "ID of location to be searched by"
           required: true
           type: string
+        - $ref: '#/parameters/authorization'
       responses:
         "200":
           description: "Successful response"
@@ -168,7 +166,6 @@ paths:
             $ref: "#/definitions/Errors"
       security:
         - locations_api_key: []
-
   /locations/{locationID}/services:
     get:
       tags:
@@ -184,6 +181,7 @@ paths:
           description: "ID of location"
           required: true
           type: string
+        - $ref: '#/parameters/authorization'
       responses:
         "200":
           description: "Successful response"
@@ -199,7 +197,6 @@ paths:
             $ref: "#/definitions/Errors"
       security:
         - locations_api_key: []
-
   /services:
     get:
       tags:
@@ -232,6 +229,7 @@ paths:
           required: false
           type: string
         - $ref: '#/parameters/pretty'
+        - $ref: '#/parameters/authorization'
       responses:
         "200":
           description: "Successful response"
@@ -243,7 +241,6 @@ paths:
             $ref: "#/definitions/Errors"
       security:
         - locations_api_key: []
-
   /services/{serviceID}:
     get:
       tags:
@@ -258,6 +255,7 @@ paths:
           description: "ID of location to be searched by"
           required: true
           type: string
+        - $ref: '#/parameters/authorization'
       responses:
         "200":
           description: "Successful response"
@@ -273,14 +271,11 @@ paths:
             $ref: "#/definitions/Errors"
       security:
         - locations_api_key: []
-
 securityDefinitions:
-
   locations_api_key:
     type: apiKey
     name: locations_api_key
     in: query
-
 parameters:
   pretty:
     name: pretty
@@ -288,7 +283,12 @@ parameters:
     type: boolean
     required: false
     description: If true, JSON response will be pretty-printed
-
+  authorization:
+    name: Authorization
+    in: header
+    type: string
+    required: true
+    description: '"Bearer [token]" where token is your OAuth2 access token'
 definitions:
   LocationsResultObject:
     properties:
@@ -296,7 +296,6 @@ definitions:
         $ref: "#/definitions/Links"
       data:
         $ref: "#/definitions/LocationsResourceObject"
-
   LocationsResultObjects:
     properties:
       links:
@@ -305,14 +304,12 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/LocationsResourceObject"
-
   ServicesResultObject:
     properties:
       links:
         $ref: "#/definitions/Links"
       data:
         $ref: "#/definitions/ServicesResourceObject"
-
   LocationsResourceObject:
     properties:
       id:
@@ -325,7 +322,6 @@ definitions:
         $ref: "#/definitions/SelfLink"
       relationships:
         $ref: "#/definitions/RelationshipsInLocations"
-
   ServicesResultObjects:
     properties:
       links:
@@ -334,7 +330,6 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/ServicesResourceObject"
-
   ServicesResourceObject:
     properties:
       id:
@@ -347,13 +342,11 @@ definitions:
         $ref: "#/definitions/ServiceLinks"
       relationships:
         $ref: "#/definitions/RelationshipsInServices"
-
   SelfLink:
     properties:
       self:
         type: string
         description: Url to this resource / location.
-
   Attributes:
     properties:
       name:
@@ -378,7 +371,7 @@ definitions:
             description: Array of ring arrays for each physical structure of a location
             type: array
             items:
-              description: Array of points that make up a ring. 
+              description: Array of points that make up a ring.
               type: array
               items:
                 type: array
@@ -428,13 +421,13 @@ definitions:
         type: integer
       giRestroomLimit:
         description: >
-          If true, access to this location's restrooms may be limited. 
-          A residence hall might restrict bathroom use or building access to 
+          If true, access to this location's restrooms may be limited.
+          A residence hall might restrict bathroom use or building access to
           residents only.
         type: boolean
       giRestroomLocations:
         description: >
-          Room numbers of gender inclusive restrooms within location. 
+          Room numbers of gender inclusive restrooms within location.
           Some restrooms may not be ADA compliant.
         type: string
       synonyms:
@@ -471,7 +464,6 @@ definitions:
       weeklyMenu:
         description: "Link to a weekly menu if the location is dining."
         type: string
-
   ServicesAttributes:
     properties:
       name:
@@ -486,31 +478,26 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/DayHours"
-
   RelationshipsInLocations:
     properties:
       services:
           $ref: "#/definitions/ServicesRelationship"
-
   RelationshipsInServices:
     properties:
       locations:
           $ref: "#/definitions/ServicesRelationship"
-
   ServicesRelationship:
     properties:
       data:
         type: array
         items:
           $ref: "#/definitions/ResourceObjectIdentifier"
-
   ResourceObjectIdentifier:
     properties:
       id:
         type: string
       type:
         type: string
-
   DayHours:
     properties:
       day:
@@ -519,14 +506,12 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/TimeSlot"
-
   TimeSlot:
     properties:
       start:
         type: string
       end:
         type: string
-
   Links:
     properties:
       self:
@@ -539,12 +524,10 @@ definitions:
         type: string
       next:
         type: string
-
   ServiceLinks:
     properties:
       self:
         type: string
-
   Error:
     type: object
     properties:
@@ -564,7 +547,6 @@ definitions:
       details:
         type: string
         description: A link to further information about the error.
-
   Errors:
     title: ArrayOfErrors
     type: array
