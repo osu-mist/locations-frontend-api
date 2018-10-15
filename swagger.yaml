@@ -2,6 +2,10 @@ swagger: '2.0'
 info:
   version: "0.0.1"
   title: Locations API
+host: 'api.oregonstate.edu'
+schemes:
+  - https
+basePath: /v1
 # Describe your paths here
 paths:
   # This is a path endpoint. Change it.
