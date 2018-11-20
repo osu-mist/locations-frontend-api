@@ -439,9 +439,7 @@ definitions:
         items:
           type: string
       openHours:
-        type: array
-        items:
-          $ref: "#/definitions/DayHours"
+        $ref: "#/definitions/DayHours"
       distance:
         description: "Distance from given location in given distance unit.
               This is only returned when the query parameters lat and lon are specified.
@@ -503,10 +501,36 @@ definitions:
       type:
         type: string
   DayHours:
+    description: >
+      This object represents open hours for a location, relative to the date
+      that the API returns the response. 1 represents the current day,
+      2 represents the next day, etc. All times are in UTC.
     properties:
-      day:
-        type: integer
-      hours:
+      1:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      2:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      3:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      4:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      5:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      6:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      7:
         type: array
         items:
           $ref: "#/definitions/TimeSlot"
@@ -514,8 +538,10 @@ definitions:
     properties:
       start:
         type: string
+        format: date-time
       end:
         type: string
+        format: date-time
   Links:
     properties:
       self:
