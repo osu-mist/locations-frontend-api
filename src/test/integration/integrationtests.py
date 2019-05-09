@@ -249,7 +249,7 @@ class gateway_tests(unittest.TestCase):
         magruder_geometry = building_magruder['data'][0]['attributes'][
             'geometry']
         self.assertEqual(magruder_geometry['type'], "MultiPolygon")
-        self.assertEqual(len(magruder_geometry['coordinates']), 4)
+        self.assertEqual(len(magruder_geometry['coordinates']), 5)
         self.assertEqual(len(magruder_geometry['coordinates'][0][0][0]), 2)
         self.assertEqual(
             type(magruder_geometry['coordinates'][0][0][0][0]), float)
