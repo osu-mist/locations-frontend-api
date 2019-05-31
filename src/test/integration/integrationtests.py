@@ -221,16 +221,6 @@ class gateway_tests(unittest.TestCase):
         }).json()
         self.assertEqual(len(building_library['data']), 1)
 
-        extensions = query_request(
-            locations_url, access_token, "get", {
-                'lat': lat,
-                'lon': lon,
-                'distance': 10,
-                'distanceUnit': 'mi',
-                'campus': 'extension'
-            }).json()
-        self.assertEqual(len(extensions['data']), 2)
-
         dining_java = query_request(locations_url, access_token, "get", {
             'lat': lat,
             'lon': lon,
@@ -525,9 +515,6 @@ class gateway_tests(unittest.TestCase):
             self.assertIsNotNone(office["attributes"]["zip"])
             self.assertIsNotNone(office["attributes"]["fax"])
             self.assertIsNotNone(office["attributes"]["website"])
-            self.assertIsNotNone(office["attributes"]["website"])
-            self.assertIsNotNone(office["attributes"]["latitude"])
-            self.assertIsNotNone(office["attributes"]["longitude"])
 
     def test_dining(self):
         query_params = {'type': 'dining', 'page[size]': max_page_size}
