@@ -33,6 +33,7 @@ build.properties
 
 # virtual_len
 **/virtual_env/*
+venv/
 
 # Keytool Files
 *.pem
