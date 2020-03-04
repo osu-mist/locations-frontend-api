@@ -435,9 +435,9 @@ class gateway_tests(unittest.TestCase):
                          "Gill Coliseum")
 
         austin_hall_result = query_request(locations_url, access_token, "get",
-                                           {
-                                               'q': 'College of Business'
-                                           }).json()
+            {
+                'q': 'College of Business Austin'
+            }).json()
         self.assertEqual(austin_hall_result["data"][0]["id"],
                          "b018683aa0e551280d1422301f8fb249")
         self.assertEqual(austin_hall_result["data"][0]["attributes"]["name"],
