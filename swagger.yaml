@@ -130,7 +130,6 @@ paths:
           required: false
           type: string
         - $ref: '#/parameters/pretty'
-        - $ref: '#/parameters/authorization'
       # Expected responses for this operation:
       responses:
         # Response code
@@ -146,8 +145,6 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/Errors"
-      security:
-        - locations_api_key: []
   /locations/{locationID}:
     get:
       tags:
@@ -171,8 +168,6 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/Errors"
-      security:
-        - locations_api_key: []
   /locations/{locationID}/services:
     get:
       tags:
@@ -201,8 +196,6 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/Errors"
-      security:
-        - locations_api_key: []
   /services:
     get:
       tags:
@@ -244,8 +237,6 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/Errors"
-      security:
-        - locations_api_key: []
   /services/{serviceID}:
     get:
       tags:
@@ -273,13 +264,6 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/Errors"
-      security:
-        - locations_api_key: []
-securityDefinitions:
-  locations_api_key:
-    type: apiKey
-    name: locations_api_key
-    in: query
 parameters:
   pretty:
     name: pretty
