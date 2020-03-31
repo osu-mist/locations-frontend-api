@@ -2,11 +2,15 @@ swagger: '2.0'
 info:
   version: "0.0.1"
   title: Locations API
+  description: Get information about OSU locations.
 host: 'api.oregonstate.edu'
 schemes:
   - https
 basePath: /v1
 # Describe your paths here
+security:
+  - OAuth2:
+    - full
 paths:
   # This is a path endpoint. Change it.
   /locations:
@@ -158,7 +162,6 @@ paths:
           description: "ID of location to be searched by"
           required: true
           type: string
-        - $ref: '#/parameters/authorization'
       responses:
         "200":
           description: "Successful response"
@@ -185,7 +188,6 @@ paths:
           description: "ID of location"
           required: true
           type: string
-        - $ref: '#/parameters/authorization'
       responses:
         "200":
           description: "Successful response"
@@ -233,7 +235,6 @@ paths:
           required: false
           type: string
         - $ref: '#/parameters/pretty'
-        - $ref: '#/parameters/authorization'
       responses:
         "200":
           description: "Successful response"
@@ -259,7 +260,6 @@ paths:
           description: "ID of location to be searched by"
           required: true
           type: string
-        - $ref: '#/parameters/authorization'
       responses:
         "200":
           description: "Successful response"
@@ -287,12 +287,13 @@ parameters:
     type: boolean
     required: false
     description: If true, JSON response will be pretty-printed
-  authorization:
-    name: Authorization
-    in: header
-    type: string
-    required: true
-    description: '"Bearer [token]" where [token] is your OAuth2 access token'
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    flow: application
+    tokenUrl: https://api.oregonstate.edu/oauth2/token
+    scopes:
+      full: Full access to the API
 definitions:
   LocationsResultObject:
     properties:
