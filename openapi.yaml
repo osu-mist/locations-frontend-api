@@ -1,129 +1,310 @@
 swagger: '2.0'
 info:
-  title: Express API Skeleton
-  description: Skeleton for Express APIs
-  version: v1
-  license:
-    name: GNU Affero General Public License Version 3
-    url: http://www.gnu.org/licenses/agpl-3.0.en.html
-  contact:
-    name: IS Data Architecture Team
-    url: https://is.oregonstate.edu/data-architecture
-    email: isdataarchitecture@oregonstate.edu
+  version: "0.0.1"
+  title: Locations API
+  description: Get information about OSU locations.
+host: 'api.oregonstate.edu'
 schemes:
   - https
-host: api.oregonstate.edu
-basePath: /v1
-externalDocs:
-  description: GitHub Repository
-  url: https://github.com/osu-mist/express-api-skeleton
-produces:
-  - application/json
-consumes:
-  - application/json
+basePath: /v2
 security:
   - OAuth2:
-      - full
+    - full
 paths:
-  /pets:
+  /locations:
     get:
-      summary: List all pets
       tags:
-        - pets
-      description: Get all pets
-      operationId: getPets
+       - locations
+      summary: Get locations
+      description: "Gets all `Location` objects. Can be filtered by parameters."
+      operationId: getLocations
+      produces:
+        - application/json
       parameters:
-        - $ref: '#/parameters/pageNumber'
-        - $ref: '#/parameters/pageSize'
         - in: query
-          name: species
-          description: Search by pet species
+          name: filter[query]
+          description: "Query to search through buildings based on building name and abbreviation"
           required: false
           type: string
+        - in: query
+          name: filter[latitude]
+          description: "Latitude of the location. Should be used with lon parameter"
+          required: false
+          type: number
+          format: double
+        - in: query
+          name: filter[longitude]
+          description: "Longitude of the location. Should be used with lat parameter"
+          required: false
+          type: number
+          format: double
+        - in: query
+          name: filter[distance]
+          description: "The radius of the circle centred on the specified location. Default: 2"
+          required: false
+          type: number
+          format: double
+        - in: query
+          name: filter[distanceUnit]
+          description: "Distance can be specified in following units:
+            Mile - mi or miles (default);
+            Yard - yd or yards;
+            Feet - ft or feet;
+            Inch - in or inch;
+            Kilometer - km or kilometers;
+            Meter - m or meters;
+            Centimeter - cm or centimeters;
+            Millimeter - mm or millimeters;
+            Nautical mile - NM, nmi or nauticalmiles
+          "
+          required: false
+          type: string
+          enum: 
+            - mi
+            - miles
+            - yd
+            - yards
+            - ft
+            - feet
+            - in
+            - inch
+            - km
+            - kilometers
+            - m
+            - meters
+            - cm
+            - centimeters
+            - mm
+            - millimeters
+            - nmi
+            - NM
+            - nauticalmiles
+        - in: query
+          name: filter[isOpen]
+          description: "True if only search for open restaurants/buildings. Default: false to search for all the results"
+          required: false
+          type: boolean
+        - in: query
+          name: filter[campus][oneOf]
+          description: "Name of the campus. Valid options are: corvallis, extension, cascades, hmsc, and other."
+          required: false
+          type: array
+          collectionFormat: csv
+          items:
+            type: string
+            enum:
+              - corvallis
+              - extension
+              - cascades
+              - hmsc
+              - other
+        - in: query
+          name: filter[type]
+          description: "Type of location. Valid options are: building, dining, cultural-center, parking, and other."
+          required: false
+          collectionFormat: multi
+          type: string
+        - in: query
+          name: filter[giRestroom]
+          description: >
+            If true, locations without gender inclusive restrooms will be filtered out.
+          required: false
+          type: boolean
+        - in: query
+          name: filter[parkingZoneGroup][oneOf]
+          description: >
+            Locations in results should match the parkingZoneGroup
+            in this query parameter.
+          required: false
+          collectionFormat: csv
+          type: array
+          items:
+            type: string
+            # what are the possible values for this?
+        - in: query
+          name: filter[adaParkingSpaceCount][gte]
+          description: "The filter for locations with ADA parking space greater than or equal to this amount"
+          required: false
+          type: number
+          format: integer
+        - in: query
+          name: filter[motorcycleParkingSpaceCount][gte]
+          description: "The filter for locations with motorcycle parking space greater than or equal to this amount"
+          required: false
+          type: number
+          format: integer
+        - in: query
+          name: filter[evParkingSpaceCount][gte]
+          description: "The filter for locations with electric vehicle parking space greater than or equal to this amount"
+          required: false
+          type: number
+          format: integer
+        - in: query
+          name: filter[abbreviation]
+          description: "Search by building abbreviation"
+          required: false
+          type: string
+        - in: query
+          name: page[size]
+          description: "Number of results to return. Used in pagination."
+          required: false
+          type: string
+          maximum: 10000
+          default: 10
+        - in: query
+          name: page[number]
+          description: "Page number of results. Used to paginate through results."
+          required: false
+          type: string
+        - $ref: '#/parameters/pretty'
+        - in: query
+          name: include
+          required: false
+          type: array
+          collectionFormat: csv
+          default: []
+          items:
+            type: string
+            enum: [services]
       responses:
-        '200':
-          description: Successful response
+        "200":
+          description: "Successful response"
           schema:
-            $ref: '#/definitions/PetsResult'
-        '400':
-          $ref: '#/responses/400'
-        '500':
-          $ref: '#/responses/500'
-    post:
-      summary: Add a new pet
-      operationId: postPet
-      tags:
-        - pets
-      parameters:
-        - in: body
-          name: body
-          required: true
+            $ref: "#/definitions/LocationsResultObjects"
+        "404":
+          description: "Not Found"
           schema:
-            $ref: '#/definitions/PetPostBody'
-      responses:
-        '201':
-          description: Pet successfully created
+            $ref: "#/definitions/Error"
+        "500":
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/PetResult'
-        '400':
-          $ref: '#/responses/400'
-        '409':
-          description: Conflict
-          schema:
-            $ref: '#/definitions/ErrorResult'
-        '500':
-          $ref: '#/responses/500'
-  /pets/{id}:
+            $ref: "#/definitions/Errors"
+  /locations/{locationID}:
     get:
-      summary: Info for a specific pet
       tags:
-        - pets
-      description: Get pet by unique ID
-      operationId: getPetById
+        - locations
+      description: "Finds location by ID"
+      operationId: getLocationByID
+      produces:
+        - application/json
       parameters:
-        - name: id
+        - name: locationID
           in: path
-          description: Unique Pet ID, UUID format
+          description: "ID of location to be searched by"
           required: true
           type: string
       responses:
-        '200':
-          description: Successful response
+        "200":
+          description: "Successful response"
           schema:
-            $ref: '#/definitions/PetResult'
-        '404':
-          description: PetResource not found
+            $ref: "#/definitions/LocationsResultObject"
+        "500":
+          description: "Internal Server Error"
           schema:
-            $ref: '#/definitions/ErrorResult'
-        '500':
-          $ref: '#/responses/500'
+            $ref: "#/definitions/Errors"
+  /locations/{locationID}/services:
+    get:
+      tags:
+        - locations
+        - services
+      description: "Lists services related to a location"
+      operationId: getServices
+      produces:
+        - application/json
+      parameters:
+        - name: locationID
+          in: path
+          description: "ID of location"
+          required: true
+          type: string
+      responses:
+        "200":
+          description: "Successful response"
+          schema:
+            $ref: "#/definitions/ServicesResultObjects"
+        "404":
+          description: "Resource not found"
+          schema:
+            $ref: "#/definitions/Errors"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/Errors"
+  /services:
+    get:
+      tags:
+       - services
+      # Describe this verb here. Note: you can use markdown
+      summary: Get services
+      description: "Gets all `Service` objects. Can be filtered by parameters."
+      operationId: getServicesList
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: filter[query]
+          description: "Query to search through buildings. Looks through the building name, abbreviation."
+          required: false
+          type: string
+        - in: query
+          name: filter[isOpen]
+          description: "True if only search for open restaurants/buildings. Default: false to search for all the results"
+          required: false
+          type: boolean
+        - in: query
+          name: page[size]
+          description: "Number of results to return. Used in pagination. Default value is 10."
+          required: false
+          type: string
+        - in: query
+          name: page[number]
+          description: "Page number of results. Used to paginate through results."
+          required: false
+          type: string
+        - $ref: '#/parameters/pretty'
+      responses:
+        "200":
+          description: "Successful response"
+          schema:
+            $ref: "#/definitions/ServicesResultObjects"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/Errors"
+  /services/{serviceID}:
+    get:
+      tags:
+        - services
+      description: "Finds service by ID"
+      operationId: getServiceById
+      produces:
+        - application/json
+      parameters:
+        - name: serviceID
+          in: path
+          description: "ID of location to be searched by"
+          required: true
+          type: string
+      responses:
+        "200":
+          description: "Successful response"
+          schema:
+            $ref: "#/definitions/ServicesResultObject"
+        "404":
+          description: "Resource not found"
+          schema:
+            $ref: "#/definitions/Errors"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/Errors"
 parameters:
-  pageNumber:
-    name: page[number]
+  pretty:
+    name: pretty
     in: query
-    type: integer
+    type: boolean
     required: false
-    description: Page number of results
-    default: 1
-    minimum: 1
-  pageSize:
-    name: page[size]
-    in: query
-    type: integer
-    required: false
-    description: Number of results to return
-    default: 25
-    maximum: 500
-    minimum: 1
-responses:
-  '400':
-     description: Bad request
-     schema:
-       $ref: '#/definitions/ErrorResult'
-  '500':
-     description: Internal server error
-     schema:
-       $ref: '#/definitions/ErrorResult'
+    description: If true, JSON response will be pretty-printed
 securityDefinitions:
   OAuth2:
     type: oauth2
@@ -132,148 +313,309 @@ securityDefinitions:
     scopes:
       full: Full access to the API
 definitions:
-  Meta:
+  LocationsResultObject:
     properties:
-      totalResults:
-        type: integer
-        description: Total number of results
-        example: 10
-      totalPages:
-        type: integer
-        description: Total number of pages
-        example: 10
-      currentPageNumber:
-        type: integer
-        description: Page number of the returned results
-        example: 1
-      currentPageSize:
-        type: integer
-        description: Number of results per page
-        example: 25
+      links:
+        $ref: "#/definitions/Links"
+      data:
+        $ref: "#/definitions/LocationsResourceObject"
+      included:
+        type: array
+        items:
+          $ref: "#/definitions/ServicesResourceObject"
+  LocationsResultObjects:
+    properties:
+      links:
+        $ref: "#/definitions/Links"
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/LocationsResourceObject"
+      included:
+        type: array
+        items:
+          $ref: "#/definitions/ServicesIncluded"
+  ServicesResultObject:
+    properties:
+      links:
+        $ref: "#/definitions/Links"
+      data:
+        $ref: "#/definitions/ServicesResourceObject"
+  ServicesIncluded:
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      attributes:
+        $ref: "#/definitions/ServicesAttributes"
+      links:
+        $ref: "#/definitions/ServiceLinks"
+  LocationsResourceObject:
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      attributes:
+        $ref: "#/definitions/Attributes"
+      links:
+        $ref: "#/definitions/SelfLink"
+      relationships:
+        $ref: "#/definitions/RelationshipsInLocations"
+  ServicesResultObjects:
+    properties:
+      links:
+        $ref: "#/definitions/Links"
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/ServicesResourceObject"
+  ServicesResourceObject:
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      attributes:
+        $ref: "#/definitions/ServicesAttributes"
+      links:
+        $ref: "#/definitions/ServiceLinks"
+      relationships:
+        $ref: "#/definitions/RelationshipsInServices"
   SelfLink:
     properties:
       self:
         type: string
-        format: uri
-        description: Self-link of current resource
-  PaginationLinks:
+        description: Url to this resource / location.
+  Attributes:
     properties:
-      first:
+      name:
         type: string
-        format: uri
-        description: The first page of data
-      last:
+        description: Name of the location.
+      abbreviation:
         type: string
-        format: uri
-        description: The last page of data
-      prev:
+      latitude:
+        type: number
+        format: float
+      longitude:
+        type: number
+        format: float
+      geometry:
+        properties:
+          type:
+            type: string
+            enum:
+              - Polygon
+              - MultiPolygon
+          coordinates:
+            description: Array of ring arrays for each physical structure of a location
+            type: array
+            items:
+              description: Array of points that make up a ring.
+              type: array
+              items:
+                type: array
+                items:
+                  type: number
+                  format: float
+      summary:
         type: string
-        format: uri
-        description: The previous page of data
-      next:
+      description:
         type: string
-        format: uri
-        description: The next page of data
-  PetResource:
+      address:
+        type: string
+      city:
+        type: string
+      state:
+        type: string
+      zip:
+        type: string
+      telephone:
+        type: string
+      fax:
+        type: string
+      thumbnails:
+        type: array
+        items:
+          type: string
+      images:
+        type: array
+        items:
+          type: string
+      departments:
+        type: array
+        items:
+          type: string
+      website:
+        type: string
+      sqft:
+        type: string
+      calendar:
+        type: string
+      campus:
+        type: string
+      type:
+        type: string
+      giRestroomCount:
+        description: Number of gender inclusive restrooms available in the location.
+        type: integer
+      giRestroomLimit:
+        description: >
+          If true, access to this location's restrooms may be limited.
+          A residence hall might restrict bathroom use or building access to
+          residents only.
+        type: boolean
+      giRestroomLocations:
+        description: >
+          Room numbers of gender inclusive restrooms within location.
+          Some restrooms may not be ADA compliant.
+        type: string
+      synonyms:
+        type: array
+        items:
+          type: string
+      openHours:
+        $ref: "#/definitions/DayHours"
+      distance:
+        description: "Distance from given location in given distance unit.
+              This is only returned when the query parameters lat and lon are specified.
+              The default distance unit is mile "
+        type: number
+        format: double
+      tags:
+        description: "Tags associated with this location"
+        type: array
+        items:
+          type: string
+      parkingZoneGroup:
+        description: "Zonegroup of location if location is parking"
+        type: string
+      evParkingSpaceCount:
+        description: "Count of electric vehicle parking spaces if the location is parking"
+        type: integer
+      adaParkingSpaceCount:
+        description: "Count of ADA parking spaces if the location is parking"
+        type: integer
+      motorcycleParkingSpaceCount:
+        description: "Count of motorcycle parking spaces if the location is parking."
+        type: integer
+      weeklyMenu:
+        description: "Link to a weekly menu if the location is dining."
+        type: string
+  ServicesAttributes:
+    properties:
+      name:
+        type: string
+        description: Name of the Service.
+      tags:
+        description: "Tags associated with this location"
+        type: array
+        items:
+          type: string
+      openHours:
+        type: array
+        items:
+          $ref: "#/definitions/DayHours"
+  RelationshipsInLocations:
+    properties:
+      services:
+          $ref: "#/definitions/ServicesRelationship"
+  RelationshipsInServices:
+    properties:
+      locations:
+          $ref: "#/definitions/ServicesRelationship"
+  ServicesRelationship:
+    properties:
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/ResourceObjectIdentifier"
+  ResourceObjectIdentifier:
     properties:
       id:
         type: string
-        description: A unique ID of pet
       type:
-        $ref: '#/definitions/PetType'
-      links:
-        $ref: '#/definitions/SelfLink'
-      attributes:
-        properties:
-          name:
-            type: string
-            description: Name of pet
-            example: Hedwig
-          owner:
-            type: string
-            description: Name of owner
-            example: Harry Potter
-          species:
-            type: string
-            description: Species of pet
-            example: Owl
-  PetResult:
+        type: string
+  DayHours:
+    description: >
+      This object represents open hours for a location, relative to the date
+      that the API returns the response. 1 represents the current day,
+      2 represents the next day, etc. All times are in UTC.
     properties:
-      links:
-        $ref: '#/definitions/SelfLink'
-      data:
-        $ref: '#/definitions/PetResource'
-  PetsResult:
-    properties:
-      links:
-        allOf:
-          - $ref: '#/definitions/SelfLink'
-          - $ref: '#/definitions/PaginationLinks'
-      meta:
-        $ref: '#/definitions/Meta'
-      data:
+      1:
         type: array
         items:
-          $ref: '#/definitions/PetResource'
-  PetPostBody:
+          $ref: "#/definitions/TimeSlot"
+      2:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      3:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      4:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      5:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      6:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+      7:
+        type: array
+        items:
+          $ref: "#/definitions/TimeSlot"
+  TimeSlot:
+    properties:
+      start:
+        type: string
+        format: date-time
+      end:
+        type: string
+        format: date-time
+  Links:
+    properties:
+      self:
+        type: string
+      first:
+        type: string
+      last:
+        type: string
+      prev:
+        type: string
+      next:
+        type: string
+  ServiceLinks:
+    properties:
+      self:
+        type: string
+  Error:
     type: object
     properties:
-      data:
-        type: object
-        properties:
-          type:
-            $ref: '#/definitions/PetType'
-          attributes:
-            type: object
-            properties:
-              name:
-                $ref: '#/definitions/PetResource/properties/attributes/properties/name'
-              owner:
-                $ref: '#/definitions/PetResource/properties/attributes/properties/owner'
-              species:
-                $ref: '#/definitions/PetResource/properties/attributes/properties/species'
-            required:
-              - name
-              - owner
-              - species
-            additionalProperties: false
-        required:
-          - type
-          - attributes
-        additionalProperties: false
-    required:
-     - data
-    additionalProperties: false
-  PetType:
-    type: string
-    enum: [pet]
-  ErrorObject:
-    properties:
       status:
+        type: integer
+        format: int32
+        description: HTTP status code.
+      developerMessage:
         type: string
-        description: HTTP status code
-        example: '123'
-      title:
+        description: An error string aimed at developers.
+      userMesage:
         type: string
-        description: A short, user readable summary of the error
-        example: Not Found
+        description: An error string aimed at end users.
       code:
+        type: integer
+        description: Error code.
+      details:
         type: string
-        description: An application-specific error code
-        example: '1234'
-      detail:
-        type: string
-        description: A long description of the error that may contain instance-specific details
-      links:
-        properties:
-          about:
-            type: string
-            format: uri
-            description: A link to further information about the error
-            example: https://developer.oregonstate.edu/documentation/error-reference#1234
-  ErrorResult:
-    properties:
-      errors:
-        type: array
-        items:
-          $ref: '#/definitions/ErrorObject'
+        description: A link to further information about the error.
+  Errors:
+    title: ArrayOfErrors
+    type: array
+    items:
+      $ref: "#/definitions/Error"
