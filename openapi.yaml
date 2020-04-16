@@ -1,12 +1,10 @@
-swagger: '2.0'
+openapi: '3.0.2'
 info:
-  version: "0.0.1"
+  version: "2.0.0"
   title: Locations API
   description: Get information about OSU locations.
-host: 'api.oregonstate.edu'
-schemes:
-  - https
-basePath: /v2
+servers: 
+  - url: https://api.oregonstate.edu/v2
 security:
   - OAuth2:
     - full
@@ -18,32 +16,34 @@ paths:
       summary: Get locations
       description: "Gets all `Location` objects. Can be filtered by parameters."
       operationId: getLocations
-      produces:
-        - application/json
       parameters:
         - in: query
           name: filter[query]
           description: "Query to search through buildings based on building name and abbreviation"
           required: false
-          type: string
+          schema:
+            type: string
         - in: query
           name: filter[latitude]
           description: "Latitude of the location. Should be used with lon parameter"
           required: false
-          type: number
-          format: double
+          schema:
+            type: number
+            format: double
         - in: query
           name: filter[longitude]
           description: "Longitude of the location. Should be used with lat parameter"
           required: false
-          type: number
-          format: double
+          schema:
+            type: number
+            format: double
         - in: query
           name: filter[distance]
           description: "The radius of the circle centred on the specified location. Default: 2"
           required: false
-          type: number
-          format: double
+          schema:
+            type: number
+            format: double
         - in: query
           name: filter[distanceUnit]
           description: "Distance can be specified in following units:
@@ -58,150 +58,176 @@ paths:
             Nautical mile - NM, nmi or nauticalmiles
           "
           required: false
-          type: string
-          enum: 
-            - mi
-            - miles
-            - yd
-            - yards
-            - ft
-            - feet
-            - in
-            - inch
-            - km
-            - kilometers
-            - m
-            - meters
-            - cm
-            - centimeters
-            - mm
-            - millimeters
-            - nmi
-            - NM
-            - nauticalmiles
+          schema:
+            type: string
+            enum: 
+              - mi
+              - miles
+              - yd
+              - yards
+              - ft
+              - feet
+              - in
+              - inch
+              - km
+              - kilometers
+              - m
+              - meters
+              - cm
+              - centimeters
+              - mm
+              - millimeters
+              - nmi
+              - NM
+              - nauticalmiles
         - in: query
           name: filter[isOpen]
-          description: "True if only search for open restaurants/buildings. Default: false to search for all the results"
+          description: "Set to true to only search for open restaurants/buildings. Default: false to search for all the results"
           required: false
-          type: boolean
+          schema:
+            type: boolean
         - in: query
           name: filter[campus][oneOf]
           description: "Name of the campus. Valid options are: corvallis, extension, cascades, hmsc, and other."
           required: false
-          type: array
-          collectionFormat: csv
-          items:
-            type: string
-            enum:
-              - corvallis
-              - extension
-              - cascades
-              - hmsc
-              - other
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - corvallis
+                - extension
+                - cascades
+                - hmsc
+                - other
         - in: query
           name: filter[type]
           description: "Type of location. Valid options are: building, dining, cultural-center, parking, and other."
-          required: false
-          collectionFormat: multi
-          type: string
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - building
+                - dining
+                - cultural-center
+                - parking
+                - other
         - in: query
           name: filter[giRestroom]
           description: >
             If true, locations without gender inclusive restrooms will be filtered out.
           required: false
-          type: boolean
+          schema:
+            type: boolean
         - in: query
           name: filter[parkingZoneGroup][oneOf]
           description: >
             Locations in results should match the parkingZoneGroup
             in this query parameter.
           required: false
-          collectionFormat: csv
-          type: array
-          items:
-            type: string
-            # what are the possible values for this?
+          schema:
+            type: array
+            items:
+              type: string
+              # what are the possible values for this?
         - in: query
           name: filter[adaParkingSpaceCount][gte]
-          description: "The filter for locations with ADA parking space greater than or equal to this amount"
+          description: "Only include locations with ADA parking space greater than or equal to this amount"
           required: false
-          type: number
-          format: integer
+          schema:
+            type: number
+            format: integer
         - in: query
           name: filter[motorcycleParkingSpaceCount][gte]
-          description: "The filter for locations with motorcycle parking space greater than or equal to this amount"
+          description: "Only include locations with motorcycle parking space greater than or equal to this amount"
           required: false
-          type: number
-          format: integer
+          schema:
+            type: number
+            format: integer
         - in: query
           name: filter[evParkingSpaceCount][gte]
-          description: "The filter for locations with electric vehicle parking space greater than or equal to this amount"
+          description: "Only include locations with electric vehicle parking space greater than or equal to this amount"
           required: false
-          type: number
-          format: integer
+          schema:
+            type: number
+            format: integer
         - in: query
           name: filter[abbreviation]
           description: "Search by building abbreviation"
           required: false
-          type: string
+          schema:
+            type: string
         - in: query
           name: page[size]
           description: "Number of results to return. Used in pagination."
           required: false
-          type: string
-          maximum: 10000
-          default: 10
+          schema:
+            type: number
+            format: integer
+            maximum: 10000
+            default: 10
         - in: query
           name: page[number]
           description: "Page number of results. Used to paginate through results."
           required: false
-          type: string
-        - $ref: '#/parameters/pretty'
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/pretty'
         - in: query
           name: include
           required: false
-          type: array
-          collectionFormat: csv
-          default: []
-          items:
-            type: string
-            enum: [services]
+          schema:
+            type: array
+            default: []
+            items:
+              type: string
+              enum: [services]
       responses:
         "200":
           description: "Successful response"
-          schema:
-            $ref: "#/definitions/LocationsResultObjects"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/LocationsResultObjects"
         "404":
           description: "Not Found"
-          schema:
-            $ref: "#/definitions/Error"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Error"
         "500":
           description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/Errors"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Errors"
   /locations/{locationID}:
     get:
       tags:
         - locations
       description: "Finds location by ID"
       operationId: getLocationByID
-      produces:
-        - application/json
       parameters:
         - name: locationID
           in: path
           description: "ID of location to be searched by"
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         "200":
           description: "Successful response"
-          schema:
-            $ref: "#/definitions/LocationsResultObject"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/LocationsResultObject"
         "500":
           description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/Errors"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Errors"
   /locations/{locationID}/services:
     get:
       tags:
@@ -209,27 +235,32 @@ paths:
         - services
       description: "Lists services related to a location"
       operationId: getServices
-      produces:
-        - application/json
       parameters:
         - name: locationID
           in: path
           description: "ID of location"
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         "200":
           description: "Successful response"
-          schema:
-            $ref: "#/definitions/ServicesResultObjects"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ServicesResultObjects"
         "404":
           description: "Resource not found"
-          schema:
-            $ref: "#/definitions/Errors"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Errors"
         "500":
           description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/Errors"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Errors"
   /services:
     get:
       tags:
@@ -238,384 +269,400 @@ paths:
       summary: Get services
       description: "Gets all `Service` objects. Can be filtered by parameters."
       operationId: getServicesList
-      produces:
-        - application/json
       parameters:
         - in: query
           name: filter[query]
           description: "Query to search through buildings. Looks through the building name, abbreviation."
           required: false
-          type: string
+          schema:
+            type: string
         - in: query
           name: filter[isOpen]
           description: "True if only search for open restaurants/buildings. Default: false to search for all the results"
           required: false
-          type: boolean
+          schema:
+            type: boolean
         - in: query
           name: page[size]
           description: "Number of results to return. Used in pagination. Default value is 10."
           required: false
-          type: string
+          schema:
+            type: string
         - in: query
           name: page[number]
           description: "Page number of results. Used to paginate through results."
           required: false
-          type: string
-        - $ref: '#/parameters/pretty'
+          schema:
+            type: string
+        - $ref: '#/components/parameters/pretty'
       responses:
         "200":
           description: "Successful response"
-          schema:
-            $ref: "#/definitions/ServicesResultObjects"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ServicesResultObjects"
         "500":
           description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/Errors"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Errors"
   /services/{serviceID}:
     get:
       tags:
         - services
       description: "Finds service by ID"
       operationId: getServiceById
-      produces:
-        - application/json
       parameters:
         - name: serviceID
           in: path
           description: "ID of location to be searched by"
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         "200":
           description: "Successful response"
-          schema:
-            $ref: "#/definitions/ServicesResultObject"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ServicesResultObject"
         "404":
           description: "Resource not found"
-          schema:
-            $ref: "#/definitions/Errors"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Errors"
         "500":
           description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/Errors"
-parameters:
-  pretty:
-    name: pretty
-    in: query
-    type: boolean
-    required: false
-    description: If true, JSON response will be pretty-printed
-securityDefinitions:
-  OAuth2:
-    type: oauth2
-    flow: application
-    tokenUrl: https://api.oregonstate.edu/oauth2/token
-    scopes:
-      full: Full access to the API
-definitions:
-  LocationsResultObject:
-    properties:
-      links:
-        $ref: "#/definitions/Links"
-      data:
-        $ref: "#/definitions/LocationsResourceObject"
-      included:
-        type: array
-        items:
-          $ref: "#/definitions/ServicesResourceObject"
-  LocationsResultObjects:
-    properties:
-      links:
-        $ref: "#/definitions/Links"
-      data:
-        type: array
-        items:
-          $ref: "#/definitions/LocationsResourceObject"
-      included:
-        type: array
-        items:
-          $ref: "#/definitions/ServicesIncluded"
-  ServicesResultObject:
-    properties:
-      links:
-        $ref: "#/definitions/Links"
-      data:
-        $ref: "#/definitions/ServicesResourceObject"
-  ServicesIncluded:
-    properties:
-      id:
-        type: string
-      type:
-        type: string
-      attributes:
-        $ref: "#/definitions/ServicesAttributes"
-      links:
-        $ref: "#/definitions/ServiceLinks"
-  LocationsResourceObject:
-    properties:
-      id:
-        type: string
-      type:
-        type: string
-      attributes:
-        $ref: "#/definitions/Attributes"
-      links:
-        $ref: "#/definitions/SelfLink"
-      relationships:
-        $ref: "#/definitions/RelationshipsInLocations"
-  ServicesResultObjects:
-    properties:
-      links:
-        $ref: "#/definitions/Links"
-      data:
-        type: array
-        items:
-          $ref: "#/definitions/ServicesResourceObject"
-  ServicesResourceObject:
-    properties:
-      id:
-        type: string
-      type:
-        type: string
-      attributes:
-        $ref: "#/definitions/ServicesAttributes"
-      links:
-        $ref: "#/definitions/ServiceLinks"
-      relationships:
-        $ref: "#/definitions/RelationshipsInServices"
-  SelfLink:
-    properties:
-      self:
-        type: string
-        description: Url to this resource / location.
-  Attributes:
-    properties:
-      name:
-        type: string
-        description: Name of the location.
-      abbreviation:
-        type: string
-      latitude:
-        type: number
-        format: float
-      longitude:
-        type: number
-        format: float
-      geometry:
-        properties:
-          type:
-            type: string
-            enum:
-              - Polygon
-              - MultiPolygon
-          coordinates:
-            description: Array of ring arrays for each physical structure of a location
-            type: array
-            items:
-              description: Array of points that make up a ring.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Errors"
+components:
+  parameters:
+    pretty:
+      name: pretty
+      in: query
+      required: false
+      description: If true, JSON response will be pretty-printed
+      schema:
+        type: boolean
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows: 
+        clientCredentials:
+          tokenUrl: https://api.oregonstate.edu/oauth2/token
+          refreshUrl: https://api.oregonstate.edu/oauth2/token
+          scopes: 
+            # what is this?
+            full: full access to the API
+  schemas:
+    LocationsResultObject:
+      properties:
+        links:
+          $ref: "#/components/schemas/Links"
+        data:
+          $ref: "#/components/schemas/LocationsResourceObject"
+        included:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServicesResourceObject"
+    LocationsResultObjects:
+      properties:
+        links:
+          $ref: "#/components/schemas/Links"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/LocationsResourceObject"
+        included:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServicesIncluded"
+    ServicesResultObject:
+      properties:
+        links:
+          $ref: "#/components/schemas/Links"
+        data:
+          $ref: "#/components/schemas/ServicesResourceObject"
+    ServicesIncluded:
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        attributes:
+          $ref: "#/components/schemas/ServicesAttributes"
+        links:
+          $ref: "#/components/schemas/ServiceLinks"
+    LocationsResourceObject:
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        attributes:
+          $ref: "#/components/schemas/Attributes"
+        links:
+          $ref: "#/components/schemas/SelfLink"
+        relationships:
+          $ref: "#/components/schemas/RelationshipsInLocations"
+    ServicesResultObjects:
+      properties:
+        links:
+          $ref: "#/components/schemas/Links"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServicesResourceObject"
+    ServicesResourceObject:
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        attributes:
+          $ref: "#/components/schemas/ServicesAttributes"
+        links:
+          $ref: "#/components/schemas/ServiceLinks"
+        relationships:
+          $ref: "#/components/schemas/RelationshipsInServices"
+    SelfLink:
+      properties:
+        self:
+          type: string
+          description: Url to this resource / location.
+    Attributes:
+      properties:
+        name:
+          type: string
+          description: Name of the location.
+        abbreviation:
+          type: string
+        latitude:
+          type: number
+          format: float
+        longitude:
+          type: number
+          format: float
+        geometry:
+          properties:
+            type:
+              type: string
+              enum:
+                - Polygon
+                - MultiPolygon
+            coordinates:
+              description: Array of ring arrays for each physical structure of a location
               type: array
               items:
+                description: Array of points that make up a ring.
                 type: array
                 items:
-                  type: number
-                  format: float
-      summary:
-        type: string
-      description:
-        type: string
-      address:
-        type: string
-      city:
-        type: string
-      state:
-        type: string
-      zip:
-        type: string
-      telephone:
-        type: string
-      fax:
-        type: string
-      thumbnails:
-        type: array
-        items:
+                  type: array
+                  items:
+                    type: number
+                    format: float
+        summary:
           type: string
-      images:
-        type: array
-        items:
+        description:
           type: string
-      departments:
-        type: array
-        items:
+        address:
           type: string
-      website:
-        type: string
-      sqft:
-        type: string
-      calendar:
-        type: string
-      campus:
-        type: string
-      type:
-        type: string
-      giRestroomCount:
-        description: Number of gender inclusive restrooms available in the location.
-        type: integer
-      giRestroomLimit:
-        description: >
-          If true, access to this location's restrooms may be limited.
-          A residence hall might restrict bathroom use or building access to
-          residents only.
-        type: boolean
-      giRestroomLocations:
-        description: >
-          Room numbers of gender inclusive restrooms within location.
-          Some restrooms may not be ADA compliant.
-        type: string
-      synonyms:
-        type: array
-        items:
+        city:
           type: string
-      openHours:
-        $ref: "#/definitions/DayHours"
-      distance:
-        description: "Distance from given location in given distance unit.
-              This is only returned when the query parameters lat and lon are specified.
-              The default distance unit is mile "
-        type: number
-        format: double
-      tags:
-        description: "Tags associated with this location"
-        type: array
-        items:
+        state:
           type: string
-      parkingZoneGroup:
-        description: "Zonegroup of location if location is parking"
-        type: string
-      evParkingSpaceCount:
-        description: "Count of electric vehicle parking spaces if the location is parking"
-        type: integer
-      adaParkingSpaceCount:
-        description: "Count of ADA parking spaces if the location is parking"
-        type: integer
-      motorcycleParkingSpaceCount:
-        description: "Count of motorcycle parking spaces if the location is parking."
-        type: integer
-      weeklyMenu:
-        description: "Link to a weekly menu if the location is dining."
-        type: string
-  ServicesAttributes:
-    properties:
-      name:
-        type: string
-        description: Name of the Service.
-      tags:
-        description: "Tags associated with this location"
-        type: array
-        items:
+        zip:
           type: string
-      openHours:
-        type: array
-        items:
-          $ref: "#/definitions/DayHours"
-  RelationshipsInLocations:
-    properties:
-      services:
-          $ref: "#/definitions/ServicesRelationship"
-  RelationshipsInServices:
-    properties:
-      locations:
-          $ref: "#/definitions/ServicesRelationship"
-  ServicesRelationship:
-    properties:
-      data:
-        type: array
-        items:
-          $ref: "#/definitions/ResourceObjectIdentifier"
-  ResourceObjectIdentifier:
-    properties:
-      id:
-        type: string
-      type:
-        type: string
-  DayHours:
-    description: >
-      This object represents open hours for a location, relative to the date
-      that the API returns the response. 1 represents the current day,
-      2 represents the next day, etc. All times are in UTC.
-    properties:
-      1:
-        type: array
-        items:
-          $ref: "#/definitions/TimeSlot"
-      2:
-        type: array
-        items:
-          $ref: "#/definitions/TimeSlot"
-      3:
-        type: array
-        items:
-          $ref: "#/definitions/TimeSlot"
-      4:
-        type: array
-        items:
-          $ref: "#/definitions/TimeSlot"
-      5:
-        type: array
-        items:
-          $ref: "#/definitions/TimeSlot"
-      6:
-        type: array
-        items:
-          $ref: "#/definitions/TimeSlot"
-      7:
-        type: array
-        items:
-          $ref: "#/definitions/TimeSlot"
-  TimeSlot:
-    properties:
-      start:
-        type: string
-        format: date-time
-      end:
-        type: string
-        format: date-time
-  Links:
-    properties:
-      self:
-        type: string
-      first:
-        type: string
-      last:
-        type: string
-      prev:
-        type: string
-      next:
-        type: string
-  ServiceLinks:
-    properties:
-      self:
-        type: string
-  Error:
-    type: object
-    properties:
-      status:
-        type: integer
-        format: int32
-        description: HTTP status code.
-      developerMessage:
-        type: string
-        description: An error string aimed at developers.
-      userMesage:
-        type: string
-        description: An error string aimed at end users.
-      code:
-        type: integer
-        description: Error code.
-      details:
-        type: string
-        description: A link to further information about the error.
-  Errors:
-    title: ArrayOfErrors
-    type: array
-    items:
-      $ref: "#/definitions/Error"
+        telephone:
+          type: string
+        fax:
+          type: string
+        thumbnails:
+          type: array
+          items:
+            type: string
+        images:
+          type: array
+          items:
+            type: string
+        departments:
+          type: array
+          items:
+            type: string
+        website:
+          type: string
+        sqft:
+          type: string
+        calendar:
+          type: string
+        campus:
+          type: string
+        type:
+          type: string
+        giRestroomCount:
+          description: Number of gender inclusive restrooms available in the location.
+          type: integer
+        giRestroomLimit:
+          description: >
+            If true, access to this location's restrooms may be limited.
+            A residence hall might restrict bathroom use or building access to
+            residents only.
+          type: boolean
+        giRestroomLocations:
+          description: >
+            Room numbers of gender inclusive restrooms within location.
+            Some restrooms may not be ADA compliant.
+          type: string
+        synonyms:
+          type: array
+          items:
+            type: string
+        openHours:
+          $ref: "#/components/schemas/DayHours"
+        distance:
+          description: "Distance from given location in given distance unit.
+                This is only returned when the query parameters lat and lon are specified.
+                The default distance unit is mile "
+          type: number
+          format: double
+        tags:
+          description: "Tags associated with this location"
+          type: array
+          items:
+            type: string
+        parkingZoneGroup:
+          description: "Zonegroup of location if location is parking"
+          type: string
+        evParkingSpaceCount:
+          description: "Count of electric vehicle parking spaces if the location is parking"
+          type: integer
+        adaParkingSpaceCount:
+          description: "Count of ADA parking spaces if the location is parking"
+          type: integer
+        motorcycleParkingSpaceCount:
+          description: "Count of motorcycle parking spaces if the location is parking."
+          type: integer
+        weeklyMenu:
+          description: "Link to a weekly menu if the location is dining."
+          type: string
+    ServicesAttributes:
+      properties:
+        name:
+          type: string
+          description: Name of the Service.
+        tags:
+          description: "Tags associated with this location"
+          type: array
+          items:
+            type: string
+        openHours:
+          type: array
+          items:
+            $ref: "#/components/schemas/DayHours"
+    RelationshipsInLocations:
+      properties:
+        services:
+            $ref: "#/components/schemas/ServicesRelationship"
+    RelationshipsInServices:
+      properties:
+        locations:
+            $ref: "#/components/schemas/ServicesRelationship"
+    ServicesRelationship:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceObjectIdentifier"
+    ResourceObjectIdentifier:
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+    DayHours:
+      description: >
+        This object represents open hours for a location, relative to the date
+        that the API returns the response. 1 represents the current day,
+        2 represents the next day, etc. All times are in UTC.
+      properties:
+        1:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlot"
+        2:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlot"
+        3:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlot"
+        4:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlot"
+        5:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlot"
+        6:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlot"
+        7:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlot"
+    TimeSlot:
+      properties:
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+    Links:
+      properties:
+        self:
+          type: string
+        first:
+          type: string
+        last:
+          type: string
+        prev:
+          type: string
+        next:
+          type: string
+    ServiceLinks:
+      properties:
+        self:
+          type: string
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: HTTP status code.
+        developerMessage:
+          type: string
+          description: An error string aimed at developers.
+        userMesage:
+          type: string
+          description: An error string aimed at end users.
+        code:
+          type: integer
+          description: Error code.
+        details:
+          type: string
+          description: A link to further information about the error.
+    Errors:
+      title: ArrayOfErrors
+      type: array
+      items:
+        $ref: "#/components/schemas/Error"
