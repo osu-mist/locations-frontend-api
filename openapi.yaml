@@ -155,20 +155,8 @@ paths:
           required: false
           schema:
             type: string
-        - in: query
-          name: page[size]
-          description: "Number of results to return. Used in pagination."
-          required: false
-          schema:
-            type: integer
-            maximum: 10000
-            default: 10
-        - in: query
-          name: page[number]
-          description: "Page number of results. Used to paginate through results."
-          required: false
-          schema:
-            type: integer
+        - $ref: "#/components/parameters/pageNumber"
+        - $ref: "#/components/parameters/pageSize"
         - $ref: '#/components/parameters/pretty'
         - in: query
           name: include
@@ -277,18 +265,8 @@ paths:
           required: false
           schema:
             type: boolean
-        - in: query
-          name: page[size]
-          description: "Number of results to return. Used in pagination. Default value is 10."
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: page[number]
-          description: "Page number of results. Used to paginate through results."
-          required: false
-          schema:
-            type: string
+        - $ref: "#/components/parameters/pageNumber"
+        - $ref: "#/components/parameters/pageSize"
         - $ref: '#/components/parameters/pretty'
       responses:
         "200":
@@ -344,6 +322,20 @@ components:
       description: If true, JSON response will be pretty-printed
       schema:
         type: boolean
+    pageSize:
+      in: query
+      name: page[size]
+      description: "Number of results to return per page. Used in pagination. Default value is 10."
+      required: false
+      schema:
+        type: string
+    pageNumber:
+      in: query
+      name: page[number]
+      description: "Page number of results. Used to paginate through results."
+      required: false
+      schema:
+        type: string
   securitySchemes:
     OAuth2:
       type: oauth2
