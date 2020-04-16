@@ -29,21 +29,21 @@ paths:
           required: false
           schema:
             type: number
-            format: double
+            format: float
         - in: query
           name: filter[longitude]
           description: "Longitude of the location. Should be used with lat parameter"
           required: false
           schema:
             type: number
-            format: double
+            format: float
         - in: query
           name: filter[distance]
           description: "The radius of the circle centred on the specified location. Default: 2"
           required: false
           schema:
             type: number
-            format: double
+            format: float
         - in: query
           name: filter[distanceUnit]
           description: "Distance can be specified in following units:
@@ -136,22 +136,19 @@ paths:
           description: "Only include locations with ADA parking space greater than or equal to this amount"
           required: false
           schema:
-            type: number
-            format: integer
+            type: integer
         - in: query
           name: filter[motorcycleParkingSpaceCount][gte]
           description: "Only include locations with motorcycle parking space greater than or equal to this amount"
           required: false
           schema:
-            type: number
-            format: integer
+            type: integer
         - in: query
           name: filter[evParkingSpaceCount][gte]
           description: "Only include locations with electric vehicle parking space greater than or equal to this amount"
           required: false
           schema:
-            type: number
-            format: integer
+            type: integer
         - in: query
           name: filter[abbreviation]
           description: "Search by building abbreviation"
@@ -163,8 +160,7 @@ paths:
           description: "Number of results to return. Used in pagination."
           required: false
           schema:
-            type: number
-            format: integer
+            type: integer
             maximum: 10000
             default: 10
         - in: query
@@ -265,7 +261,6 @@ paths:
     get:
       tags:
        - services
-      # Describe this verb here. Note: you can use markdown
       summary: Get services
       description: "Gets all `Service` objects. Can be filtered by parameters."
       operationId: getServicesList
@@ -357,7 +352,6 @@ components:
           tokenUrl: https://api.oregonstate.edu/oauth2/token
           refreshUrl: https://api.oregonstate.edu/oauth2/token
           scopes: 
-            # what is this?
             full: full access to the API
   schemas:
     LocationsResultObject:
@@ -529,7 +523,7 @@ components:
                 This is only returned when the query parameters lat and lon are specified.
                 The default distance unit is mile "
           type: number
-          format: double
+          format: float
         tags:
           description: "Tags associated with this location"
           type: array
