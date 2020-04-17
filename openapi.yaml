@@ -35,14 +35,14 @@ paths:
             type: string
         - in: query
           name: filter[latitude]
-          description: 'Latitude of the location. Should be used with lon parameter'
+          description: 'Latitude of the location. Should be used with `filter[longitude]` parameter'
           required: false
           schema:
             type: number
             format: float
         - in: query
           name: filter[longitude]
-          description: 'Longitude of the location. Should be used with lat parameter'
+          description: 'Longitude of the location. Should be used with `filter[latitude]` parameter'
           required: false
           schema:
             type: number
@@ -67,6 +67,8 @@ paths:
             Centimeter - `cm` or `centimeters`;
             Millimeter - `mm` or `millimeters`;
             Nautical mile - `NM`, `nmi` or `nauticalmiles`
+
+            Should be used with the `filter[distance]` parameter
           '
           required: false
           schema:
