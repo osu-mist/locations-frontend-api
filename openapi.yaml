@@ -569,6 +569,7 @@ components:
           type: array
           items:
             type: string
+            example: recreation
         openHours:
           type: array
           items:
