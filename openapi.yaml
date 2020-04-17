@@ -1,94 +1,94 @@
-openapi: '3.0.2'
+openapi: 3.0.0
 info:
-  version: "2.0.0"
   title: Locations API
-  description: Get information about OSU locations.
-servers: 
+  description: Get information about OSU locations
+  version: v2
+  license:
+    name: GNU Affero General Public License Version 3
+    url: http://www.gnu.org/licenses/agpl-3.0.en.html
+  contact:
+    name: IS Data Architecture Team
+    url: https://is.oregonstate.edu/data-architecture
+    email: isdataarchitecture@oregonstate.edu
+externalDocs:
+  description: GitHub Repository
+  url: https://github.com/osu-mist/locations-frontend-api
+servers:
   - url: https://api.oregonstate.edu/v2
 security:
   - OAuth2:
-    - full
+      - full
 paths:
   /locations:
     get:
       tags:
        - locations
       summary: Get locations
-      description: "Gets all `Location` objects. Can be filtered by parameters."
+      description: Gets all `Location` objects. Can be filtered by parameters.
       operationId: getLocations
       parameters:
         - in: query
-          name: filter[query]
-          description: "Query to search through buildings based on building name and abbreviation"
+          name: filter[search]
+          description: 'Search through buildings based on building name and abbreviation'
           required: false
           schema:
             type: string
         - in: query
           name: filter[latitude]
-          description: "Latitude of the location. Should be used with lon parameter"
+          description: 'Latitude of the location. Should be used with lon parameter'
           required: false
           schema:
             type: number
             format: float
         - in: query
           name: filter[longitude]
-          description: "Longitude of the location. Should be used with lat parameter"
+          description: 'Longitude of the location. Should be used with lat parameter'
           required: false
           schema:
             type: number
             format: float
         - in: query
           name: filter[distance]
-          description: "The radius of the circle centred on the specified location. Default: 2"
+          description: 'The radius of the circle centred on the specified location. Default: 2'
           required: false
           schema:
             type: number
+            default: 2.0
             format: float
         - in: query
           name: filter[distanceUnit]
-          description: "Distance can be specified in following units:
-            Mile - mi or miles (default);
-            Yard - yd or yards;
-            Feet - ft or feet;
-            Inch - in or inch;
-            Kilometer - km or kilometers;
-            Meter - m or meters;
-            Centimeter - cm or centimeters;
-            Millimeter - mm or millimeters;
-            Nautical mile - NM, nmi or nauticalmiles
-          "
+          description: 'Distance can be specified in following units:
+            Mile - `mi` or `miles` (default);
+            Yard - `yd` or `yards`;
+            Feet - `ft` or `feet`;
+            Inch - `in` or `inch`;
+            Kilometer - `km` or `kilometers`;
+            Meter - `m` or `meters`;
+            Centimeter - `cm` or `centimeters`;
+            Millimeter - `mm` or `millimeters`;
+            Nautical mile - `NM`, `nmi` or `nauticalmiles`
+          '
           required: false
           schema:
             type: string
-            enum: 
-              - mi
-              - miles
-              - yd
-              - yards
-              - ft
-              - feet
-              - in
-              - inch
-              - km
-              - kilometers
-              - m
-              - meters
-              - cm
-              - centimeters
-              - mm
-              - millimeters
-              - nmi
-              - NM
-              - nauticalmiles
+            enum: [mi, miles,
+                   yd, yards,
+                   ft, feet,
+                   in, inch,
+                   km, kilometers,
+                   m, meters,
+                   cm, centimeters,
+                   mm, millimeters,
+                   nmi, NM, nauticalmiles]
         - in: query
           name: filter[isOpen]
-          description: "Set to true to only search for open restaurants/buildings. Default: false to search for all the results"
+          description: 'Set to true to only search for open restaurants/buildings. Default: false to search for all the results'
           required: false
           schema:
             type: boolean
         - in: query
           name: filter[campus][oneOf]
-          description: "Name of the campus. Valid options are: corvallis, extension, cascades, hmsc, and other."
+          description: 'Name of the campus.'
           required: false
           schema:
             type: array
@@ -102,7 +102,8 @@ paths:
                 - other
         - in: query
           name: filter[type]
-          description: "Type of location. Valid options are: building, dining, cultural-center, parking, and other."
+          required: false
+          description: 'Type of location. Valid options are: building, dining, cultural-center, parking, and other.'
           schema:
             type: array
             items:
@@ -114,7 +115,7 @@ paths:
                 - parking
                 - other
         - in: query
-          name: filter[giRestroom]
+          name: filter[hasGiRestroom]
           description: >
             If true, locations without gender inclusive restrooms will be filtered out.
           required: false
@@ -130,250 +131,249 @@ paths:
             type: array
             items:
               type: string
-              # what are the possible values for this?
+              enum:
+                - A1
+                - A2
+                - A3
+                - B1
+                - B2
+                - B3
+                - C
+                - R
         - in: query
           name: filter[adaParkingSpaceCount][gte]
-          description: "Only include locations with ADA parking space greater than or equal to this amount"
+          description: 'Only include locations with ADA parking space greater than or equal to this amount'
           required: false
           schema:
             type: integer
         - in: query
-          name: filter[motorcycleParkingSpaceCount][gte]
-          description: "Only include locations with motorcycle parking space greater than or equal to this amount"
+          name: filter[motoParkingSpaceCount][gte]
+          description: 'Only include locations with motorcycle parking space greater than or equal to this amount'
           required: false
           schema:
             type: integer
         - in: query
           name: filter[evParkingSpaceCount][gte]
-          description: "Only include locations with electric vehicle parking space greater than or equal to this amount"
+          description: 'Only include locations with electric vehicle parking space greater than or equal to this amount'
           required: false
           schema:
             type: integer
         - in: query
           name: filter[abbreviation]
-          description: "Search by building abbreviation"
+          description: 'Search by building abbreviation'
           required: false
           schema:
             type: string
-        - $ref: "#/components/parameters/pageNumber"
-        - $ref: "#/components/parameters/pageSize"
-        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
         - in: query
           name: include
           required: false
           schema:
             type: array
-            default: []
             items:
               type: string
               enum: [services]
       responses:
-        "200":
-          description: "Successful response"
+        '200':
+          description: Successful response
           content:
-            "application/json":
+            'application/json':
               schema:
-                $ref: "#/components/schemas/LocationsResultObjects"
-        "404":
-          description: "Not Found"
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Error"
-        "500":
-          description: "Internal Server Error"
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Errors"
+                $ref: '#/components/schemas/LocationsResultObjects'
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
   /locations/{locationID}:
     get:
       tags:
         - locations
-      description: "Finds location by ID"
+      description: 'Finds location by ID'
       operationId: getLocationByID
       parameters:
         - name: locationID
           in: path
-          description: "ID of location to be searched by"
+          description: 'ID of location to be searched by'
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: "Successful response"
+        '200':
+          description: Successful response
           content:
-            "application/json":
+            'application/json':
               schema:
-                $ref: "#/components/schemas/LocationsResultObject"
-        "500":
-          description: "Internal Server Error"
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Errors"
+                $ref: '#/components/schemas/LocationsResultObject'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
   /locations/{locationID}/services:
     get:
       tags:
         - locations
         - services
-      description: "Lists services related to a location"
+      description: 'Lists services related to a location'
       operationId: getServices
       parameters:
         - name: locationID
           in: path
-          description: "ID of location"
+          description: 'ID of location'
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: "Successful response"
+        '200':
+          description: Successful response
           content:
-            "application/json":
+            'application/json':
               schema:
-                $ref: "#/components/schemas/ServicesResultObjects"
-        "404":
-          description: "Resource not found"
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Errors"
-        "500":
-          description: "Internal Server Error"
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Errors"
+                $ref: '#/components/schemas/ServicesResultObjects'
+        '404':
+          $ref: "#/components/responses/404"
+        '500':
+          $ref: "#/components/responses/500"
   /services:
     get:
       tags:
        - services
       summary: Get services
-      description: "Gets all `Service` objects. Can be filtered by parameters."
+      description: 'Gets all `Service` objects. Can be filtered by parameters.'
       operationId: getServicesList
       parameters:
         - in: query
           name: filter[query]
-          description: "Query to search through buildings. Looks through the building name, abbreviation."
+          description: 'Query to search through buildings. Looks through the building name, abbreviation.'
           required: false
           schema:
             type: string
         - in: query
           name: filter[isOpen]
-          description: "True if only search for open restaurants/buildings. Default: false to search for all the results"
+          description: 'True if only search for open restaurants/buildings. Default: false to search for all the results'
           required: false
           schema:
             type: boolean
-        - $ref: "#/components/parameters/pageNumber"
-        - $ref: "#/components/parameters/pageSize"
-        - $ref: '#/components/parameters/pretty'
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
       responses:
-        "200":
-          description: "Successful response"
+        '200':
+          description: Successful response
           content:
-            "application/json":
+            'application/json':
               schema:
-                $ref: "#/components/schemas/ServicesResultObjects"
-        "500":
-          description: "Internal Server Error"
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Errors"
+                $ref: '#/components/schemas/ServicesResultObjects'
+        '400':
+          $ref: "#/components/responses/400"
+        '500':
+          $ref: "#/components/responses/500"
   /services/{serviceID}:
     get:
       tags:
         - services
-      description: "Finds service by ID"
+      description: 'Finds service by ID'
       operationId: getServiceById
       parameters:
         - name: serviceID
           in: path
-          description: "ID of location to be searched by"
+          description: 'ID of location to be searched by'
           required: true
           schema:
             type: string
       responses:
-        "200":
-          description: "Successful response"
+        '200':
+          description: Successful response
           content:
-            "application/json":
+            'application/json':
               schema:
-                $ref: "#/components/schemas/ServicesResultObject"
-        "404":
-          description: "Resource not found"
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Errors"
-        "500":
-          description: "Internal Server Error"
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/Errors"
+                $ref: '#/components/schemas/ServicesResultObject'
+        '404':
+          $ref: "#/components/responses/404"
+        '500':
+          $ref: "#/components/responses/500"
 components:
   parameters:
-    pretty:
-      name: pretty
-      in: query
-      required: false
-      description: If true, JSON response will be pretty-printed
-      schema:
-        type: boolean
     pageSize:
       in: query
       name: page[size]
-      description: "Number of results to return per page. Used in pagination. Default value is 10."
+      description: 'Number of results to return per page. Used in pagination. Default value is 10.'
       required: false
       schema:
         type: string
+        maximum: 500
+        default: 25
+        minimum: 1
     pageNumber:
       in: query
       name: page[number]
-      description: "Page number of results. Used to paginate through results."
+      description: 'Page number of results. Used to paginate through results.'
       required: false
       schema:
         type: string
+        default: 1
+        minimum: 1
   securitySchemes:
     OAuth2:
       type: oauth2
-      flows: 
+      flows:
         clientCredentials:
           tokenUrl: https://api.oregonstate.edu/oauth2/token
-          refreshUrl: https://api.oregonstate.edu/oauth2/token
-          scopes: 
-            full: full access to the API
+          scopes:
+            full: Full access to the API
+  responses:
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResult'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResult'
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResult'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResult'
   schemas:
     LocationsResultObject:
       properties:
         links:
-          $ref: "#/components/schemas/Links"
+          $ref: '#/components/schemas/Links'
         data:
-          $ref: "#/components/schemas/LocationsResourceObject"
+          $ref: '#/components/schemas/LocationsResourceObject'
         included:
           type: array
           items:
-            $ref: "#/components/schemas/ServicesResourceObject"
+            $ref: '#/components/schemas/ServicesResourceObject'
     LocationsResultObjects:
       properties:
         links:
-          $ref: "#/components/schemas/Links"
+          $ref: '#/components/schemas/Links'
         data:
           type: array
           items:
-            $ref: "#/components/schemas/LocationsResourceObject"
+            $ref: '#/components/schemas/LocationsResourceObject'
         included:
           type: array
           items:
-            $ref: "#/components/schemas/ServicesIncluded"
+            $ref: '#/components/schemas/ServicesIncluded'
     ServicesResultObject:
       properties:
         links:
-          $ref: "#/components/schemas/Links"
+          $ref: '#/components/schemas/Links'
         data:
-          $ref: "#/components/schemas/ServicesResourceObject"
+          $ref: '#/components/schemas/ServicesResourceObject'
     ServicesIncluded:
       properties:
         id:
@@ -381,9 +381,9 @@ components:
         type:
           type: string
         attributes:
-          $ref: "#/components/schemas/ServicesAttributes"
+          $ref: '#/components/schemas/ServicesAttributes'
         links:
-          $ref: "#/components/schemas/ServiceLinks"
+          $ref: '#/components/schemas/ServiceLinks'
     LocationsResourceObject:
       properties:
         id:
@@ -391,19 +391,19 @@ components:
         type:
           type: string
         attributes:
-          $ref: "#/components/schemas/Attributes"
+          $ref: '#/components/schemas/Attributes'
         links:
-          $ref: "#/components/schemas/SelfLink"
+          $ref: '#/components/schemas/SelfLink'
         relationships:
-          $ref: "#/components/schemas/RelationshipsInLocations"
+          $ref: '#/components/schemas/RelationshipsInLocations'
     ServicesResultObjects:
       properties:
         links:
-          $ref: "#/components/schemas/Links"
+          $ref: '#/components/schemas/Links'
         data:
           type: array
           items:
-            $ref: "#/components/schemas/ServicesResourceObject"
+            $ref: '#/components/schemas/ServicesResourceObject'
     ServicesResourceObject:
       properties:
         id:
@@ -411,11 +411,11 @@ components:
         type:
           type: string
         attributes:
-          $ref: "#/components/schemas/ServicesAttributes"
+          $ref: '#/components/schemas/ServicesAttributes'
         links:
-          $ref: "#/components/schemas/ServiceLinks"
+          $ref: '#/components/schemas/ServiceLinks'
         relationships:
-          $ref: "#/components/schemas/RelationshipsInServices"
+          $ref: '#/components/schemas/RelationshipsInServices'
     SelfLink:
       properties:
         self:
@@ -509,32 +509,32 @@ components:
           items:
             type: string
         openHours:
-          $ref: "#/components/schemas/DayHours"
+          $ref: '#/components/schemas/DayHours'
         distance:
-          description: "Distance from given location in given distance unit.
+          description: 'Distance from given location in given distance unit.
                 This is only returned when the query parameters lat and lon are specified.
-                The default distance unit is mile "
+                The default distance unit is mile '
           type: number
           format: float
         tags:
-          description: "Tags associated with this location"
+          description: 'Tags associated with this location'
           type: array
           items:
             type: string
         parkingZoneGroup:
-          description: "Zonegroup of location if location is parking"
+          description: 'Zonegroup of location if location is parking'
           type: string
         evParkingSpaceCount:
-          description: "Count of electric vehicle parking spaces if the location is parking"
+          description: 'Count of electric vehicle parking spaces if the location is parking'
           type: integer
         adaParkingSpaceCount:
-          description: "Count of ADA parking spaces if the location is parking"
+          description: 'Count of ADA parking spaces if the location is parking'
           type: integer
         motorcycleParkingSpaceCount:
-          description: "Count of motorcycle parking spaces if the location is parking."
+          description: 'Count of motorcycle parking spaces if the location is parking.'
           type: integer
         weeklyMenu:
-          description: "Link to a weekly menu if the location is dining."
+          description: 'Link to a weekly menu if the location is dining.'
           type: string
     ServicesAttributes:
       properties:
@@ -542,28 +542,28 @@ components:
           type: string
           description: Name of the Service.
         tags:
-          description: "Tags associated with this location"
+          description: 'Tags associated with this location'
           type: array
           items:
             type: string
         openHours:
           type: array
           items:
-            $ref: "#/components/schemas/DayHours"
+            $ref: '#/components/schemas/DayHours'
     RelationshipsInLocations:
       properties:
         services:
-            $ref: "#/components/schemas/ServicesRelationship"
+            $ref: '#/components/schemas/ServicesRelationship'
     RelationshipsInServices:
       properties:
         locations:
-            $ref: "#/components/schemas/ServicesRelationship"
+            $ref: '#/components/schemas/ServicesRelationship'
     ServicesRelationship:
       properties:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/ResourceObjectIdentifier"
+            $ref: '#/components/schemas/ResourceObjectIdentifier'
     ResourceObjectIdentifier:
       properties:
         id:
@@ -579,31 +579,31 @@ components:
         1:
           type: array
           items:
-            $ref: "#/components/schemas/TimeSlot"
+            $ref: '#/components/schemas/TimeSlot'
         2:
           type: array
           items:
-            $ref: "#/components/schemas/TimeSlot"
+            $ref: '#/components/schemas/TimeSlot'
         3:
           type: array
           items:
-            $ref: "#/components/schemas/TimeSlot"
+            $ref: '#/components/schemas/TimeSlot'
         4:
           type: array
           items:
-            $ref: "#/components/schemas/TimeSlot"
+            $ref: '#/components/schemas/TimeSlot'
         5:
           type: array
           items:
-            $ref: "#/components/schemas/TimeSlot"
+            $ref: '#/components/schemas/TimeSlot'
         6:
           type: array
           items:
-            $ref: "#/components/schemas/TimeSlot"
+            $ref: '#/components/schemas/TimeSlot'
         7:
           type: array
           items:
-            $ref: "#/components/schemas/TimeSlot"
+            $ref: '#/components/schemas/TimeSlot'
     TimeSlot:
       properties:
         start:
@@ -651,4 +651,4 @@ components:
       title: ArrayOfErrors
       type: array
       items:
-        $ref: "#/components/schemas/Error"
+        $ref: '#/components/schemas/Error'
