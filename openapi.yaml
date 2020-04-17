@@ -185,14 +185,14 @@ paths:
           $ref: '#/components/responses/400'
         '500':
           $ref: '#/components/responses/500'
-  /locations/{locationID}:
+  /locations/{locationId}:
     get:
       tags:
         - locations
       description: 'Finds location by ID'
       operationId: getLocationByID
       parameters:
-        - name: locationID
+        - name: locationId
           in: path
           description: 'ID of location to be searched by'
           required: true
@@ -209,7 +209,7 @@ paths:
           $ref: '#/components/responses/404'
         '500':
           $ref: '#/components/responses/500'
-  /locations/{locationID}/services:
+  /locations/{locationId}/services:
     get:
       tags:
         - locations
@@ -217,7 +217,7 @@ paths:
       description: 'Lists services related to a location'
       operationId: getServices
       parameters:
-        - name: locationID
+        - name: locationId
           in: path
           description: 'ID of location'
           required: true
@@ -267,14 +267,14 @@ paths:
           $ref: "#/components/responses/400"
         '500':
           $ref: "#/components/responses/500"
-  /services/{serviceID}:
+  /services/{serviceId}:
     get:
       tags:
         - services
       description: 'Finds service by ID'
       operationId: getServiceById
       parameters:
-        - name: serviceID
+        - name: serviceId
           in: path
           description: 'ID of location to be searched by'
           required: true
@@ -628,27 +628,34 @@ components:
       properties:
         self:
           type: string
-    Error:
-      type: object
+    ErrorResult:
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorObject'
+    ErrorObject:
       properties:
         status:
-          type: integer
-          format: int32
-          description: HTTP status code.
-        developerMessage:
           type: string
-          description: An error string aimed at developers.
-        userMesage:
+          description: HTTP status code
+          example: '123'
+        title:
           type: string
-          description: An error string aimed at end users.
+          description: A short, user readable summary of the error
+          example: Not Found
         code:
-          type: integer
-          description: Error code.
-        details:
           type: string
-          description: A link to further information about the error.
-    Errors:
-      title: ArrayOfErrors
-      type: array
-      items:
-        $ref: '#/components/schemas/Error'
+          description: An application-specific error code
+          example: '1234'
+        detail:
+          type: string
+          description: A long description of the error that may contain instance-specific
+            details
+        links:
+          properties:
+            about:
+              type: string
+              format: uri
+              description: A link to further information about the error
+              example: https://developer.oregonstate.edu/documentation/error-reference#1234
