@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Locations API
-  description: Get information about OSU locations
+  description: Get information about OSU locations and services
   version: v2
   license:
     name: GNU Affero General Public License Version 3
