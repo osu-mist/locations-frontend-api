@@ -458,38 +458,54 @@ components:
           type: string
         address:
           type: string
+          example: 12345 NE STREET RD
         city:
           type: string
+          example: Corvallis
         state:
           type: string
+          example: OR
         zip:
           type: string
+          example: '97330'
         telephone:
           type: string
+          example: 541-111-1111
         fax:
           type: string
+          example: 541-111-1111
         thumbnails:
           type: array
           items:
             type: string
+            format: url
+            example: https://example.oregonstate.edu/image.jpg
         images:
           type: array
           items:
             type: string
+            format: url
+            example: https://example.oregonstate.edu/image.jpg
         departments:
           type: array
           items:
             type: string
+            example: College of Engineering
         website:
           type: string
+          format: url
+          example: https://example.oregonstate.edu
         sqft:
           type: string
         calendar:
           type: string
         campus:
           type: string
+          example: Corvallis
         type:
           type: string
+          enum: [building, dining, other, parking, cultural-center]
+          example: building
         giRestroomCount:
           description: Number of gender inclusive restrooms available in the location.
           type: integer
@@ -504,10 +520,12 @@ components:
             Room numbers of gender inclusive restrooms within location.
             Some restrooms may not be ADA compliant.
           type: string
+          example: 0111A, 0101, 0102
         synonyms:
           type: array
           items:
             type: string
+            example: "Gymnasium"
         openHours:
           $ref: '#/components/schemas/DayHours'
         distance:
@@ -516,14 +534,17 @@ components:
                 The default distance unit is mile '
           type: number
           format: float
+          example: 1.8
         tags:
           description: 'Tags associated with this location'
           type: array
           items:
             type: string
+            example: cultural-center
         parkingZoneGroup:
           description: 'Zonegroup of location if location is parking'
           type: string
+          example: A1
         evParkingSpaceCount:
           description: 'Count of electric vehicle parking spaces if the location is parking'
           type: integer
@@ -536,6 +557,8 @@ components:
         weeklyMenu:
           description: 'Link to a weekly menu if the location is dining.'
           type: string
+          format: url
+          example: https://app.uhds.oregonstate.edu/api/dining/weeklymenu/index?loc=1
     ServicesAttributes:
       properties:
         name:
