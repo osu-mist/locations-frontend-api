@@ -80,12 +80,7 @@ paths:
                    cm, centimeters,
                    mm, millimeters,
                    nmi, NM, nauticalmiles]
-        - in: query
-          name: filter[isOpen]
-          description: 'Set to true to only search for open restaurants/buildings. Default: false to search for all the results'
-          required: false
-          schema:
-            type: boolean
+        - $ref: "#/components/parameters/isOpen"
         - in: query
           name: filter[campus][oneOf]
           description: 'Name of the campus.'
@@ -180,7 +175,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/LocationsResultObjects'
+                $ref: '#/components/schemas/LocationSetResult'
         '400':
           $ref: '#/components/responses/400'
         '500':
@@ -204,7 +199,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/LocationsResultObject'
+                $ref: '#/components/schemas/LocationResult'
         '404':
           $ref: '#/components/responses/404'
         '500':
@@ -248,12 +243,7 @@ paths:
           required: false
           schema:
             type: string
-        - in: query
-          name: filter[isOpen]
-          description: 'True if only search for open restaurants/buildings. Default: false to search for all the results'
-          required: false
-          schema:
-            type: boolean
+        - $ref: "#/components/parameters/isOpen"
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
       responses:
@@ -312,6 +302,13 @@ components:
         type: string
         default: 1
         minimum: 1
+    isOpen:
+      in: query
+      name: filter[isOpen]
+      description: Set true to search only for results that are open right now
+      required: false
+      schema:
+        type: boolean
   securitySchemes:
     OAuth2:
       type: oauth2
@@ -346,7 +343,7 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResult'
   schemas:
-    LocationsResultObject:
+    LocationResult:
       properties:
         links:
           $ref: '#/components/schemas/Links'
@@ -356,7 +353,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ServicesResourceObject'
-    LocationsResultObjects:
+    LocationSetResult:
       properties:
         links:
           $ref: '#/components/schemas/Links'
