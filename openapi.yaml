@@ -34,19 +34,13 @@ paths:
           schema:
             type: string
         - in: query
-          name: filter[latitude]
-          description: 'Latitude of the location. Should be used with `filter[longitude]` parameter'
+          name: filter[coordinates]
+          description: A (latitude,longitude) pair of coordinates
           required: false
           schema:
-            type: number
-            format: float
-        - in: query
-          name: filter[longitude]
-          description: 'Longitude of the location. Should be used with `filter[latitude]` parameter'
-          required: false
-          schema:
-            type: number
-            format: float
+            type: string
+            pattern: '^-?\d+\.\d+,-?\d+\.\d+$'
+            example: 44.567509,-123.286651
         - in: query
           name: filter[distance]
           description: 'The radius of the circle centred on the specified location. Default: 2'
