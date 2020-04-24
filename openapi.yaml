@@ -34,6 +34,12 @@ paths:
           schema:
             type: string
         - in: query
+          name: filter[name]
+          description: Search buildings by name
+          required: false
+          schema:
+            type: string
+        - in: query
           name: filter[coordinates]
           description: A (latitude,longitude) pair of coordinates
           required: false
@@ -53,42 +59,21 @@ paths:
           name: filter[distanceUnit]
           description: |
             Distance can be specified in following units:
-            Mile - `mi` or `miles` (default);
-            Yard - `yd` or `yards`;
-            Feet - `ft` or `feet`;
-            Inch - `in` or `inch`;
-            Kilometer - `km` or `kilometers`;
-            Meter - `m` or `meters`;
-            Centimeter - `cm` or `centimeters`;
-            Millimeter - `mm` or `millimeters`;
-            Nautical mile - `NM`, `nmi` or `nauticalmiles`
+            - `mi` - miles
+            - `yd` - yards
+            - `ft` - feet
+            - `in` - inches
+            - `km` - kilometers
+            - `m` - meters
+            - `cm` - centimeters
+            - `mm` - millimeters
+            - `nmi` - nautical miles
 
             Should be used with the `filter[distance]` parameter
           required: false
           schema:
             type: string
-            enum:
-              [
-                mi,
-                miles,
-                yd,
-                yards,
-                ft,
-                feet,
-                in,
-                inch,
-                km,
-                kilometers,
-                m,
-                meters,
-                cm,
-                centimeters,
-                mm,
-                millimeters,
-                nmi,
-                NM,
-                nauticalmiles,
-              ]
+            enum: [mi, yd, ft, in, km, m, cm, mm, nmi]
         - $ref: '#/components/parameters/isOpen'
         - in: query
           name: filter[campus][oneOf]
