@@ -382,10 +382,13 @@ components:
       properties:
         id:
           type: string
+          example: 5c4f1efcbaada0c63e
+          description: ID of a location object
         type:
           type: string
+          enum: [service]
         attributes:
-          $ref: '#/components/schemas/Attributes'
+          $ref: '#/components/schemas/LocationsAttributes'
         links:
           $ref: '#/components/schemas/SelfLink'
         relationships:
@@ -404,8 +407,11 @@ components:
       properties:
         id:
           type: string
+          example: 5c4f1efcbaada0c63e
+          description: ID of a service object
         type:
           type: string
+          enum: [service]
         attributes:
           $ref: '#/components/schemas/ServicesAttributes'
         links:
@@ -435,13 +441,14 @@ components:
         self:
           type: string
           description: Url to this resource / location.
-    Attributes:
+    LocationsAttributes:
       properties:
         name:
           type: string
           description: Name of the location.
         abbreviation:
           type: string
+          description: Abbreviation for the location
         latitude:
           type: number
           format: float
@@ -449,6 +456,9 @@ components:
           type: number
           format: float
         geometry:
+          description: >-
+            an array of arrays of (latitude, longitude) coordinates 
+            representing the shapes that make up the location
           properties:
             type:
               type: string
@@ -473,28 +483,36 @@ components:
         address:
           type: string
           example: 12345 NE STREET RD
+          description: the street address of the location
         city:
           type: string
           example: Corvallis
+          description: the city where the location is located
         state:
           type: string
           example: OR
+          description: the state where the location is located
         zip:
           type: string
           example: '97330'
+          description: the zip code of the location
         telephone:
           type: string
           example: 541-111-1111
+          description: a phone number that can be used to reach the location
         fax:
           type: string
           example: 541-111-1111
+          description: a fax number that can be used to reach the location
         thumbnails:
           type: array
+          description: an array of URLs for thumbnail images of the location
           items:
             type: string
             format: url
             example: https://example.oregonstate.edu/image.jpg
         images:
+          description: an array of URLs for images of the location
           type: array
           items:
             type: string
@@ -502,24 +520,29 @@ components:
             example: https://example.oregonstate.edu/image.jpg
         departments:
           type: array
+          description: departments related to the location
           items:
             type: string
             example: College of Engineering
         website:
           type: string
+          description: the website of the location
           format: url
           example: https://example.oregonstate.edu
         sqft:
           type: string
+          description: the size in square feet of the location
         calendar:
           type: string
         campus:
           type: string
           example: Corvallis
+          description: the OSU campus where the location is located
         type:
           type: string
           enum: [building, dining, other, parking, cultural-center]
           example: building
+          description: the type of the building
         giRestroomCount:
           description: Number of gender inclusive restrooms available in the location.
           type: number
@@ -540,6 +563,7 @@ components:
             example: 0111A
         synonyms:
           type: array
+          description: other terms that can be used for the location
           items:
             type: string
             example: Gymnasium
