@@ -536,12 +536,17 @@ components:
           type: string
         campus:
           type: string
-          example: Corvallis
+          example: corvallis
           description: the OSU campus where the location is located
+          enum:
+            - corvallis
+            - extension
+            - cascades
+            - hmsc
+            - other
         type:
           type: string
           enum: [building, dining, other, parking, cultural-center]
-          example: building
           description: the type of the building
         giRestroomCount:
           description: Number of gender inclusive restrooms available in the location.
