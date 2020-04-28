@@ -629,9 +629,7 @@ components:
             type: string
             example: recreation
         openHours:
-          type: array
-          items:
-            $ref: '#/components/schemas/DayHours'
+          $ref: '#/components/schemas/DayHours'
     RelationshipsInLocations:
       properties:
         services:
