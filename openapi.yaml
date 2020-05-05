@@ -675,38 +675,12 @@ components:
           type: string
     DayHours:
       description: >-
-        This object represents open hours for a location, relative to the date
-        that the API returns the response. 1 represents the current day,
-        2 represents the next day, etc. All times are in UTC.
-      properties:
-        '1':
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeSlot'
-        '2':
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeSlot'
-        '3':
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeSlot'
-        '4':
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeSlot'
-        '5':
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeSlot'
-        '6':
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeSlot'
-        '7':
-          type: array
-          items:
-            $ref: '#/components/schemas/TimeSlot'
+        This array represents open hours for a location, relative to the date
+        that the API returns the response. The first element represents the current day,
+        the second represents the next day etc. All times are in UTC.
+      type: array
+      items:
+        $ref: '#/components/schemas/TimeSlot'
     TimeSlot:
       properties:
         start:
