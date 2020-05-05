@@ -35,7 +35,13 @@ paths:
             type: string
         - in: query
           name: filter[name]
-          description: Search buildings by name
+          description: Search for a building with this exact name
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: filter[name][fuzzy]
+          description: Search for a building with a name similiar to the query
           required: false
           schema:
             type: string
@@ -476,10 +482,19 @@ components:
                   items:
                     type: number
                     format: float
-        summary:
+        zoneSummary:
           type: string
+          description: the description of the parking zone of the group
         description:
-          type: string
+          type: object
+          description: miscellaneous information about the location in HTML and text format
+          properties:
+            html:
+              type: string
+              description: the description for the location, formatted using HTML tags
+            text:
+              type: string
+              description: the desciption for the location, formatted without HTML tags
         address:
           type: string
           example: 12345 NE STREET RD
@@ -534,6 +549,7 @@ components:
           description: the size in square feet of the location
         calendar:
           type: string
+          description: a link, if available, to a calendar file for the location
         campus:
           type: string
           example: corvallis
