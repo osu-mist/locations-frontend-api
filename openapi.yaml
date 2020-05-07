@@ -390,7 +390,7 @@ components:
         attributes:
           $ref: '#/components/schemas/ServicesAttributes'
         links:
-          $ref: '#/components/schemas/ServicePaginationLinks'
+          $ref: '#/components/schemas/SelfLink'
     LocationsResourceObject:
       properties:
         id:
@@ -428,7 +428,7 @@ components:
         attributes:
           $ref: '#/components/schemas/ServicesAttributes'
         links:
-          $ref: '#/components/schemas/ServicePaginationLinks'
+          $ref: '#/components/schemas/SelfLink'
         relationships:
           $ref: '#/components/schemas/RelationshipsInServices'
     Meta:
@@ -461,14 +461,18 @@ components:
           type: string
           description: Name of the location.
           example: Dixon Recreation Center
-        bannerAbbreviation:
-          type: string
-          description: Abbreviation for the location
-          example: DxRC
-        arcGisAbbreviation:
-          type: string
-          description: Abbreviation for the location
-          example: DxRC
+        abbreviations:
+          type: object
+          description: possible abbreviations for the location
+          properties:
+            banner:
+              type: string
+              description: Banner abbreviation for the location
+              example: DxRC
+            arcGis:
+              type: string
+              description: ArcGIS abreviation for the location
+              example: DxRC
         latitude:
           type: number
           format: float
@@ -544,20 +548,24 @@ components:
           type: string
           example: '541-111-1111'
           description: a fax number that can be used to reach the location
-        thumbnailUris:
-          type: array
-          description: an array of URLs for thumbnail images of the location
-          items:
-            type: string
-            format: uri
-            example: https://example.oregonstate.edu/image.jpg
-        imageUris:
-          description: an array of URLs for images of the location
-          type: array
-          items:
-            type: string
-            format: uri
-            example: https://example.oregonstate.edu/image.jpg
+        images:
+          type: object
+          description: full size and thumbnail image URLs for the location
+          properties:
+            fullSize:
+              description: an array of URLs for images of the location
+              type: array
+              items:
+                type: string
+                format: uri
+                example: https://example.oregonstate.edu/image.jpg
+            thumbnails:
+              type: array
+              description: an array of URLs for thumbnail images of the location
+              items:
+                type: string
+                format: uri
+                example: https://example.oregonstate.edu/image.jpg
         departments:
           type: array
           description: departments related to the location
@@ -571,6 +579,7 @@ components:
           example: https://example.oregonstate.edu
         sqft:
           type: number
+          format: integer
           description: the size in square feet of the location
           example: 12345
           nullable: true
@@ -593,24 +602,27 @@ components:
           type: string
           enum: [building, dining, other, parking, cultural-center]
           description: the type of the building
-        giRestroomCount:
-          description: Number of gender inclusive restrooms available in the location.
-          type: number
-          format: integer
-        giRestroomLimit:
-          description: >-
-            If true, access to this location's restrooms may be limited.
-            A residence hall might restrict bathroom use or building access to
-            residents only.
-          type: boolean
-        giRestroomLocations:
-          description: >-
-            Room numbers of gender inclusive restrooms within location.
-            Some restrooms may not be ADA compliant.
-          type: array
-          items:
-            type: string
-            example: 0111A
+        giRestrooms:
+          type: object
+          properties:
+            count:
+              description: Number of gender inclusive restrooms available in the location.
+              type: number
+              format: integer
+            limit:
+              description: >-
+                If true, access to this location's restrooms may be limited.
+                A residence hall might restrict bathroom use or building access to
+                residents only.
+              type: boolean
+            locations:
+              description: >-
+                Room numbers of gender inclusive restrooms within location.
+                Some restrooms may not be ADA compliant.
+              type: array
+              items:
+                type: string
+                example: 0111A
         synonyms:
           type: array
           description: other terms that can be used for the location
@@ -650,18 +662,22 @@ components:
             - B3
             - C
             - R
-        evParkingSpaceCount:
-          description: Count of electric vehicle parking spaces if the location is parking
-          type: number
-          format: integer
-        adaParkingSpaceCount:
-          description: Count of ADA parking spaces if the location is parking
-          type: number
-          format: integer
-        motorcycleParkingSpaceCount:
-          description: Count of motorcycle parking spaces if the location is parking.
-          type: number
-          format: integer
+        parkingSpaces:
+          type: object
+          required: [evSpaceCount, adaSpaceCount, motorcycleSpaceCount]
+          properties:
+            evSpaceCount:
+              description: Count of electric vehicle parking spaces if the location is parking
+              type: number
+              format: integer
+            adaSpaceCount:
+              description: Count of ADA parking spaces if the location is parking
+              type: number
+              format: integer
+            motorcycleSpaceCount:
+              description: Count of motorcycle parking spaces if the location is parking.
+              type: number
+              format: integer
         weeklyMenu:
           description: Link to a weekly menu if the location is dining.
           type: string
@@ -724,8 +740,9 @@ components:
     DayHours:
       description: >-
         This array represents open hours for a location, relative to the date
-        that the API returns the response. The first element represents the current day,
-        the second represents the next day etc. All times are in UTC.
+        that the API returns the response. The array has seven elements: the 
+        first element represents the current day, the second represents the next 
+        day etc. All times are in UTC.
       type: array
       items:
         $ref: '#/components/schemas/TimeSlot'
@@ -757,10 +774,6 @@ components:
           format: uri
           nullable: true
           description: The next page of data
-    ServicePaginationLinks:
-      properties:
-        self:
-          type: string
     ErrorResult:
       properties:
         errors:
