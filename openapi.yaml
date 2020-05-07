@@ -33,18 +33,21 @@ paths:
           required: false
           schema:
             type: string
+            example: dixon
         - in: query
           name: filter[name]
           description: Search for a building with this exact name
           required: false
           schema:
             type: string
+            example: Dixon Recreation Center
         - in: query
           name: filter[name][fuzzy]
           description: Search for a building with a name similiar to the query
           required: false
           schema:
             type: string
+            example: dixon
         - in: query
           name: filter[coordinates]
           description: A (latitude,longitude) pair of coordinates
@@ -159,12 +162,14 @@ paths:
           required: false
           schema:
             type: string
+            example: DxRC
         - in: query
           name: filter[arcGisAbbreviation]
           description: Search by ArcGIS abbreviat ion
           required: false
           schema:
             type: string
+            example: DxRC
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
         - in: query
@@ -239,6 +244,7 @@ paths:
           required: false
           schema:
             type: string
+            example: dixon
         - $ref: '#/components/parameters/isOpen'
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
