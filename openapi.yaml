@@ -700,43 +700,37 @@ components:
     RelationshipsInLocations:
       properties:
         services:
-          $ref: '#/components/schemas/LocationsRelationship'
+          properties:
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 5c4f1efcbaada0c63e
+                  type:
+                    type: string
+                    enum: [service]
+            links:
+              $ref: '#/components/schemas/SelfLink'
     RelationshipsInServices:
       properties:
-        locations:
-          $ref: '#/components/schemas/ServicesRelationship'
-    ServicesRelationship:
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/LocationsResourceObjectIdentifier'
-        links:
-          $ref: '#/components/schemas/SelfLink'
-    LocationsRelationship:
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ServicesResourceObjectIdentifier'
-        links:
-          $ref: '#/components/schemas/SelfLink'
-    LocationsResourceObjectIdentifier:
-      properties:
-        id:
-          type: string
-          example: 5c4f1efcbaada0c63e
-        type:
-          type: string
-          enum: [location]
-    ServicesResourceObjectIdentifier:
-      properties:
-        id:
-          type: string
-          example: 5c4f1efcbaada0c63e
-        type:
-          type: string
-          enum: [service]
+        services:
+          properties:
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 5c4f1efcbaada0c63e
+                  type:
+                    type: string
+                    enum: [location]
+            links:
+              $ref: '#/components/schemas/SelfLink'
     DayHours:
       description: >-
         This array represents open hours for a location, relative to the date
