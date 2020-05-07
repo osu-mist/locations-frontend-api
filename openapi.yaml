@@ -570,9 +570,10 @@ components:
           format: uri
           example: https://example.oregonstate.edu
         sqft:
-          type: string
+          type: number
           description: the size in square feet of the location
-          example: '12345'
+          example: 12345
+          nullable: true
         calendar:
           type: string
           description: a link, if available, to a calendar file for the location
