@@ -351,11 +351,11 @@ components:
         links:
           $ref: '#/components/schemas/PaginationLinks'
         data:
-          $ref: '#/components/schemas/LocationsResource'
+          $ref: '#/components/schemas/LocationResource'
         included:
           type: array
           items:
-            $ref: '#/components/schemas/ServicesResource'
+            $ref: '#/components/schemas/ServiceResource'
         meta:
           $ref: '#/components/schemas/Meta'
     LocationSetResult:
@@ -365,7 +365,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/LocationsResource'
+            $ref: '#/components/schemas/LocationResource'
         included:
           type: array
           items:
@@ -377,7 +377,7 @@ components:
         links:
           $ref: '#/components/schemas/PaginationLinks'
         data:
-          $ref: '#/components/schemas/ServicesResource'
+          $ref: '#/components/schemas/ServiceResource'
         meta:
           $ref: '#/components/schemas/Meta'
     ServicesIncluded:
@@ -391,7 +391,7 @@ components:
           $ref: '#/components/schemas/ServicesAttributes'
         links:
           $ref: '#/components/schemas/SelfLink'
-    LocationsResource:
+    LocationResource:
       properties:
         id:
           type: string
@@ -413,10 +413,10 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/ServicesResource'
+            $ref: '#/components/schemas/ServiceResource'
         meta:
           $ref: '#/components/schemas/Meta'
-    ServicesResource:
+    ServiceResource:
       properties:
         id:
           type: string
