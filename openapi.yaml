@@ -458,15 +458,19 @@ components:
         name:
           type: string
           description: Name of the location.
+          example: Dixon Recreation Center
         abbreviation:
           type: string
           description: Abbreviation for the location
+          example: DxRC
         latitude:
           type: number
           format: float
+          example: 44.563137
         longitude:
           type: number
           format: float
+          example: -123.278729
         geometry:
           description: >-
             an array of arrays of (latitude, longitude) coordinates 
@@ -491,6 +495,7 @@ components:
         zoneSummary:
           type: string
           description: the description of the parking zone of the group
+          example: 'Zone: Austin Hall'
         description:
           type: object
           description: miscellaneous information about the location in HTML and text format
@@ -498,9 +503,17 @@ components:
             html:
               type: string
               description: the description for the location, formatted using HTML tags
+              example: >-
+                <h4>\n\tAccessibility:</h4>
+                \n<p>\n\tENTRIES: North entry: ramp up to main floor.<br />
+                \n\tFLOORS: All floors; elevator (no Braille).</p>\n
             text:
               type: string
               description: the desciption for the location, formatted without HTML tags
+              example: >-
+                \r\n\tAccessibility:\r\n\r\n\r\n\t
+                ENTRIES: North entry: ramp up to main floor.\r\n\t
+                FLOORS: All floors; elevator (no Braille).\r\n
         address:
           type: string
           example: 12345 NE STREET RD
@@ -553,9 +566,11 @@ components:
         sqft:
           type: string
           description: the size in square feet of the location
+          example: '12345'
         calendar:
           type: string
           description: a link, if available, to a calendar file for the location
+          example: https://example.oregonstate.edu/cal.ics
         campus:
           type: string
           example: corvallis
@@ -649,6 +664,7 @@ components:
         name:
           type: string
           description: Name of the Service.
+          example: Dixon Pool
         tags:
           description: Tags associated with this location
           type: array
@@ -660,7 +676,7 @@ components:
     RelationshipsInLocations:
       properties:
         services:
-          $ref: '#/components/schemas/ServicesRelationship'
+          $ref: '#/components/schemas/LocationsRelationship'
     RelationshipsInServices:
       properties:
         locations:
@@ -670,15 +686,33 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/ResourceObjectIdentifier'
+            $ref: '#/components/schemas/LocationsResourceObjectIdentifier'
         links:
           $ref: '#/components/schemas/SelfLink'
-    ResourceObjectIdentifier:
+    LocationsRelationship:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServicesResourceObjectIdentifier'
+        links:
+          $ref: '#/components/schemas/SelfLink'
+    LocationsResourceObjectIdentifier:
       properties:
         id:
           type: string
+          example: 5c4f1efcbaada0c63e
         type:
           type: string
+          enum: [location]
+    ServicesResourceObjectIdentifier:
+      properties:
+        id:
+          type: string
+          example: 5c4f1efcbaada0c63e
+        type:
+          type: string
+          enum: [service]
     DayHours:
       description: >-
         This array represents open hours for a location, relative to the date
