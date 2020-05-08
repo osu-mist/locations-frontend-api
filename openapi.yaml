@@ -479,6 +479,7 @@ components:
     LocationsAttributes:
       properties:
         name:
+          nullable: false
           type: string
           description: Name of the location.
           example: Dixon Recreation Center
@@ -489,23 +490,28 @@ components:
             banner:
               type: string
               description: Banner abbreviation for the location
+              nullable: true
               example: DxRC
             arcGis:
               type: string
               description: ArcGIS abreviation for the location
+              nullable: true
               example: DxRC
         latitude:
           type: number
           format: float
+          nullable: true
           example: 44.563137
         longitude:
           type: number
           format: float
+          nullable: true
           example: -123.278729
         geometry:
           description: >-
             an array of arrays of (latitude, longitude) coordinates 
             representing the shapes that make up the location
+          nullable: true
           properties:
             type:
               type: string
@@ -524,12 +530,14 @@ components:
                     type: number
                     format: float
         zoneSummary:
+          nullable: true
           type: string
           description: the description of the parking zone of the group
           example: 'Zone: Austin Hall'
         description:
           type: object
           description: miscellaneous information about the location in HTML and text format
+          nullable: true
           properties:
             html:
               type: string
@@ -548,22 +556,27 @@ components:
         address:
           type: string
           example: 12345 NE STREET RD
+          nullable: true
           description: the street address of the location
         city:
           type: string
           example: Corvallis
+          nullable: true
           description: the city where the location is located
         state:
           type: string
           example: OR
+          nullable: true
           description: the state where the location is located
         zip:
           type: string
           example: '97330'
+          nullable: true
           description: the zip code of the location
         telephone:
           type: string
           example: '541-111-1111'
+          nullable: true
           description: a phone number that can be used to reach the location
         fax:
           type: string
@@ -572,10 +585,12 @@ components:
         images:
           type: object
           description: full size and thumbnail image URLs for the location
+          nullable: false
           properties:
             fullSize:
               description: an array of URLs for images of the location
               type: array
+              nullable: false
               items:
                 type: string
                 format: uri
@@ -583,6 +598,7 @@ components:
             thumbnails:
               type: array
               description: an array of URLs for thumbnail images of the location
+              nullable: false
               items:
                 type: string
                 format: uri
@@ -590,12 +606,14 @@ components:
         departments:
           type: array
           description: departments related to the location
+          nullable: false
           items:
             type: string
             example: College of Engineering
         website:
           type: string
           description: the website of the location
+          nullable: true
           format: uri
           example: https://example.oregonstate.edu
         sqft:
@@ -607,12 +625,14 @@ components:
         calendar:
           type: string
           description: a link, if available, to a calendar file for the location
+          nullable: true
           format: uri
           example: https://example.oregonstate.edu/cal.ics
         campus:
           type: string
           example: corvallis
           description: the OSU campus where the location is located
+          nullable: false
           enum:
             - corvallis
             - extension
@@ -622,30 +642,36 @@ components:
         type:
           type: string
           enum: [building, dining, other, parking, cultural-center]
+          nullable: false
           description: the type of the building
         giRestrooms:
           type: object
+          nullable: false
           properties:
             count:
               description: Number of gender inclusive restrooms available in the location.
               type: number
+              nullable: true
               format: integer
             limit:
               description: >-
                 If true, access to this location's restrooms may be limited.
                 A residence hall might restrict bathroom use or building access to
                 residents only.
+              nullable: true
               type: boolean
             locations:
               description: >-
                 Room numbers of gender inclusive restrooms within location.
                 Some restrooms may not be ADA compliant.
               type: array
+              nullable: true
               items:
                 type: string
                 example: 0111A
         synonyms:
           type: array
+          nullable: false
           description: other terms that can be used for the location
           items:
             type: string
@@ -658,10 +684,12 @@ components:
             This is only returned when the query parameters lat and lon are specified.
             The default distance unit is mile
           type: number
+          nullable: true
           format: float
           example: 1.8
         tags:
           description: Tags associated with this location
+          nullable: false
           type: array
           items:
             type: string
@@ -674,6 +702,7 @@ components:
         parkingZoneGroup:
           description: Zonegroup of location if location is parking
           type: string
+          nullable: true
           enum:
             - A1
             - A2
@@ -691,18 +720,22 @@ components:
               description: Count of electric vehicle parking spaces if the location is parking
               type: number
               format: integer
+              nullable: true
             adaSpaceCount:
               description: Count of ADA parking spaces if the location is parking
               type: number
               format: integer
+              nullable: true
             motorcycleSpaceCount:
               description: Count of motorcycle parking spaces if the location is parking.
               type: number
               format: integer
+              nullable: true
         weeklyMenu:
           description: Link to a weekly menu if the location is dining.
           type: string
           format: uri
+          nullable: true
           example: https://app.uhds.oregonstate.edu/api/dining/weeklymenu/index?loc=1
     ServicesAttributes:
       properties:
