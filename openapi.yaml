@@ -369,7 +369,7 @@ components:
         included:
           type: array
           items:
-            $ref: '#/components/schemas/ServicesIncluded'
+            $ref: '#/components/schemas/ServiceIncluded'
         meta:
           $ref: '#/components/schemas/Meta'
     ServiceResult:
@@ -378,9 +378,13 @@ components:
           $ref: '#/components/schemas/PaginationLinks'
         data:
           $ref: '#/components/schemas/ServiceResource'
+        included:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocationIncluded'
         meta:
           $ref: '#/components/schemas/Meta'
-    ServicesIncluded:
+    ServiceIncluded:
       properties:
         id:
           type: string
@@ -389,6 +393,19 @@ components:
           enum: [service]
         attributes:
           $ref: '#/components/schemas/ServicesAttributes'
+        links:
+          $ref: '#/components/schemas/SelfLink'
+    LocationIncluded:
+      properties:
+        id:
+          type: string
+          example: 5c4f1efcbaada0c63e
+          description: ID of a location object
+        type:
+          type: string
+          enum: [service]
+        attributes:
+          $ref: '#/components/schemas/LocationsAttributes'
         links:
           $ref: '#/components/schemas/SelfLink'
     LocationResource:
@@ -416,6 +433,10 @@ components:
             $ref: '#/components/schemas/ServiceResource'
         meta:
           $ref: '#/components/schemas/Meta'
+        included:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocationIncluded'
     ServiceResource:
       properties:
         id:
