@@ -742,10 +742,12 @@ components:
         name:
           type: string
           description: Name of the Service.
+          nullable: false
           example: Dixon Pool
         tags:
           description: Tags associated with this location
           type: array
+          nullable: false
           items:
             type: string
             example: recreation
