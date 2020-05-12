@@ -165,21 +165,14 @@ paths:
             example: DxRC
         - in: query
           name: filter[arcGisAbbreviation]
-          description: Search by ArcGIS abbreviat ion
+          description: Search by ArcGIS abbreviation
           required: false
           schema:
             type: string
             example: DxRC
         - $ref: '#/components/parameters/pageNumber'
         - $ref: '#/components/parameters/pageSize'
-        - in: query
-          name: include
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              enum: [services]
+        - $ref: '#/components/parameters/locationsIncluded'
       responses:
         '200':
           description: Successful response
@@ -199,6 +192,7 @@ paths:
       operationId: getLocationById
       parameters:
         - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/locationsIncluded'
       responses:
         '200':
           description: Successful response
@@ -285,6 +279,18 @@ paths:
           $ref: '#/components/responses/500'
 components:
   parameters:
+    locationsIncluded:
+      in: query
+      name: include
+      required: false
+      description: >-
+        Add "services" to have the response include all service
+        resources for this location
+      schema:
+        type: array
+        items:
+          type: string
+          enum: [services]
     locationId:
       name: locationId
       in: path
