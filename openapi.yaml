@@ -142,6 +142,7 @@ paths:
           schema:
             type: number
             format: integer
+            example: 1
         - in: query
           name: filter[motoParkingSpaceCount][gte]
           description: Only include locations with motorcycle parking space greater than or equal to this amount
@@ -149,6 +150,7 @@ paths:
           schema:
             type: number
             format: integer
+            example: 1
         - in: query
           name: filter[evParkingSpaceCount][gte]
           description: Only include locations with electric vehicle parking space greater than or equal to this amount
@@ -156,6 +158,7 @@ paths:
           schema:
             type: number
             format: integer
+            example: 1
         - in: query
           name: filter[bannerAbbreviation]
           description: Search by banner abbreviation
@@ -352,6 +355,12 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResult'
   schemas:
+    LocationType:
+      type: string
+      enum: [location]
+    ServiceType:
+      type: string
+      enum: [service]
     LocationResult:
       properties:
         links:
@@ -395,8 +404,7 @@ components:
         id:
           type: string
         type:
-          type: string
-          enum: [service]
+          $ref: '#/components/schemas/ServiceType'
         attributes:
           $ref: '#/components/schemas/ServicesAttributes'
         links:
@@ -406,10 +414,9 @@ components:
         id:
           type: string
           example: 5c4f1efcbaada0c63e
-          description: ID of a location object
+          description: ID of a service object
         type:
-          type: string
-          enum: [service]
+          $ref: '#/components/schemas/LocationType'
         attributes:
           $ref: '#/components/schemas/LocationsAttributes'
         links:
@@ -421,8 +428,7 @@ components:
           example: 5c4f1efcbaada0c63e
           description: ID of a location object
         type:
-          type: string
-          enum: [service]
+          $ref: '#/components/schemas/LocationType'
         attributes:
           $ref: '#/components/schemas/LocationsAttributes'
         links:
@@ -450,8 +456,7 @@ components:
           example: 5c4f1efcbaada0c63e
           description: ID of a service object
         type:
-          type: string
-          enum: [service]
+          $ref: '#/components/schemas/ServiceType'
         attributes:
           $ref: '#/components/schemas/ServicesAttributes'
         links:
@@ -772,8 +777,7 @@ components:
                     type: string
                     example: 5c4f1efcbaada0c63e
                   type:
-                    type: string
-                    enum: [service]
+                    $ref: '#/components/schemas/ServiceType'
             links:
               $ref: '#/components/schemas/SelfLink'
     RelationshipsInServices:
@@ -789,8 +793,7 @@ components:
                     type: string
                     example: 5c4f1efcbaada0c63e
                   type:
-                    type: string
-                    enum: [location]
+                    $ref: '#/components/schemas/LocationType'
             links:
               $ref: '#/components/schemas/SelfLink'
     DayHours:
