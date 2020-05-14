@@ -803,6 +803,8 @@ components:
         first element represents the current day, the second represents the next 
         day etc. All times are in UTC.
       type: array
+      minItems: 7
+      maxItems: 7
       items:
         $ref: '#/components/schemas/TimeSlot'
     TimeSlot:
