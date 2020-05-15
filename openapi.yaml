@@ -355,6 +355,21 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResult'
   schemas:
+    CoordinatePair:
+      description: a pair of latitude, longitude coordinates
+      type: object
+      required: [lat, long]
+      properties:
+        lat:
+          example: 44.562934
+          type: number
+          format: float
+          description: the latitude value of the coordinate pair
+        long:
+          example: -123.281901
+          type: number
+          format: float
+          description: the longitude value of the coordinate pair
     LocationType:
       type: string
       enum: [location]
@@ -508,16 +523,8 @@ components:
               description: ArcGIS abreviation for the location
               nullable: true
               example: DxRC
-        latitude:
-          type: number
-          format: float
-          nullable: true
-          example: 44.563137
-        longitude:
-          type: number
-          format: float
-          nullable: true
-          example: -123.278729
+        coordinates:
+          $ref: '#/components/schemas/CoordinatePair'
         geometry:
           description: >-
             an array of arrays of (latitude, longitude) coordinates 
@@ -536,10 +543,7 @@ components:
                 description: Array of points that make up a ring.
                 type: array
                 items:
-                  type: array
-                  items:
-                    type: number
-                    format: float
+                  $ref: '#/components/schemas/CoordinatePair'
         zoneSummary:
           nullable: true
           type: string
