@@ -222,7 +222,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/ServiceSetResult'
+                $ref: '#/components/schemas/LocationServiceSetResult'
         '404':
           $ref: '#/components/responses/404'
         '500':
@@ -276,6 +276,31 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ServiceResult'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /services/{serviceId}/locations:
+    get:
+      tags:
+        - services
+        - locations
+      description: Finds locations related to a service
+      operationId: getServiceLocationsById
+      parameters:
+        - name: serviceId
+          in: path
+          description: ID of service
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ServiceLocationSetResult'
         '404':
           $ref: '#/components/responses/404'
         '500':
@@ -388,6 +413,14 @@ components:
             $ref: '#/components/schemas/ServiceResource'
         meta:
           $ref: '#/components/schemas/Meta'
+    ServiceLocationSetResult:
+      properties:
+        links:
+          $ref: '#/components/schemas/PaginationLinks'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocationResource'
     LocationSetResult:
       properties:
         links:
@@ -450,6 +483,14 @@ components:
           $ref: '#/components/schemas/SelfLink'
         relationships:
           $ref: '#/components/schemas/RelationshipsInLocations'
+    LocationServiceSetResult:
+      properties:
+        links:
+          $ref: '#/components/schemas/PaginationLinks'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceResource'
     ServiceSetResult:
       properties:
         links:
