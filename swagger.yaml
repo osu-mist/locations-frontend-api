@@ -468,6 +468,9 @@ definitions:
             accessible:
               type: boolean
               description: "Whether this entry is accessible"
+            function:
+              type: string
+              description: "The function of the entry"
   ServicesAttributes:
     properties:
       name:
