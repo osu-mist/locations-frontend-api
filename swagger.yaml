@@ -471,6 +471,41 @@ definitions:
             function:
               type: string
               description: "The function of the entry"
+      aedInventories:
+        description: "A list of AED inventories of a building"
+        type: array
+        items:
+          type: object
+          properties:
+            lat:
+              type: number
+              format: double
+              description: "Latitude of the AED inventory"
+            lon:
+              type: number
+              format: double
+              description: "Longitude of the AED inventory"
+            location:
+              type: string
+              description: "The specific location of the AED inventory"
+            floor:
+              type: integer
+              description: "The floor number of the AED inventory"
+            make:
+              type: string
+              description: "The make of AED inventory"
+            model:
+              type: string
+              description: "The model of AED inventory"
+            serialNo:
+              type: string
+              description: "The serial number of AED inventory"
+            departmentOwner:
+              type: string
+              description: "The department owner of AED inventory"
+            contact:
+              type: string
+              description: "The main contact of AED inventory"
   ServicesAttributes:
     properties:
       name:
