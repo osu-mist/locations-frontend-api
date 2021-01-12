@@ -2,7 +2,7 @@ import json
 import ssl
 import sys
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import randint
 
 import geojson
@@ -21,6 +21,7 @@ from configuration_load import get_access_token, \
                                get_single_resource_id, \
                                get_url
 
+initialTime = datetime.utcnow().replace(microsecond=0).isoformat()
 
 class gateway_tests(unittest.TestCase):
     def test_services(self):
@@ -319,15 +320,22 @@ class gateway_tests(unittest.TestCase):
                                                }).json()
 
             now = datetime.utcnow().replace(microsecond=0).isoformat()
+            print('\ninitialTime: ' + initialTime)
+            print('now: ' + now)
             weekday = str(datetime.today().weekday() + 1)
 
             for open_resource in all_open_resources['data']:
                 # Test that only open resources are returned when they should
                 # be and each open resource has a related open hours
                 open_hours = open_resource['attributes']['openHours']
+                print('------------------------------------')
+                print(open_resource['attributes']['name'])
+                for open_hour in open_hours[weekday]:
+                    isOpen = open_hour['start'] <= now + 'Z' <= open_hour['end']
+                    print(open_hour['start'] + ', ' + open_hour['end'] + ', ' + str(isOpen))
                 self.assertIsNotNone(open_hours)
                 self.assertTrue(
-                    any(open_hour['start'] <= now + 'Z' <= open_hour['end']
+                    any(open_hour['start'] <= initialTime + 'Z' <= open_hour['end']
                         for open_hour in open_hours[weekday]))
 
         test_resource(locations_url)
