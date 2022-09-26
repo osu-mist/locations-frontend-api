@@ -133,7 +133,7 @@ class gateway_tests(unittest.TestCase):
                                                  'type': 'building',
                                                  'campus': 'corvallis'
                                              }).json()
-        self.assertEqual(len(building_engineering['data']), 3)
+        self.assertEqual(len(building_engineering['data']), 2)
 
     def test_multi_type(self):
         # test search using multiple type= parameters
